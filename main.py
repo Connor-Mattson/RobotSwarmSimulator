@@ -24,7 +24,7 @@ def main():
     running = True
 
     # Create the simulation world
-    world = RectangularWorld(WORLD_WIDTH, WORLD_HEIGHT, pop_size=250)
+    world = RectangularWorld(WORLD_WIDTH, WORLD_HEIGHT, pop_size=50)
     world.setup()
      
     # main loop
@@ -44,7 +44,7 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
 
-        # Limit the 
+        # Limit the FPS of the simulation to FRAMERATE
         pygame.time.Clock().tick(FRAMERATE)
      
      
