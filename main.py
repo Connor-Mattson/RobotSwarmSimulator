@@ -1,10 +1,12 @@
 import pygame
+from src.gui.agentGUI import DifferentialDriveGUI
 from src.world.RectanglularWorld import RectangularWorld
 
 screen = None
 FRAMERATE = 30
 WORLD_WIDTH = 500
 WORLD_HEIGHT = 500
+GUI_WIDTH = 200
 
 # define a main function
 def main():
@@ -18,17 +20,40 @@ def main():
      
     # screen must be global so that other modules can access + draw to the window
     global screen
-    screen = pygame.display.set_mode((WORLD_WIDTH, WORLD_HEIGHT))
+    screen = pygame.display.set_mode((WORLD_WIDTH + GUI_WIDTH, WORLD_HEIGHT))
      
     # define a variable to control the main loop
     running = True
+    paused = False
 
     # Create the simulation world
-    world = RectangularWorld(WORLD_WIDTH, WORLD_HEIGHT, pop_size=50)
+    world = RectangularWorld(WORLD_WIDTH, WORLD_HEIGHT, pop_size=3)
     world.setup()
+
+    # Create the GUI
+    gui = DifferentialDriveGUI(x=WORLD_WIDTH, y=0, h=WORLD_HEIGHT, w=GUI_WIDTH)
+    gui.set_title("Differential Drive", subtitle="Goal: Drive in a Circle")
+    world.attach_gui(gui)
      
     # main loop
     while running:
+
+        # Looped Event Handling
+        for event in pygame.event.get():
+            # Cancel the game loop if user quits the GUI
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    paused = not paused
+
+            if event.type == pygame.MOUSEBUTTONUP:
+                pos = pygame.mouse.get_pos()
+                world.onClick(pos)
+
+        if(paused):
+            pygame.time.Clock().tick(FRAMERATE)
+            continue
 
         # Caclulate Steps
         world.step()
@@ -36,13 +61,8 @@ def main():
         # Draw!
         screen.fill((0, 0, 0))
         world.draw(screen)
+        gui.draw(screen)
         pygame.display.flip()
-
-        # Looped Event Handling
-        for event in pygame.event.get():
-            # Cancel the game loop if user quits the GUI
-            if event.type == pygame.QUIT:
-                running = False
 
         # Limit the FPS of the simulation to FRAMERATE
         pygame.time.Clock().tick(FRAMERATE)

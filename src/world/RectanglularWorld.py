@@ -13,7 +13,11 @@ class RectangularWorld(World):
         self.population_size = pop_size
 
     def setup(self):
-        self.population = [DifferentialDriveAgent() for _ in range(self.population_size)]
+        self.population = [DifferentialDriveAgent(angle=0, name=f"Bot_{i}") for i in range(self.population_size)]
+        # self.population = [
+        #     DifferentialDriveAgent(x=10, y=10, angle=1.9),
+        #     DifferentialDriveAgent(x=50, y=50, angle=1.9)
+        # ]
 
     def step(self):
         """
@@ -63,16 +67,26 @@ class RectangularWorld(World):
             minX = min(minX, agent.x_pos)
             minY = min(minY, agent.y_pos)
         return (minX, minY), (maxX, maxY)
+    
+    def onClick(self, pos) -> None:
+        neighborhood = self.getNeighborsWithinDistance(pos, self.population[0].radius)
+        if(len(neighborhood) == 0): return
 
-    def distance(self, pointA, pointB) -> float:
-        return math.dist(pointA, pointB)
+        # Remove Highlights from everyone
+        for n in self.population:
+            n.is_highlighted = False
 
+        if self.gui != None:
+            self.gui.set_selected(neighborhood[0])
+            neighborhood[0].is_highlighted = True
+    
     def withinWorldBoundaries(self, agent: DifferentialDriveAgent):
         """
         Set agent position with respect to the world's boundaries and the bounding box of the agent
         """
-        agent.x_pos = max(agent.radius, min(self.bounded_width - agent.radius, agent.x_pos))
-        agent.y_pos = max(agent.radius, min(self.bounded_height - agent.radius, agent.y_pos))
+        padding = 10
+        agent.x_pos = max(agent.radius + padding, min((self.bounded_width - agent.radius - padding), agent.x_pos))
+        agent.y_pos = max(agent.radius + padding, min((self.bounded_height - agent.radius - padding), agent.y_pos))
 
     def preventAgentCollisions(self, agent: DifferentialDriveAgent) -> None:
         """
@@ -102,7 +116,6 @@ class RectangularWorld(World):
             if(dy != 0):
                 theta = math.atan((dx) / (dy))
 
-            
             if(theta < 0):
                 offset_x = (target_distance * math.sin(theta)) - dx
                 offset_y = (target_distance * math.cos(theta)) - dy
@@ -110,20 +123,20 @@ class RectangularWorld(World):
                 offset_x = (target_distance * math.sin(theta)) + dx
                 offset_y = (target_distance * math.cos(theta)) + dy
             
-            print("TESTING (Attempt {})[n: {}]".format(str(100 - timeout), len(neighborhood)))
-            print("=" * 20)
-            print("Preventing Collision between A (collidor) and B")
-            print("Distance: {}".format(center_distance))
-            print("Center: {}".format(agent_center))
-            print("=" * 20)
-            print("A: {}".format(str(agent)))
-            print("B: {}".format(str(colliding_agent)))
-            print("dx: {}".format(dx))
-            print("dy: {}".format(dy))
-            print("Angle from A to B: {}".format(theta))
-            print("Pushback with Vector: {}".format([offset_x, offset_y]))
-            print("=" * 20)
-            print("\n")
+            # print("TESTING (Attempt {})[n: {}]".format(str(100 - timeout), len(neighborhood)))
+            # print("=" * 20)
+            # print("Preventing Collision between A (collidor) and B")
+            # print("Distance: {}".format(center_distance))
+            # print("Center: {}".format(agent_center))
+            # print("=" * 20)
+            # print("A: {}".format(str(agent)))
+            # print("B: {}".format(str(colliding_agent)))
+            # print("dx: {}".format(dx))
+            # print("dy: {}".format(dy))
+            # print("Angle from A to B: {}".format(theta))
+            # print("Pushback with Vector: {}".format([offset_x, offset_y]))
+            # print("=" * 20)
+            # print("\n")
             
             agent.x_pos -= offset_x
             agent.y_pos -= offset_y
@@ -143,22 +156,20 @@ class RectangularWorld(World):
             
             # Vector A: The vector between the source and target agents
             vecA = [agent.x_pos - sensor_position[0], agent.y_pos - sensor_position[1]]
-            magnitude = self.distance([0, 0], vecA)
-            vecA = [vecA[0] / magnitude, vecA[1] / magnitude] # Unit Vector
 
             # Vector B: The vector representing the sensor's line of sight
             vecB = source_agent.getLOSVector()
-            magnitude = self.distance([0, 0], vecB)
-            vecB = [vecB[0] / magnitude, vecB[1] / magnitude] # Unit Vector
 
             # If the angle between the vectors is acute (positive dot product) 
             # and if the LOS crosses through the area of another bot, then the sensor is active
             dot = (vecA[0] * vecB[0]) + (vecA[1] * vecB[1])
             
-            if distance_from_agent_to_line <= agent.radius:
+            if distance_from_agent_to_line <= agent.radius / 2:
                 if dot > 0:
+                    source_agent.agent_in_sight = agent
                     return True
-                    
+
+        source_agent.agent_in_sight = None
         return False
 
     def generalEquationOfALine(self, pointA: Tuple, pointB: Tuple) -> Tuple:
@@ -169,3 +180,6 @@ class RectangularWorld(World):
         b = x2 - x1
         c = (x1 - x2) * y1 + (y2 - y1) * x1
         return a, b, c
+
+    def distance(self, pointA, pointB) -> float:
+        return math.dist(pointA, pointB)
