@@ -11,7 +11,7 @@ class DifferentialDriveAgent(Agent):
     is_highlighted = False
     agent_in_sight = None
     
-    dt = 0.6
+    dt = 1
     dy = 0.0
     dx = 0.0
     
@@ -88,7 +88,7 @@ class DifferentialDriveAgent(Agent):
         sight_color = (255, 0, 0)
         if(self.sensor_on):
             sight_color = (0, 255, 0)
-        mangitude = self.radius * 20
+        mangitude = self.radius * (20 if self.is_highlighted else 3)
         head = (self.x_pos, self.y_pos)
         tail = (self.x_pos + (mangitude * math.cos(self.angle)), self.y_pos + (mangitude * math.sin(self.angle)))
         pygame.draw.line(screen, sight_color, head, tail)

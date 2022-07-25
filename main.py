@@ -1,9 +1,9 @@
 import pygame
 from src.gui.agentGUI import DifferentialDriveGUI
-from src.world.RectanglularWorld import RectangularWorld
+from src.world.RectangularWorld import RectangularWorld
 
 screen = None
-FRAMERATE = 30
+FRAMERATE = 60
 WORLD_WIDTH = 500
 WORLD_HEIGHT = 500
 GUI_WIDTH = 200
@@ -27,7 +27,7 @@ def main():
     paused = False
 
     # Create the simulation world
-    world = RectangularWorld(WORLD_WIDTH, WORLD_HEIGHT, pop_size=3)
+    world = RectangularWorld(WORLD_WIDTH, WORLD_HEIGHT, pop_size=30)
     world.setup()
 
     # Create the GUI

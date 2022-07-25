@@ -1,4 +1,5 @@
 import math, random
+import numpy as np
 from multiprocessing import managers
 from turtle import distance
 from typing import List, Tuple
@@ -146,28 +147,52 @@ class RectangularWorld(World):
 
     def checkForSensor(self, source_agent: DifferentialDriveAgent) -> bool:
         sensor_position = source_agent.getPosition()
-        a, b, c = self.generalEquationOfALine(sensor_position, source_agent.getFrontalPoint())
+        
+        # Equations taken from Dunn's 3D Math Primer for Graphics, section A.12
+        p_0 = np.array([sensor_position[0], sensor_position[1]])
+        d = np.array(source_agent.getLOSVector())
+        d_hat = d / np.linalg.norm(d)
+        
         for agent in self.population:
-            if not issubclass(type(agent), Agent):
-                raise Exception("Agents must be subtype of Agent, not {}".format(type(agent)))
             if agent == source_agent:
                 continue
-            distance_from_agent_to_line = ((a * agent.x_pos) + (b * agent.y_pos) + c) / (math.sqrt(a*a + b*b))
-            
-            # Vector A: The vector between the source and target agents
-            vecA = [agent.x_pos - sensor_position[0], agent.y_pos - sensor_position[1]]
 
-            # Vector B: The vector representing the sensor's line of sight
-            vecB = source_agent.getLOSVector()
+            c = np.array([agent.x_pos, agent.y_pos])
+            e = c - p_0
+            a = np.dot(e, d_hat)
 
-            # If the angle between the vectors is acute (positive dot product) 
-            # and if the LOS crosses through the area of another bot, then the sensor is active
-            dot = (vecA[0] * vecB[0]) + (vecA[1] * vecB[1])
+            r_2 = agent.radius * agent.radius
+            e_2 = np.dot(e, e)
+            a_2 = a * a
+
+            has_intersection = (r_2 - e_2 + a_2) >= 0
+            if has_intersection and a >= 0:
+                source_agent.agent_in_sight = agent
+                return True
+
+        ## OLD AND INACCURATE
+        # a, b, c = self.generalEquationOfALine(sensor_position, source_agent.getFrontalPoint())
+        # for agent in self.population:
+        #     if not issubclass(type(agent), Agent):
+        #         raise Exception("Agents must be subtype of Agent, not {}".format(type(agent)))
+        #     if agent == source_agent:
+        #         continue
+        #     distance_from_agent_to_line = ((a * agent.x_pos) + (b * agent.y_pos) + c) / (math.sqrt(a*a + b*b))
             
-            if distance_from_agent_to_line <= agent.radius / 2:
-                if dot > 0:
-                    source_agent.agent_in_sight = agent
-                    return True
+        #     # Vector A: The vector between the source and target agents
+        #     vecA = [agent.x_pos - sensor_position[0], agent.y_pos - sensor_position[1]]
+
+        #     # Vector B: The vector representing the sensor's line of sight
+        #     vecB = source_agent.getLOSVector()
+
+        #     # If the angle between the vectors is acute (positive dot product) 
+        #     # and if the LOS crosses through the area of another bot, then the sensor is active
+        #     dot = (vecA[0] * vecB[0]) + (vecA[1] * vecB[1])
+            
+        #     if distance_from_agent_to_line <= agent.radius / 2:
+        #         if dot > 0:
+        #             source_agent.agent_in_sight = agent
+        #             return True
 
         source_agent.agent_in_sight = None
         return False
