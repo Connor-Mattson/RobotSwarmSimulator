@@ -6,18 +6,17 @@ from src.agent.Agent import Agent
 
 class DifferentialDriveAgent(Agent):
     
-    wheel_radius = 2.5
+    radius = 5
+    wheel_radius = 2.0
     sensor_on = False
     is_highlighted = False
     agent_in_sight = None
     
-    dt = 1
-    dy = 0.0
-    dx = 0.0
+    dt = 1.0
     
     # Circling
-    vr_0 = 0.7
-    vl_0 = -0.3
+    vr_0 = -0.7
+    vl_0 = 0.3
     vr_1 = 1
     vl_1 = 1
 
@@ -43,7 +42,6 @@ class DifferentialDriveAgent(Agent):
             self.vr_1 = controller[2]
             self.vl_1 = controller[3]
 
-        self.radius = 5
         if angle == None:
             self.angle = random.random() * math.pi
         else:

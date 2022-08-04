@@ -1,9 +1,12 @@
 import pygame
 from src.agent.DiffDriveAgent import DifferentialDriveAgent
 from src.gui.abstractGUI import AbstractGUI
+from src.world.World import World
 
 class DifferentialDriveGUI(AbstractGUI):
 
+    # Pair the GUI to the World
+    world = None
     title = None
     subtitle = None
     selected = None
@@ -20,6 +23,9 @@ class DifferentialDriveGUI(AbstractGUI):
         self.title = title
         self.subtitle = subtitle
 
+    def set_world(self, world: World):
+        self.world = world
+
     def draw(self, screen):
         super().draw(screen)
         self.text_baseline = 10
@@ -31,18 +37,23 @@ class DifferentialDriveGUI(AbstractGUI):
             if(self.selected):
                 a = self.selected
                 self.appendTextToGUI(screen, f"Current Agent: {a.name}")
-                self.appendTextToGUI(screen, f"\n")
+                self.appendTextToGUI(screen, f"")
                 self.appendTextToGUI(screen, f"x: {a.x_pos}")
                 self.appendTextToGUI(screen, f"y: {a.y_pos}")
                 self.appendTextToGUI(screen, f"dx: {a.dx}")
                 self.appendTextToGUI(screen, f"dy: {a.dy}")
-                self.appendTextToGUI(screen, f"\n")
+                self.appendTextToGUI(screen, f"")
                 self.appendTextToGUI(screen, f"θ: {a.angle}")
                 self.appendTextToGUI(screen, f"sensor: {a.sensor_on}")
                 if(a.agent_in_sight != None):
                     self.appendTextToGUI(screen, f"sees: {a.agent_in_sight.name}")
             else:
                 self.appendTextToGUI(screen, "Current Agent: None")
+                self.appendTextToGUI(screen, "")
+                self.appendTextToGUI(screen, "Behavior", size=18)
+                for b in self.world.behavior:
+                    out = b.out_average()
+                    self.appendTextToGUI(screen, "{} : {:0.2f}".format(out[0], out[1]))
 
         else:
             print("NO FONT")

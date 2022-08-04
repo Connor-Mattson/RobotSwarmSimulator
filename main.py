@@ -32,10 +32,13 @@ def main():
 
     # Create the GUI
     gui = DifferentialDriveGUI(x=WORLD_WIDTH, y=0, h=WORLD_HEIGHT, w=GUI_WIDTH)
-    gui.set_title("Differential Drive", subtitle="Goal: Drive in a Circle")
+    gui.set_title("Differential Drive", subtitle="Goal: Aggregation")
+   
+    # Attach the world to the gui and visa versa
+    gui.set_world(world)
     world.attach_gui(gui)
      
-    # main loop
+    # Main loop
     while running:
 
         # Looped Event Handling

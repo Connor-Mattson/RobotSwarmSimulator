@@ -1,8 +1,14 @@
+import pygame
 import math, random
 import numpy as np
 from multiprocessing import managers
 from turtle import distance
 from typing import List, Tuple
+from src.behavior.GroupRotationBehavior import GroupRotationBehavior
+from src.behavior.ScatterBehavior import ScatterBehavior
+from src.behavior.RadialVariance import RadialVarianceBehavior
+from src.behavior.AngularMomentum import AngularMomentumBehavior
+from src.behavior.AverageSpeed import AverageSpeedBehavior
 from src.world.World import World
 from src.agent.Agent import Agent
 from src.agent.DiffDriveAgent import DifferentialDriveAgent
@@ -14,15 +20,20 @@ class RectangularWorld(World):
         self.population_size = pop_size
 
     def setup(self):
-        self.population = [DifferentialDriveAgent(angle=0, name=f"Bot_{i}") for i in range(self.population_size)]
-        # self.population = [
-        #     DifferentialDriveAgent(x=10, y=10, angle=1.9),
-        #     DifferentialDriveAgent(x=50, y=50, angle=1.9)
-        # ]
+        self.population = [DifferentialDriveAgent(name=f"Bot_{i}") for i in range(self.population_size)]
+        
+        world_radius = np.linalg.norm([self.bounded_width/2, self.bounded_height/2])
+        self.behavior = [
+            AverageSpeedBehavior(population = self.population),
+            AngularMomentumBehavior(population = self.population, r = world_radius),
+            RadialVarianceBehavior(population = self.population, r= world_radius),
+            ScatterBehavior(population = self.population, r = world_radius),
+            GroupRotationBehavior(population = self.population)
+        ]
 
     def step(self):
         """
-        Cycle through the entire population and take one step.
+        Cycle through the entire population and take one step. Calculate Behavior if needed.
         """
         for agent in self.population:
             if not issubclass(type(agent), DifferentialDriveAgent):
@@ -33,10 +44,14 @@ class RectangularWorld(World):
                 check_for_sensor = self.checkForSensor
             )
 
+        for behavior in self.behavior:
+            behavior.calculate()
+
     def draw(self, screen):
         """
         Cycle through the entire population and draw the agents.
         """
+
         for agent in self.population:
             if not issubclass(type(agent), DifferentialDriveAgent):
                 raise Exception("Agents must be subtype of Agent, not {}".format(type(agent)))
@@ -71,11 +86,14 @@ class RectangularWorld(World):
     
     def onClick(self, pos) -> None:
         neighborhood = self.getNeighborsWithinDistance(pos, self.population[0].radius)
-        if(len(neighborhood) == 0): return
 
         # Remove Highlights from everyone
         for n in self.population:
             n.is_highlighted = False
+
+        if(len(neighborhood) == 0): 
+            self.gui.set_selected(None)
+            return
 
         if self.gui != None:
             self.gui.set_selected(neighborhood[0])
@@ -88,6 +106,7 @@ class RectangularWorld(World):
         padding = 10
         agent.x_pos = max(agent.radius + padding, min((self.bounded_width - agent.radius - padding), agent.x_pos))
         agent.y_pos = max(agent.radius + padding, min((self.bounded_height - agent.radius - padding), agent.y_pos))
+        agent.angle += (math.pi / 720)
 
     def preventAgentCollisions(self, agent: DifferentialDriveAgent) -> None:
         """
@@ -97,11 +116,11 @@ class RectangularWorld(World):
         """
 
         agent_center = agent.getPosition()
-        timeout = 100
-        while(timeout > 0):
-            timeout -= 1
+        timeout = 0
+        while(timeout <= 1000):
+            timeout += 1
             minimum_distance = agent.radius * 2
-            target_distance = minimum_distance + 0.1
+            target_distance = minimum_distance + (0.1 * timeout)
 
             neighborhood = self.getNeighborsWithinDistance(agent_center, minimum_distance, excluded=agent)
             if(len(neighborhood) == 0):
@@ -109,38 +128,15 @@ class RectangularWorld(World):
 
             colliding_agent = neighborhood[0]
             center_distance = self.distance(agent_center, colliding_agent.getPosition())
-                        
-            # Calculate the required offsets for the agent's x, y position in order to avoid a collision with the neighbor
-            dy = colliding_agent.y_pos - agent_center[1]
-            dx = colliding_agent.x_pos - agent_center[0]
-            theta = 0
-            if(dy != 0):
-                theta = math.atan((dx) / (dy))
+            distance_needed = target_distance - center_distance
 
-            if(theta < 0):
-                offset_x = (target_distance * math.sin(theta)) - dx
-                offset_y = (target_distance * math.cos(theta)) - dy
-            else:
-                offset_x = (target_distance * math.sin(theta)) + dx
-                offset_y = (target_distance * math.cos(theta)) + dy
+            base = np.array([1, 0])
+            a_to_b = agent_center - colliding_agent.getPosition()
+            theta = np.arccos(np.dot(a_to_b, base) / np.linalg.norm(a_to_b) * np.linalg.norm(base))
             
-            # print("TESTING (Attempt {})[n: {}]".format(str(100 - timeout), len(neighborhood)))
-            # print("=" * 20)
-            # print("Preventing Collision between A (collidor) and B")
-            # print("Distance: {}".format(center_distance))
-            # print("Center: {}".format(agent_center))
-            # print("=" * 20)
-            # print("A: {}".format(str(agent)))
-            # print("B: {}".format(str(colliding_agent)))
-            # print("dx: {}".format(dx))
-            # print("dy: {}".format(dy))
-            # print("Angle from A to B: {}".format(theta))
-            # print("Pushback with Vector: {}".format([offset_x, offset_y]))
-            # print("=" * 20)
-            # print("\n")
-            
-            agent.x_pos -= offset_x
-            agent.y_pos -= offset_y
+            agent.x_pos += distance_needed * np.cos(theta)
+            agent.y_pos += distance_needed * np.sin(theta)
+            agent.angle += (math.pi / 720) * timeout
             agent_center = (agent.x_pos, agent.y_pos)
 
         raise Exception("Could not find a suitible position for agent. Consider increasing the search domain, decreasing the population count or increasing the size of the environment")

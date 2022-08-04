@@ -3,6 +3,7 @@ from src.gui.abstractGUI import AbstractGUI
 class World():
 
     population = []
+    behavior = []
     bounded_width = 100
     bounded_height = 100
     gui = None
