@@ -7,7 +7,7 @@ from src.agent.Agent import Agent
 class DifferentialDriveAgent(Agent):
     
     radius = 5
-    wheel_radius = 2.0
+    wheel_radius = 1.0
     sensor_on = False
     is_highlighted = False
     agent_in_sight = None
@@ -15,16 +15,16 @@ class DifferentialDriveAgent(Agent):
     dt = 1.0
     
     # Circling
-    vr_0 = -0.7
-    vl_0 = 0.3
-    vr_1 = 1
-    vl_1 = 1
+    # vr_0 = -0.7
+    # vl_0 = 0.3
+    # vr_1 = 1
+    # vl_1 = 1
 
     # Aggregation
-    # vr_0 = -0.7
-    # vl_0 = -1.0
-    # vr_1 = 1.0
-    # vl_1 = -1.0
+    vr_0 = -0.7
+    vl_0 = -1.0
+    vr_1 = 1.0
+    vl_1 = -1.0
 
     def __init__(self, x = None, y = None, controller = [], name = None, angle = None) -> None:
         """
@@ -43,7 +43,7 @@ class DifferentialDriveAgent(Agent):
             self.vl_1 = controller[3]
 
         if angle == None:
-            self.angle = random.random() * math.pi
+            self.angle = random.random() * math.pi * 2
         else:
             self.angle = angle
 

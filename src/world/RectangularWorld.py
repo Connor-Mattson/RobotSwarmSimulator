@@ -20,7 +20,11 @@ class RectangularWorld(World):
         self.population_size = pop_size
 
     def setup(self):
-        self.population = [DifferentialDriveAgent(name=f"Bot_{i}") for i in range(self.population_size)]
+        self.population = [DifferentialDriveAgent(angle=0, name=f"Bot_{i}") for i in range(self.population_size)]
+        self.population = [
+            DifferentialDriveAgent(angle=0, controller=[1, 1, 1, 1], x = 20, y = 100),
+            # DifferentialDriveAgent(angle=180, controller=[1, 1, 1, 1], x = 200, y = 100)
+        ]
         
         world_radius = np.linalg.norm([self.bounded_width/2, self.bounded_height/2])
         self.behavior = [
@@ -38,6 +42,7 @@ class RectangularWorld(World):
         for agent in self.population:
             if not issubclass(type(agent), DifferentialDriveAgent):
                 raise Exception("Agents must be subtype of Agent, not {}".format(type(agent)))
+            
             agent.step(
                 check_for_world_boundaries = self.withinWorldBoundaries, 
                 check_for_agent_collisions = self.preventAgentCollisions, 
@@ -106,7 +111,7 @@ class RectangularWorld(World):
         padding = 10
         agent.x_pos = max(agent.radius + padding, min((self.bounded_width - agent.radius - padding), agent.x_pos))
         agent.y_pos = max(agent.radius + padding, min((self.bounded_height - agent.radius - padding), agent.y_pos))
-        agent.angle += (math.pi / 720)
+        # agent.angle += (math.pi / 720)
 
     def preventAgentCollisions(self, agent: DifferentialDriveAgent) -> None:
         """
@@ -116,30 +121,27 @@ class RectangularWorld(World):
         """
 
         agent_center = agent.getPosition()
-        timeout = 0
-        while(timeout <= 1000):
-            timeout += 1
-            minimum_distance = agent.radius * 2
-            target_distance = minimum_distance + (0.1 * timeout)
 
-            neighborhood = self.getNeighborsWithinDistance(agent_center, minimum_distance, excluded=agent)
-            if(len(neighborhood) == 0):
-                return
+        minimum_distance = agent.radius * 2
+        target_distance = minimum_distance + (0.1)
 
-            colliding_agent = neighborhood[0]
-            center_distance = self.distance(agent_center, colliding_agent.getPosition())
-            distance_needed = target_distance - center_distance
+        neighborhood = self.getNeighborsWithinDistance(agent_center, minimum_distance, excluded=agent)
+        if(len(neighborhood) == 0):
+            return
 
-            base = np.array([1, 0])
-            a_to_b = agent_center - colliding_agent.getPosition()
-            theta = np.arccos(np.dot(a_to_b, base) / np.linalg.norm(a_to_b) * np.linalg.norm(base))
-            
-            agent.x_pos += distance_needed * np.cos(theta)
-            agent.y_pos += distance_needed * np.sin(theta)
-            agent.angle += (math.pi / 720) * timeout
-            agent_center = (agent.x_pos, agent.y_pos)
+        colliding_agent = neighborhood[0]
+        center_distance = self.distance(agent_center, colliding_agent.getPosition())
+        distance_needed = target_distance - center_distance
 
-        raise Exception("Could not find a suitible position for agent. Consider increasing the search domain, decreasing the population count or increasing the size of the environment")
+        base = np.array([1, 0])
+        a_to_b = agent_center - colliding_agent.getPosition()
+        theta = np.arccos(np.dot(a_to_b, base) / np.linalg.norm(a_to_b) * np.linalg.norm(base))
+        
+        agent.x_pos += distance_needed * np.cos(theta)
+        agent.y_pos += distance_needed * np.sin(theta)
+        
+        # agent.angle += (math.pi / 720)
+        agent_center = (agent.x_pos, agent.y_pos)
 
     def checkForSensor(self, source_agent: DifferentialDriveAgent) -> bool:
         sensor_position = source_agent.getPosition()
@@ -165,30 +167,6 @@ class RectangularWorld(World):
             if has_intersection and a >= 0:
                 source_agent.agent_in_sight = agent
                 return True
-
-        ## OLD AND INACCURATE
-        # a, b, c = self.generalEquationOfALine(sensor_position, source_agent.getFrontalPoint())
-        # for agent in self.population:
-        #     if not issubclass(type(agent), Agent):
-        #         raise Exception("Agents must be subtype of Agent, not {}".format(type(agent)))
-        #     if agent == source_agent:
-        #         continue
-        #     distance_from_agent_to_line = ((a * agent.x_pos) + (b * agent.y_pos) + c) / (math.sqrt(a*a + b*b))
-            
-        #     # Vector A: The vector between the source and target agents
-        #     vecA = [agent.x_pos - sensor_position[0], agent.y_pos - sensor_position[1]]
-
-        #     # Vector B: The vector representing the sensor's line of sight
-        #     vecB = source_agent.getLOSVector()
-
-        #     # If the angle between the vectors is acute (positive dot product) 
-        #     # and if the LOS crosses through the area of another bot, then the sensor is active
-        #     dot = (vecA[0] * vecB[0]) + (vecA[1] * vecB[1])
-            
-        #     if distance_from_agent_to_line <= agent.radius / 2:
-        #         if dot > 0:
-        #             source_agent.agent_in_sight = agent
-        #             return True
 
         source_agent.agent_in_sight = None
         return False

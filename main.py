@@ -27,7 +27,7 @@ def main():
     paused = False
 
     # Create the simulation world
-    world = RectangularWorld(WORLD_WIDTH, WORLD_HEIGHT, pop_size=30)
+    world = RectangularWorld(WORLD_WIDTH, WORLD_HEIGHT, pop_size=4)
     world.setup()
 
     # Create the GUI
@@ -59,7 +59,9 @@ def main():
             continue
 
         # Caclulate Steps
-        world.step()
+        STEPS = 1
+        for _ in range(STEPS):
+            world.step()
 
         # Draw!
         screen.fill((0, 0, 0))
