@@ -28,7 +28,7 @@ def main():
 
     # Create the simulation world
     world = RectangularWorld(WORLD_WIDTH, WORLD_HEIGHT, pop_size=30)
-    world.setup()
+    world.setup(controller=[-0.7, -1.0, 1.0, -1.0])
 
     # Create the GUI
     gui = DifferentialDriveGUI(x=WORLD_WIDTH, y=0, h=WORLD_HEIGHT, w=GUI_WIDTH)

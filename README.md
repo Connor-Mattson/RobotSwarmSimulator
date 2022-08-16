@@ -8,9 +8,4 @@ Experiments replicated from *Discovery and Exploration of Novel Swarm Behaviors 
 
 ## Setup
 Install Python Packages <br>
-
-    # Windows
     pip install -r requirements.txt
-
-    # Mac/Linux
-    pip3 install -r requirements.txt

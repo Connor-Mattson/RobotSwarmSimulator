@@ -17,8 +17,9 @@ class RectangularWorld(World):
         super().__init__(w, h)
         self.population_size = pop_size
 
-    def setup(self):
-        self.population = [DifferentialDriveAgent(name=f"Bot_{i}") for i in range(self.population_size)]
+    def setup(self, controller=[]):
+        self.population = [DifferentialDriveAgent(name=f"Bot_{i}", controller=controller) for i in range(self.population_size)]
+        
         # self.population = [
         #     DifferentialDriveAgent(angle=0, controller=[-0.7, -1.0, 1.0, -1.0], x = 700, y = 700),
         #     DifferentialDriveAgent(angle=0, controller=[-0.7, -1.0, 1.0, -1.0], x = 700, y = 700)
@@ -214,6 +215,9 @@ class RectangularWorld(World):
 
         source_agent.agent_in_sight = None
         return False
+
+    def getBehaviorVector(self):
+        return np.array([s.out_average()[1] for s in self.behavior])
 
     def generalEquationOfALine(self, pointA: Tuple, pointB: Tuple) -> Tuple:
         x1, y1 = pointA
