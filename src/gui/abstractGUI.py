@@ -15,7 +15,8 @@ class AbstractGUI:
         self.h = h
 
     def set_selected(self, agent):
-        print("Attaching New Agent")
+        #print("Attaching New Agent")
+        pass
 
     def draw(self, screen):
         pygame.draw.rect(screen, color=(10,10,10), rect=Rect((self.x, self.y),(self.w, self.h)))

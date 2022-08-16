@@ -65,11 +65,11 @@ class DifferentialDriveAgent(Agent):
         self.y_pos += self.dy * self.dt
         self.angle += heading * self.dt
 
-        if check_for_agent_collisions != None:
-            check_for_agent_collisions(self)
-
         if check_for_world_boundaries != None:
             check_for_world_boundaries(self)
+
+        if check_for_agent_collisions != None:
+            check_for_agent_collisions(self)
 
         if check_for_sensor != None:
             self.sensor_on = check_for_sensor(self)

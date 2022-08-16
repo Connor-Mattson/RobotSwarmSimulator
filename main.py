@@ -24,10 +24,10 @@ def main():
      
     # define a variable to control the main loop
     running = True
-    paused = False
+    paused = True
 
     # Create the simulation world
-    world = RectangularWorld(WORLD_WIDTH, WORLD_HEIGHT, pop_size=4)
+    world = RectangularWorld(WORLD_WIDTH, WORLD_HEIGHT, pop_size=30)
     world.setup()
 
     # Create the GUI
@@ -37,6 +37,8 @@ def main():
     # Attach the world to the gui and visa versa
     gui.set_world(world)
     world.attach_gui(gui)
+
+    steps_per_frame = 1
      
     # Main loop
     while running:
@@ -49,7 +51,12 @@ def main():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     paused = not paused
-
+                if event.key == pygame.K_RSHIFT:
+                    steps_per_frame *= 2
+                    steps_per_frame = min(steps_per_frame, 50)
+                if event.key == pygame.K_LSHIFT and steps_per_frame > 1:
+                    steps_per_frame /= 2
+                    steps_per_frame = round(steps_per_frame)
             if event.type == pygame.MOUSEBUTTONUP:
                 pos = pygame.mouse.get_pos()
                 world.onClick(pos)
@@ -59,8 +66,7 @@ def main():
             continue
 
         # Caclulate Steps
-        STEPS = 1
-        for _ in range(STEPS):
+        for _ in range(steps_per_frame):
             world.step()
 
         # Draw!
