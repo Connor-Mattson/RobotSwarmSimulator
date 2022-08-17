@@ -12,7 +12,7 @@ class DifferentialDriveAgent(Agent):
     is_highlighted = False
     agent_in_sight = None
     
-    dt = 1.0
+    dt = 1.4
     
     # Circling
     # vr_0 = -0.7

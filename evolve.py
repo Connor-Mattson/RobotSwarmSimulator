@@ -32,12 +32,12 @@ def main():
 
     # Initialize GA
     evolution = BehaviorDiscovery(
-        generations=5,
-        population_size=100,
+        generations=40,
+        population_size=40,
         crossover_rate=0.8,
         mutation_rate=0.1,
         world_size=[WORLD_WIDTH, WORLD_HEIGHT],
-        lifespan=200,
+        lifespan=10,
         agents=30,
         k_neighbors=15
     )

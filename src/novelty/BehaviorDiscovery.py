@@ -35,8 +35,8 @@ class BehaviorDiscovery():
         self.initializePopulation()
 
     def initializePopulation(self):
-        LOWER_BOUND = -1
-        UPPER_BOUND = 1
+        LOWER_BOUND = -1.2
+        UPPER_BOUND = 1.2
         RANGE = UPPER_BOUND - LOWER_BOUND
         GENE_SIZE = 4
         BEHAVIOR_SIZE = 5
@@ -135,7 +135,7 @@ class BehaviorDiscovery():
         self.population = np.concatenate((self.population, [vector]))
 
     def getRandomRoundedFloat(self, lower, _range):
-        return round(((np.random.rand() * _range) + lower), 2)
+        return round(((np.random.rand() * _range) + lower), 4)
 
     def getBestScore(self):
         return max(self.scores)
