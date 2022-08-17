@@ -28,7 +28,7 @@ def main():
 
     # Create the simulation world
     world = RectangularWorld(WORLD_WIDTH, WORLD_HEIGHT, pop_size=30)
-    world.setup(controller=[-0.7, -1.0, 1.0, -1.0])
+    world.setup(controller=[-0.7, 0.3, 1.0, 1.0])
 
     # Create the GUI
     gui = DifferentialDriveGUI(x=WORLD_WIDTH, y=0, h=WORLD_HEIGHT, w=GUI_WIDTH)
@@ -38,11 +38,12 @@ def main():
     gui.set_world(world)
     world.attach_gui(gui)
 
+    total_allowed_steps = 300
+    steps_taken = 0
     steps_per_frame = 1
      
     # Main loop
     while running:
-
         # Looped Event Handling
         for event in pygame.event.get():
             # Cancel the game loop if user quits the GUI
@@ -61,13 +62,17 @@ def main():
                 pos = pygame.mouse.get_pos()
                 world.onClick(pos)
 
-        if(paused):
+        if paused:
             pygame.time.Clock().tick(FRAMERATE)
             continue
 
-        # Caclulate Steps
+        # Calculate Steps - Stop if we reach desired frame
         for _ in range(steps_per_frame):
+            if total_allowed_steps is not None:
+                if steps_taken > total_allowed_steps:
+                    break
             world.step()
+            steps_taken += 1
 
         # Draw!
         screen.fill((0, 0, 0))

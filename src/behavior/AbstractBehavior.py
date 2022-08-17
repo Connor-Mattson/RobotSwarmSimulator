@@ -6,12 +6,10 @@ HISTORY_SIZE = 100
 
 class AbstractBehavior():
 
-    name = None
-    current_value = 0
-    value_history = []
-    
     def __init__(self, name: str):
         self.name = name
+        self.current_value = 0
+        self.value_history = []
 
     def set_value(self, value):
         # Keep Track of the 100 most recent values

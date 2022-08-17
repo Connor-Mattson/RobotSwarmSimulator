@@ -12,19 +12,19 @@ class DifferentialDriveAgent(Agent):
     is_highlighted = False
     agent_in_sight = None
     
-    dt = 1.4
+    dt = 1.8
     
     # Circling
-    # vr_0 = -0.7
-    # vl_0 = 0.3
-    # vr_1 = 1
-    # vl_1 = 1
+    vr_0 = -0.7
+    vl_0 = 0.3
+    vr_1 = 1
+    vl_1 = 1
 
     # Aggregation
-    vr_0 = -0.7
-    vl_0 = -1.0
-    vr_1 = 1.0
-    vl_1 = -1.0
+    # vr_0 = -0.7
+    # vl_0 = -1.0
+    # vr_1 = 1.0
+    # vl_1 = -1.0
 
     def __init__(self, x = None, y = None, controller = [], name = None, angle = None) -> None:
         """

@@ -217,7 +217,8 @@ class RectangularWorld(World):
         return False
 
     def getBehaviorVector(self):
-        return np.array([s.out_average()[1] for s in self.behavior])
+        behavior = np.array([s.out_average()[1] for s in self.behavior])
+        return behavior
 
     def generalEquationOfALine(self, pointA: Tuple, pointB: Tuple) -> Tuple:
         x1, y1 = pointA

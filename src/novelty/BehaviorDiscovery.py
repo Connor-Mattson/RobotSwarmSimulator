@@ -32,6 +32,7 @@ class BehaviorDiscovery():
         self.k = k_neighbors
         self.status = "Initializing"
         self.score_history = []
+        self.average_history = []
         self.initializePopulation()
 
     def initializePopulation(self):
@@ -45,7 +46,7 @@ class BehaviorDiscovery():
             [self.getRandomRoundedFloat(LOWER_BOUND, RANGE) for i in range(GENE_SIZE)] for j in range(self.population_size)
         ]
         self.scores = np.array([0.0 for i in range(self.population_size)])
-        self.behavior = np.array([[-1 for j in range(BEHAVIOR_SIZE)] for i in range(self.population_size)])
+        self.behavior = np.array([[-1.0 for j in range(BEHAVIOR_SIZE)] for i in range(self.population_size)])
 
     def runSingleGeneration(self, screen, i):
         """
@@ -71,13 +72,13 @@ class BehaviorDiscovery():
         
         best = max(self.scores)
         self.score_history.append(best)
-        # print(self.score_history)
+        self.average_history.append(sum(self.scores) / len(self.scores))
 
     def evolve(self):
         self.crossovers = 0
         self.mutations = 0
         self.status = "Evolution"
-        selection = np.array([self.tournamentSelection(participants=4) for _ in self.population])
+        selection = np.array([self.tournamentSelection(participants=10) for _ in self.population])
         self.population = np.array([])
         
         # Crossover in pairs
@@ -93,6 +94,7 @@ class BehaviorDiscovery():
     def results(self):
         self.status = "Complete"
         Trends().graphBest(self.score_history)
+        Trends().graphAverage(self.average_history)
         Trends().graphArchive(self.archive)
     
     def tournamentSelection(self, participants = 4):
@@ -106,7 +108,7 @@ class BehaviorDiscovery():
         selection_probability = [p * math.pow(1-p, i) for i in range(participants)]
         roll = random.random()
         for i, p in enumerate(selection_probability):
-            if(roll < sum(selection_probability[:i])):
+            if roll < sum(selection_probability[:i]):
                 return self.population[scores[i][1]]
                 
         return self.population[scores[-1][1]]
@@ -114,11 +116,11 @@ class BehaviorDiscovery():
     def crossOver(self, p1, p2):
         c1 = p1.copy()
         c2 = p2.copy()
-        if(random.random() < self.crossover_rate):
+        if random.random() < self.crossover_rate:
             self.crossovers += 1
             crossover_point = random.randint(1, len(p1) - 2)
-            c1 = np.append(c1[:crossover_point], c2[crossover_point:])
-            c2 = np.append(c2[:crossover_point], c1[crossover_point:])
+            c1 = np.append(p1[:crossover_point], p2[crossover_point:])
+            c2 = np.append(p2[:crossover_point], p1[crossover_point:])
         return c1, c2
 
     def mutation(self, child):

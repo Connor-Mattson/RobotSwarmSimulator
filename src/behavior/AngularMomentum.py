@@ -2,13 +2,13 @@ import numpy as np
 from typing import List
 from src.behavior.AbstractBehavior import AbstractBehavior
 
+
 class AngularMomentumBehavior(AbstractBehavior):
-    
     population = []
     world_radius = 1
-    
+
     def __init__(self, population: List, r: float):
-        super().__init__(name = "Angular Momentum")
+        super().__init__(name="Angular Momentum")
         self.population = population
         self.world_radius = r
 
@@ -27,7 +27,7 @@ class AngularMomentumBehavior(AbstractBehavior):
             momentum_list.append(momentum)
 
         average_momentum = sum(momentum_list) / (r * n)
-        self.set_value(average_momentum)    
+        self.set_value(average_momentum)
 
     def center_of_mass(self):
         positions = [
