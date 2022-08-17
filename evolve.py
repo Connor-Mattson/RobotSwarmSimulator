@@ -32,14 +32,14 @@ def main():
 
     # Initialize GA
     evolution = BehaviorDiscovery(
-        generations=10,
-        population_size=16,
-        crossover_rate=0.7,
-        mutation_rate=0.05,
+        generations=5,
+        population_size=100,
+        crossover_rate=0.8,
+        mutation_rate=0.1,
         world_size=[WORLD_WIDTH, WORLD_HEIGHT],
-        lifespan=100,
-        agents=10,
-        k_neighbors=5
+        lifespan=200,
+        agents=30,
+        k_neighbors=15
     )
 
     gui.set_discovery(evolution)
@@ -84,6 +84,8 @@ def main():
         evolution.evolve()
         gui.draw(screen=screen)
         pygame.display.flip()
+
+    evolution.results()
 
 # run the main function only if this module is executed as the main script
 # (if you import this as a module then nothing is executed)

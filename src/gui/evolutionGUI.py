@@ -43,6 +43,8 @@ class EvolutionGUI(AbstractGUI):
                 self.appendTextToGUI(screen, "Best Score (Last Gen): {:0.4f}".format(self.discovery.getBestScore()))
                 self.appendTextToGUI(screen, f"Crossovers: {self.discovery.crossovers}")
                 self.appendTextToGUI(screen, f"Mutations: {self.discovery.mutations}")
+                self.appendTextToGUI(screen, "")
+                self.appendTextToGUI(screen, f"Archive Size: {len(self.discovery.archive.archive)}")
         else:
             print("NO FONT")
 

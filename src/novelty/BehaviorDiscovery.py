@@ -4,6 +4,7 @@ import numpy as np
 import pygame
 from src.novelty.NoveltyArchive import NoveltyArchieve
 from src.world.RectangularWorld import RectangularWorld
+from src.results.Trends import Trends
 
 class BehaviorDiscovery():
     """
@@ -30,6 +31,7 @@ class BehaviorDiscovery():
         self.archive = NoveltyArchieve(max_size = 10000)
         self.k = k_neighbors
         self.status = "Initializing"
+        self.score_history = []
         self.initializePopulation()
 
     def initializePopulation(self):
@@ -68,12 +70,14 @@ class BehaviorDiscovery():
             self.scores[i] = novelty
         
         best = max(self.scores)
+        self.score_history.append(best)
+        # print(self.score_history)
 
     def evolve(self):
         self.crossovers = 0
         self.mutations = 0
         self.status = "Evolution"
-        selection = np.array([self.tournamentSelection(participants=10) for _ in self.population])
+        selection = np.array([self.tournamentSelection(participants=4) for _ in self.population])
         self.population = np.array([])
         
         # Crossover in pairs
@@ -86,15 +90,19 @@ class BehaviorDiscovery():
             self.addToPopulation(child_A)
             self.addToPopulation(child_B)
 
-        print(self.population)
-
+    def results(self):
+        self.status = "Complete"
+        Trends().graphBest(self.score_history)
+        Trends().graphArchive(self.archive)
+    
     def tournamentSelection(self, participants = 4):
         player_indexes = np.random.randint(0, len(self.population), participants)
         scores = [(self.scores[i], i) for i in player_indexes]
         scores.sort()
+        scores = scores[::-1] # Reverse List (So we have descending scores)
 
         # Highest scores are most likely to succeed
-        p = 0.8
+        p = 0.9
         selection_probability = [p * math.pow(1-p, i) for i in range(participants)]
         roll = random.random()
         for i, p in enumerate(selection_probability):
@@ -117,9 +125,8 @@ class BehaviorDiscovery():
         for i in range(len(child)):
             if(random.random() < self.mutation_rate):
                 self.mutations += 1
-                child[i] += (random.random() * 0.6) - 0.3
+                child[i] += (random.random() * 1.0) - 0.5
         return child
-
 
     def addToPopulation(self, vector):
         if(len(self.population) == 0):
