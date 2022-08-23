@@ -24,21 +24,22 @@ def main():
      
     # define a variable to control the main loop
     running = True
-    paused = True
+    paused = False
 
     # Create the simulation world
     world = RectangularWorld(WORLD_WIDTH, WORLD_HEIGHT, pop_size=30)
-    world.setup(controller=[-0.7, 0.3, 1.0, 1.0])
+    # world.setup(controller=[-0.7, 0.3, 1.0, 1.0])
+    world.setup(controller=[-0.7, -1.0, 1.0, -1.0])
 
     # Create the GUI
     gui = DifferentialDriveGUI(x=WORLD_WIDTH, y=0, h=WORLD_HEIGHT, w=GUI_WIDTH)
-    gui.set_title("Differential Drive", subtitle="Goal: Aggregation")
+    gui.set_title("Differential Drive")
    
     # Attach the world to the gui and visa versa
     gui.set_world(world)
     world.attach_gui(gui)
 
-    total_allowed_steps = 300
+    total_allowed_steps = None
     steps_taken = 0
     steps_per_frame = 1
      
