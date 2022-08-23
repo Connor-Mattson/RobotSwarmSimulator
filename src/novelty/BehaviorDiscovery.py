@@ -1,19 +1,23 @@
 import math
 import random
 import numpy as np
-import pygame
-from src.novelty.NoveltyArchive import NoveltyArchieve
+from src.novelty.NoveltyArchive import NoveltyArchive
 from src.world.RectangularWorld import RectangularWorld
 from src.results.Trends import Trends
 
-class BehaviorDiscovery():
+
+def getRandomRoundedFloat(lower, _range):
+    return round(((np.random.rand() * _range) + lower), 4)
+
+
+class BehaviorDiscovery:
     """
     A Genetic Algorithm that will run many simulations of agent interaction and search for novel
     controllers.
     """
 
     def __init__(self, generations=10, population_size=20, crossover_rate=0.3, mutation_rate=0.1,
-         lifespan=1000, world_size = [100, 100], agents=30, k_neighbors = 15):
+                 lifespan=1000, world_size=[100, 100], agents=30, k_neighbors=15):
         self.population = np.array([])
         self.behavior = np.array([])
         self.scores = np.array([])
@@ -28,7 +32,7 @@ class BehaviorDiscovery():
         self.crossovers = 0
         self.mutations = 0
         self.num_agents = agents
-        self.archive = NoveltyArchieve(max_size = 10000)
+        self.archive = NoveltyArchive()
         self.k = k_neighbors
         self.status = "Initializing"
         self.score_history = []
@@ -36,14 +40,14 @@ class BehaviorDiscovery():
         self.initializePopulation()
 
     def initializePopulation(self):
-        LOWER_BOUND = -1.2
-        UPPER_BOUND = 1.2
+        LOWER_BOUND = -1.0
+        UPPER_BOUND = 1.0
         RANGE = UPPER_BOUND - LOWER_BOUND
         GENE_SIZE = 4
         BEHAVIOR_SIZE = 5
 
         self.population = [
-            [self.getRandomRoundedFloat(LOWER_BOUND, RANGE) for i in range(GENE_SIZE)] for j in range(self.population_size)
+            [getRandomRoundedFloat(LOWER_BOUND, RANGE) for i in range(GENE_SIZE)] for j in range(self.population_size)
         ]
         self.scores = np.array([0.0 for i in range(self.population_size)])
         self.behavior = np.array([[-1.0 for j in range(BEHAVIOR_SIZE)] for i in range(self.population_size)])
@@ -69,7 +73,7 @@ class BehaviorDiscovery():
         for i, behavior_vector in enumerate(self.behavior):
             novelty = self.archive.getNovelty(k=self.k, vec=behavior_vector)
             self.scores[i] = novelty
-        
+
         best = max(self.scores)
         self.score_history.append(best)
         self.average_history.append(sum(self.scores) / len(self.scores))
@@ -80,7 +84,7 @@ class BehaviorDiscovery():
         self.status = "Evolution"
         selection = np.array([self.tournamentSelection(participants=10) for _ in self.population])
         self.population = np.array([])
-        
+
         # Crossover in pairs
         for i in range(0, len(selection), 2):
             parent_A = selection[i]
@@ -96,21 +100,21 @@ class BehaviorDiscovery():
         Trends().graphBest(self.score_history)
         Trends().graphAverage(self.average_history)
         Trends().graphArchive(self.archive)
-    
-    def tournamentSelection(self, participants = 4):
+
+    def tournamentSelection(self, participants=4):
         player_indexes = np.random.randint(0, len(self.population), participants)
         scores = [(self.scores[i], i) for i in player_indexes]
         scores.sort()
-        scores = scores[::-1] # Reverse List (So we have descending scores)
+        scores = scores[::-1]  # Reverse List (So we have descending scores)
 
         # Highest scores are most likely to succeed
         p = 0.9
-        selection_probability = [p * math.pow(1-p, i) for i in range(participants)]
+        selection_probability = [p * math.pow(1 - p, i) for i in range(participants)]
         roll = random.random()
         for i, p in enumerate(selection_probability):
             if roll < sum(selection_probability[:i]):
                 return self.population[scores[i][1]]
-                
+
         return self.population[scores[-1][1]]
 
     def crossOver(self, p1, p2):
@@ -125,23 +129,29 @@ class BehaviorDiscovery():
 
     def mutation(self, child):
         for i in range(len(child)):
-            if(random.random() < self.mutation_rate):
+            if random.random() < self.mutation_rate:
                 self.mutations += 1
-                child[i] += (random.random() * 1.0) - 0.5
+                mutation_size = (random.random() * 0.1) - 0.05
+                if mutation_size < 0:
+                    child[i] = max(-1, child[i] + mutation_size)
+                elif mutation_size > 0:
+                    child[i] = min(1, child[i] + mutation_size)
+
         return child
 
     def addToPopulation(self, vector):
-        if(len(self.population) == 0):
+        if len(self.population) == 0:
             self.population = np.array([vector])
             return
         self.population = np.concatenate((self.population, [vector]))
 
-    def getRandomRoundedFloat(self, lower, _range):
-        return round(((np.random.rand() * _range) + lower), 4)
-
     def getBestScore(self):
         return max(self.scores)
 
+    def getAverageScore(self):
+        if len(self.average_history) == 0:
+            return 0
+        return self.average_history[-1]
+
     def getBestGenome(self):
         return self.population[np.where(self.scores == self.getBestScore())[0][0]]
-    

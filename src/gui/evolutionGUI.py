@@ -11,6 +11,7 @@ class EvolutionGUI(AbstractGUI):
     discovery = None
     title = None
     subtitle = None
+    generation_time = None
     text_baseline = 10
 
     def __init__(self, x=0, y=0, w=0, h=0):
@@ -25,6 +26,9 @@ class EvolutionGUI(AbstractGUI):
 
     def set_discovery(self, discovery: BehaviorDiscovery):
         self.discovery = discovery
+
+    def set_elapsed_time(self, time):
+        self.generation_time = time
 
     def draw(self, screen):
         super().draw(screen)
@@ -41,10 +45,14 @@ class EvolutionGUI(AbstractGUI):
                 self.appendTextToGUI(screen, f"Population Index: {self.discovery.curr_genome}")
                 self.appendTextToGUI(screen, "")
                 self.appendTextToGUI(screen, "Best Score (Last Gen): {:0.4f}".format(self.discovery.getBestScore()))
+                self.appendTextToGUI(screen, "Avg Score (Last Gen): {:0.4f}".format(self.discovery.getAverageScore()))
                 self.appendTextToGUI(screen, f"Crossovers: {self.discovery.crossovers}")
                 self.appendTextToGUI(screen, f"Mutations: {self.discovery.mutations}")
                 self.appendTextToGUI(screen, "")
                 self.appendTextToGUI(screen, f"Archive Size: {len(self.discovery.archive.archive)}")
+            if self.generation_time:
+                self.appendTextToGUI(screen, "")
+                self.appendTextToGUI(screen, "Comp Time: {:0.2f}s".format(self.generation_time))
         else:
             print("NO FONT")
 
