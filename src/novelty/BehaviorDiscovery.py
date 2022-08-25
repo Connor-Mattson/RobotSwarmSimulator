@@ -65,7 +65,7 @@ class BehaviorDiscovery:
 
         behavior = world.getBehaviorVector()
         self.behavior[i] = behavior
-        self.archive.addToArchive(behavior)
+        self.archive.addToArchive(behavior, genome)
 
     def evaluate(self, screen):
         self.status = "Evaluation"

@@ -8,20 +8,20 @@ WORLD_WIDTH = 500
 WORLD_HEIGHT = 500
 GUI_WIDTH = 200
 
+
 # define a main function
-def main():
-     
+def main(controller=None):
     # initialize the pygame module
     pygame.init()
     # load and set the logo
     # logo = pygame.image.load("logo32x32.png")
     # pygame.display.set_icon(logo)
     pygame.display.set_caption("Swarm Simulation")
-     
+
     # screen must be global so that other modules can access + draw to the window
     global screen
     screen = pygame.display.set_mode((WORLD_WIDTH + GUI_WIDTH, WORLD_HEIGHT))
-     
+
     # define a variable to control the main loop
     running = True
     paused = False
@@ -29,12 +29,21 @@ def main():
     # Create the simulation world
     world = RectangularWorld(WORLD_WIDTH, WORLD_HEIGHT, pop_size=30)
     # world.setup(controller=[-0.7, 0.3, 1.0, 1.0])
-    world.setup(controller=[-0.7, -1.0, 1.0, -1.0])
+    # world.setup(controller=[-0.7, -1.0, 1.0, -1.0])
+
+    if controller is not None:
+        world.setup(controller=controller)
+    else:
+        # world.setup(controller=[-0.7, 0.3, 1.0, 1.0])
+        # world.setup(controller=[-0.7, -1.0, 1.0, -1.0])
+        # world.setup(controller=[1, 0.58008062, 0.9649, 0.7992])
+        world.setup(controller=[0.66, 0.62, 0.14, 0.13])  # "Hive" Behavior
+        # world.setup(controller=[0.64, 0.75, 0.06, 0.09])  # "Flocking" Behavior
 
     # Create the GUI
     gui = DifferentialDriveGUI(x=WORLD_WIDTH, y=0, h=WORLD_HEIGHT, w=GUI_WIDTH)
     gui.set_title("Differential Drive")
-   
+
     # Attach the world to the gui and visa versa
     gui.set_world(world)
     world.attach_gui(gui)
@@ -42,7 +51,7 @@ def main():
     total_allowed_steps = None
     steps_taken = 0
     steps_per_frame = 1
-     
+
     # Main loop
     while running:
         # Looped Event Handling
@@ -83,10 +92,10 @@ def main():
 
         # Limit the FPS of the simulation to FRAMERATE
         pygame.time.Clock().tick(FRAMERATE)
-     
-     
+
+
 # run the main function only if this module is executed as the main script
 # (if you import this as a module then nothing is executed)
-if __name__=="__main__":
+if __name__ == "__main__":
     # call the main function
     main()

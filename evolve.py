@@ -3,21 +3,18 @@ import time
 from src.gui.evolutionGUI import EvolutionGUI
 from src.novelty.BehaviorDiscovery import BehaviorDiscovery
 
-screen = None
 FRAMERATE = 60
 WORLD_WIDTH = 500
 WORLD_HEIGHT = 500
 GUI_WIDTH = 200
 
 
-# define a main function
 def main():
     # initialize the pygame module
     pygame.init()
     pygame.display.set_caption("Evolutionary Novelty Search")
 
     # screen must be global so that other modules can access + draw to the window
-    global screen
     screen = pygame.display.set_mode((WORLD_WIDTH + GUI_WIDTH, WORLD_HEIGHT))
 
     # define a variable to control the main loop
@@ -33,10 +30,10 @@ def main():
         generations=100,
         population_size=100,
         crossover_rate=0.7,
-        mutation_rate=0.15,
+        mutation_rate=0.1,
         world_size=[WORLD_WIDTH, WORLD_HEIGHT],
-        lifespan=50,
-        agents=5,
+        lifespan=250,
+        agents=30,
         k_neighbors=15
     )
 
@@ -87,7 +84,8 @@ def main():
         gui.set_elapsed_time(current_time - last_gen_timestamp)
         last_gen_timestamp = current_time
 
-    evolution.archive.saveArchive(f"trial_{evolution.total_generations}_{len(evolution.population)}")
+    evolution.archive.saveArchive(f"pheno_{evolution.total_generations}_{len(evolution.population)}")
+    evolution.archive.saveGenotypes(f"geno_{evolution.total_generations}_{len(evolution.population)}")
     evolution.results()
 
 

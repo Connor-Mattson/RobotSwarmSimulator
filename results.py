@@ -1,12 +1,18 @@
 from src.novelty.NoveltyArchive import NoveltyArchive
 from src.results.Trends import Trends
-
+from src.results.Cluster import Cluster
 
 # define a main function
 def main():
-    archive = NoveltyArchive(from_file="trial_100_100_1661295094.csv")
+    archive = NoveltyArchive(
+        pheno_file="trialA/pheno_100_100_1661362911.csv",
+        geno_file="trialA/geno_100_100_1661362911.csv"
+    )
+
     Trends().graphArchive(archive)
 
+    clustering = Cluster(archive)
+    clustering.displayGUI()
 
 # run the main function only if this module is executed as the main script
 # (if you import this as a module then nothing is executed)
