@@ -37,8 +37,8 @@ def main(controller=None):
         # world.setup(controller=[-0.7, 0.3, 1.0, 1.0])
         # world.setup(controller=[-0.7, -1.0, 1.0, -1.0])
         # world.setup(controller=[1, 0.58008062, 0.9649, 0.7992])
-        world.setup(controller=[0.66, 0.62, 0.14, 0.13])  # "Hive" Behavior
-        # world.setup(controller=[0.64, 0.75, 0.06, 0.09])  # "Flocking" Behavior
+        # world.setup(controller=[0.66, 0.62, 0.14, 0.13])  # "Hive" Behavior
+        world.setup(controller=[0.64, 0.75, 0.06, 0.09])  # "Flocking" Behavior
 
     # Create the GUI
     gui = DifferentialDriveGUI(x=WORLD_WIDTH, y=0, h=WORLD_HEIGHT, w=GUI_WIDTH)
@@ -83,6 +83,8 @@ def main(controller=None):
                     break
             world.step()
             steps_taken += 1
+            if steps_taken % 100 == 0:
+                print(f"Total steps: {steps_taken}")
 
         # Draw!
         screen.fill((0, 0, 0))
