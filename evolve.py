@@ -1,7 +1,10 @@
+import math
+
 import pygame
 import time
 from src.gui.evolutionGUI import EvolutionGUI
 from src.novelty.BehaviorDiscovery import BehaviorDiscovery
+from src.novelty.GeneRule import GeneRule
 
 FRAMERATE = 60
 WORLD_WIDTH = 500
@@ -20,21 +23,32 @@ def main():
     # define a variable to control the main loop
     running = True
     paused = False
+    save_results = True
+    display_plots = True
 
     # Create the GUI
     gui = EvolutionGUI(x=WORLD_WIDTH, y=0, h=WORLD_HEIGHT, w=GUI_WIDTH)
     gui.set_title("Novelty Evolution")
 
     # Initialize GA
+    gene_rules = [
+        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.5, round_digits=4),
+        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.5, round_digits=4),
+        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.5, round_digits=4),
+        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.5, round_digits=4),
+        GeneRule(_max=(2 * math.pi), _min=(-2 * math.pi), mutation_step=(math.pi / 2), round_digits=6),
+    ]
+
     evolution = BehaviorDiscovery(
         generations=100,
         population_size=100,
         crossover_rate=0.7,
-        mutation_rate=0.1,
+        mutation_rate=0.15,
         world_size=[WORLD_WIDTH, WORLD_HEIGHT],
-        lifespan=250,
+        lifespan=1200,
         agents=30,
-        k_neighbors=15
+        k_neighbors=15,
+        genotype_rules=gene_rules
     )
 
     gui.set_discovery(evolution)
@@ -84,9 +98,12 @@ def main():
         gui.set_elapsed_time(current_time - last_gen_timestamp)
         last_gen_timestamp = current_time
 
-    evolution.archive.saveArchive(f"pheno_{evolution.total_generations}_{len(evolution.population)}")
-    evolution.archive.saveGenotypes(f"geno_{evolution.total_generations}_{len(evolution.population)}")
-    evolution.results()
+    if save_results:
+        evolution.archive.saveArchive(f"pheno_g{len(gene_rules)}_gen{evolution.total_generations}_pop{len(evolution.population)}")
+        evolution.archive.saveGenotypes(f"geno_g{len(gene_rules)}_gen{evolution.total_generations}_pop{len(evolution.population)}")
+
+    if display_plots:
+        evolution.results()
 
 
 # run the main function only if this module is executed as the main script

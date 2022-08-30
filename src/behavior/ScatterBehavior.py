@@ -3,10 +3,6 @@ from typing import List
 from src.behavior.AbstractBehavior import AbstractBehavior
 
 class ScatterBehavior(AbstractBehavior):
-    
-    population = []
-    world_radius = 1
-    
     def __init__(self, population: List, r: float):
         super().__init__(name = "Scatter")
         self.population = population

@@ -14,7 +14,7 @@ class AbstractBehavior():
     def set_value(self, value):
         # Keep Track of the 100 most recent values
         self.value_history.append(value)
-        if(len(self.value_history) > HISTORY_SIZE):
+        if len(self.value_history) > HISTORY_SIZE:
             self.value_history = self.value_history[1:]
 
         self.current_value = value

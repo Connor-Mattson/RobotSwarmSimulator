@@ -7,19 +7,10 @@ from src.behavior.ScatterBehavior import ScatterBehavior
 from src.behavior.RadialVariance import RadialVarianceBehavior
 from src.behavior.AngularMomentum import AngularMomentumBehavior
 from src.behavior.AverageSpeed import AverageSpeedBehavior
+from src.behavior.SensorRotation import SensorRotation
 from src.world.World import World
 from src.agent.Agent import Agent
 from src.agent.DiffDriveAgent import DifferentialDriveAgent
-
-
-def generalEquationOfALine(pointA: Tuple, pointB: Tuple) -> Tuple:
-    x1, y1 = pointA
-    x2, y2 = pointB
-
-    a = y1 - y2
-    b = x2 - x1
-    c = (x1 - x2) * y1 + (y2 - y1) * x1
-    return a, b, c
 
 
 def distance(pointA, pointB) -> float:
@@ -51,7 +42,8 @@ class RectangularWorld(World):
             AngularMomentumBehavior(population=self.population, r=world_radius),
             RadialVarianceBehavior(population=self.population, r=world_radius),
             ScatterBehavior(population=self.population, r=world_radius),
-            GroupRotationBehavior(population=self.population)
+            GroupRotationBehavior(population=self.population),
+            SensorRotation(population=self.population)
         ]
 
     def step(self):
@@ -65,7 +57,7 @@ class RectangularWorld(World):
             agent.step(
                 check_for_world_boundaries=self.withinWorldBoundaries,
                 check_for_agent_collisions=self.preventAgentCollisions,
-                check_for_sensor=self.checkForSensor
+                population=self.population
             )
 
         for behavior in self.behavior:
@@ -75,7 +67,6 @@ class RectangularWorld(World):
         """
         Cycle through the entire population and draw the agents.
         """
-
         for agent in self.population:
             if not issubclass(type(agent), DifferentialDriveAgent):
                 raise Exception("Agents must be subtype of Agent, not {}".format(type(agent)))
@@ -137,7 +128,6 @@ class RectangularWorld(World):
         """
 
         agent_center = agent.getPosition()
-
         minimum_distance = agent.radius * 2
         target_distance = minimum_distance + 0.1
 
@@ -160,8 +150,6 @@ class RectangularWorld(World):
 
                 # print(f"Overlap. A: {agent_center}, B: {colliding_agent.getPosition()}")
                 distance_needed = target_distance - center_distance
-
-                base = np.array([1, 0])
                 a_to_b = agent_center - colliding_agent.getPosition()
 
                 # If distance super close to 0, we have a problem. Add noise.
@@ -203,34 +191,6 @@ class RectangularWorld(World):
 
             neighborhood = self.getNeighborsWithinDistance(agent_center, minimum_distance, excluded=agent)
             remaining_attempts -= 1
-
-    def checkForSensor(self, source_agent: DifferentialDriveAgent) -> bool:
-        sensor_position = source_agent.getPosition()
-
-        # Equations taken from Dunn's 3D Math Primer for Graphics, section A.12
-        p_0 = np.array([sensor_position[0], sensor_position[1]])
-        d = np.array(source_agent.getLOSVector())
-        d_hat = d / np.linalg.norm(d)
-
-        for agent in self.population:
-            if agent == source_agent:
-                continue
-
-            c = np.array([agent.x_pos, agent.y_pos])
-            e = c - p_0
-            a = np.dot(e, d_hat)
-
-            r_2 = agent.radius * agent.radius
-            e_2 = np.dot(e, e)
-            a_2 = a * a
-
-            has_intersection = (r_2 - e_2 + a_2) >= 0
-            if has_intersection and a >= 0:
-                source_agent.agent_in_sight = agent
-                return True
-
-        source_agent.agent_in_sight = None
-        return False
 
     def getBehaviorVector(self):
         behavior = np.array([s.out_average()[1] for s in self.behavior])

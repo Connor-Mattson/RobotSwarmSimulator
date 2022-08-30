@@ -11,11 +11,12 @@ def main():
     # )
 
     archive = NoveltyArchive(
-        pheno_file="trialB/pheno_100_100_1661391478.csv",
-        geno_file="trialB/geno_100_100_1661391478.csv"
+        pheno_file="trialD/pheno_g5_gen100_pop100_1661858162.csv",
+        geno_file="trialD/geno_g5_gen100_pop100_1661858162.csv"
     )
 
-    Trends().graphArchive(archive)
+    Trends().graphArchiveComparisons(archive)
+    Trends().plotMetricHistograms(archive)
 
     clustering = Cluster(archive)
     clustering.displayGUI()

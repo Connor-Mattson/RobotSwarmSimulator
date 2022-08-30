@@ -57,7 +57,7 @@ class Cluster:
 
     def clustering(self):
         print("Starting k-Medoids Clustering")
-        kmedoids = KMedoids(n_clusters=15, random_state=0, init="k-medoids++").fit(self.reduced)
+        kmedoids = KMedoids(n_clusters=16, random_state=0, init="k-medoids++").fit(self.reduced)
         self.cluster_indices = kmedoids.labels_
         self.cluster_medoids = kmedoids.cluster_centers_
         self.medoid_genomes = [[] for _ in self.cluster_medoids]

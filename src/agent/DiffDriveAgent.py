@@ -3,29 +3,10 @@ import pygame
 import random
 import math
 from src.agent.Agent import Agent
+from src.sensors.BinaryLOSSensor import BinaryLOSSensor
 
 
 class DifferentialDriveAgent(Agent):
-    radius = 5
-    wheel_radius = 1.0
-    sensor_on = False
-    is_highlighted = False
-    agent_in_sight = None
-
-    dt = 1.8
-
-    # Circling
-    vr_0 = -0.7
-    vl_0 = 0.3
-    vr_1 = 1
-    vl_1 = 1
-
-    # Aggregation
-    # vr_0 = -0.7
-    # vl_0 = -1.0
-    # vr_1 = 1.0
-    # vl_1 = -1.0
-
     def __init__(self, x=None, y=None, controller=None, name=None, angle=None) -> None:
         """
         Controller is a vector of length 4 that details the velocities of the wheels.
@@ -39,27 +20,38 @@ class DifferentialDriveAgent(Agent):
 
         super().__init__(x, y, name=name)
 
-        if len(controller) == 4:
+        if len(controller) == 5:
             self.vr_0 = controller[0]
             self.vl_0 = controller[1]
             self.vr_1 = controller[2]
             self.vl_1 = controller[3]
+            self.s_theta = controller[4]
+        else:
+            self.vr_0 = -0.7
+            self.vl_0 = 0.3
+            self.vr_1 = 1
+            self.vl_1 = 1
+            self.s_theta = 0
 
         if angle is None:
             self.angle = random.random() * math.pi * 2
         else:
             self.angle = angle
 
-    def step(self, check_for_sensor=None, check_for_world_boundaries=None, check_for_agent_collisions=None) -> None:
+        self.radius = 5
+        self.wheel_radius = 1.0
+        self.is_highlighted = False
+        self.agent_in_sight = None
+        self.dt = 1.8
+
+        self.sensors = [
+            # BinaryLOSSensor(parent=self),
+            BinaryLOSSensor(parent=self, angle=self.s_theta)
+        ]
+
+    def step(self, check_for_world_boundaries=None, population=[], check_for_agent_collisions=None) -> None:
         super().step()
-
-        if not self.sensor_on:
-            vl = self.vl_0
-            vr = self.vr_0
-        else:
-            vl = self.vl_1
-            vr = self.vr_1
-
+        vr, vl = self.interpretSensors()
         self.dx = (self.wheel_radius / 2) * (vl + vr) * math.cos(self.angle)
         self.dy = (self.wheel_radius / 2) * (vl + vr) * math.sin(self.angle)
         heading = (vr - vl) / (self.radius * 2)
@@ -74,35 +66,34 @@ class DifferentialDriveAgent(Agent):
         if check_for_agent_collisions is not None:
             check_for_agent_collisions(self)
 
-        if check_for_sensor is not None:
-            self.sensor_on = check_for_sensor(self)
+        for sensor in self.sensors:
+            sensor.step(population=population)
 
     def draw(self, screen) -> None:
         super().draw(screen)
+        for sensor in self.sensors:
+            sensor.draw(screen)
 
         # Draw Cell Membrane
         filled = 0 if self.is_highlighted else 1
         pygame.draw.circle(screen, (255, 255, 255), (self.x_pos, self.y_pos), self.radius, width=filled)
 
-        # Draw Sensory Vector (Vision Vector)
-        sight_color = (255, 0, 0)
-        if (self.sensor_on):
-            sight_color = (0, 255, 0)
-        mangitude = self.radius * (20 if self.is_highlighted else 3)
-        head = (self.x_pos, self.y_pos)
-        tail = (self.x_pos + (mangitude * math.cos(self.angle)), self.y_pos + (mangitude * math.sin(self.angle)))
-        pygame.draw.line(screen, sight_color, head, tail)
+        # "Front" direction vector
+        head = self.getFrontalPoint()
+        tail = self.getPosition()
+        vec = [head[0] - tail[0], head[1] - tail[1]]
+        mag = self.radius * 2
+        vec_with_magnitude = ((vec[0] * mag) + tail[0], (vec[1] * mag) + tail[1])
+        pygame.draw.line(screen, (255, 255, 255), tail, vec_with_magnitude)
 
-    def getFrontalPoint(self) -> Tuple:
-        """
-        Returns the location on the circumference that represents the "front" of the robot
-        """
-        return self.x_pos + math.cos(self.angle), self.y_pos + math.sin(self.angle)
-
-    def getLOSVector(self) -> List:
-        head = (self.x_pos, self.y_pos)
-        tail = self.getFrontalPoint()
-        return [tail[0] - head[0], tail[1] - head[1]]
+    def interpretSensors(self) -> Tuple:
+        if self.sensors[0].on:
+            vr = self.vr_1
+            vl = self.vl_1
+        else:
+            vr = self.vr_0
+            vl = self.vl_0
+        return vr, vl
 
     def __str__(self) -> str:
         return "(x: {}, y: {}, r: {}, θ: {})".format(self.x_pos, self.y_pos, self.radius, self.angle)

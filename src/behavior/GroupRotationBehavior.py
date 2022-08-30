@@ -3,9 +3,7 @@ from typing import List
 from src.behavior.AbstractBehavior import AbstractBehavior
 
 class GroupRotationBehavior(AbstractBehavior):
-    
-    population = []
-    
+
     def __init__(self, population: List):
         super().__init__(name = "Group Rotation")
         self.population = population

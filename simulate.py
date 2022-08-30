@@ -1,9 +1,11 @@
+import math
+
 import pygame
 from src.gui.agentGUI import DifferentialDriveGUI
 from src.world.RectangularWorld import RectangularWorld
 
 screen = None
-FRAMERATE = 60
+FRAMERATE = 128
 WORLD_WIDTH = 500
 WORLD_HEIGHT = 500
 GUI_WIDTH = 200
@@ -27,7 +29,7 @@ def main(controller=None):
     paused = False
 
     # Create the simulation world
-    world = RectangularWorld(WORLD_WIDTH, WORLD_HEIGHT, pop_size=30)
+    world = RectangularWorld(WORLD_WIDTH, WORLD_HEIGHT, pop_size=20)
     # world.setup(controller=[-0.7, 0.3, 1.0, 1.0])
     # world.setup(controller=[-0.7, -1.0, 1.0, -1.0])
 
@@ -100,4 +102,12 @@ def main(controller=None):
 # (if you import this as a module then nothing is executed)
 if __name__ == "__main__":
     # call the main function
-    main()
+    # custom_controller = [-0.4516, -0.5024, -0.2318, 1.0, -1.16*math.pi]
+
+    # Complex Circuits
+    custom_controller = [-0.4, -0.5, -0.2318, 1.0, -1.16 * math.pi]
+
+    # Partner Search
+    custom_controller = [-0.549, -0.4532, -0.2683, -1.0, -(math.pi/2)]
+
+    main(controller=custom_controller)

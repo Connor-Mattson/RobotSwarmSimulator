@@ -3,9 +3,6 @@ from typing import List
 from src.behavior.AbstractBehavior import AbstractBehavior
 
 class AverageSpeedBehavior(AbstractBehavior):
-    
-    population = []
-    
     def __init__(self, population: List):
         super().__init__(name = "Average Speed")
         self.population = population

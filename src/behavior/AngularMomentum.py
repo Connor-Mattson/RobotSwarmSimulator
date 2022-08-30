@@ -4,9 +4,6 @@ from src.behavior.AbstractBehavior import AbstractBehavior
 
 
 class AngularMomentumBehavior(AbstractBehavior):
-    population = []
-    world_radius = 1
-
     def __init__(self, population: List, r: float):
         super().__init__(name="Angular Momentum")
         self.population = population
