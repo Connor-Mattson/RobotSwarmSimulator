@@ -2,15 +2,17 @@ import pygame
 import math, random
 import numpy as np
 from typing import List, Tuple
+
+from src.agent.DiffDriveAgent import DifferentialDriveAgent
 from src.behavior.GroupRotationBehavior import GroupRotationBehavior
 from src.behavior.ScatterBehavior import ScatterBehavior
 from src.behavior.RadialVariance import RadialVarianceBehavior
 from src.behavior.AngularMomentum import AngularMomentumBehavior
 from src.behavior.AverageSpeed import AverageSpeedBehavior
+from src.behavior.SensorOffset import SensorOffset
 from src.behavior.SensorRotation import SensorRotation
 from src.world.World import World
 from src.agent.Agent import Agent
-from src.agent.DiffDriveAgent import DifferentialDriveAgent
 
 
 def distance(pointA, pointB) -> float:
@@ -24,13 +26,18 @@ class RectangularWorld(World):
         self.population_size = pop_size
 
     def setup(self, controller=[]):
-        self.population = [DifferentialDriveAgent(name=f"Bot_{i}", controller=controller) for i in
-                           range(self.population_size)]
+        self.population = [
+            DifferentialDriveAgent(name=f"Bot_{i}",
+                                   controller=controller,
+                                   world_dim=[self.bounded_width, self.bounded_height])
+            for i in range(self.population_size)
+        ]
 
         # self.population = [
         #     DifferentialDriveAgent(angle=0, controller=[-0.7, -1.0, 1.0, -1.0], x = 700, y = 700),
         #     DifferentialDriveAgent(angle=0, controller=[-0.7, -1.0, 1.0, -1.0], x = 700, y = 700)
         # ]
+
         # Pile On - Testing if stacked collisions work as expected
         # self.population = [
         #     DifferentialDriveAgent(angle=math.pi / 2, controller=[0.99, 1, 1, 1], x = 250, y = 250) for i in range(self.population_size)
@@ -43,7 +50,7 @@ class RectangularWorld(World):
             RadialVarianceBehavior(population=self.population, r=world_radius),
             ScatterBehavior(population=self.population, r=world_radius),
             GroupRotationBehavior(population=self.population),
-            SensorRotation(population=self.population)
+            SensorOffset(population=self.population, sensor_a_index=0, sensor_b_index=1),
         ]
 
     def step(self):

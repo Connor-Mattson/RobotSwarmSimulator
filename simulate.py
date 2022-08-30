@@ -29,7 +29,7 @@ def main(controller=None):
     paused = False
 
     # Create the simulation world
-    world = RectangularWorld(WORLD_WIDTH, WORLD_HEIGHT, pop_size=12)
+    world = RectangularWorld(WORLD_WIDTH, WORLD_HEIGHT, pop_size=30)
     # world.setup(controller=[-0.7, 0.3, 1.0, 1.0])
     # world.setup(controller=[-0.7, -1.0, 1.0, -1.0])
 
@@ -63,6 +63,7 @@ def main(controller=None):
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     paused = not paused
+                    print(f"Paused on Simulation Step: {steps_taken}")
                 if event.key == pygame.K_RSHIFT:
                     steps_per_frame *= 2
                     steps_per_frame = min(steps_per_frame, 50)
@@ -105,7 +106,7 @@ if __name__ == "__main__":
 
     # Complex Circuits (For n > 30 this is just a circle)
     # Use n = 25
-    custom_controller = [-0.4, -0.5, -0.2318, 1.0, -1.16 * math.pi]
+    # custom_controller = [-0.4, -0.5, -0.2318, 1.0, -1.16 * math.pi]
 
     # Complex Circuits 2
     # custom_controller = [0.6836, 0.95, 0.86, -0.9, -1.72*math.pi]
@@ -113,7 +114,15 @@ if __name__ == "__main__":
     # Membrane (for N > 50)
     # custom_controller = [0.6336, 0.95, 0.86, -0.9, -1.72*math.pi]
 
-    # Partner Search
+    # Partner Search (Dependent on stochastic initialization, unreliable)
     # custom_controller = [-0.549, -0.4532, -0.2683, -1.0, -(math.pi/2)]
+
+    # Localized Aggregation
+    # custom_controller = [-0.0471, -1.0, -1.0, 0.1820, (-1.3 * math.pi)]
+
+    # Normal Aggregation
+    # custom_controller = [-0.7, -1.0, 1.0, -1.0, 0]
+
+    custom_controller = [-0.7, -1.0, 1.0, -0.7, -1.0, 1.0, -1.0, -1.0, 0, math.pi]
 
     main(controller=custom_controller)

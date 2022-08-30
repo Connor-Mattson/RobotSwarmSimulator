@@ -36,7 +36,12 @@ def main():
         GeneRule(_max=1.0, _min=-1.0, mutation_step=0.5, round_digits=4),
         GeneRule(_max=1.0, _min=-1.0, mutation_step=0.5, round_digits=4),
         GeneRule(_max=1.0, _min=-1.0, mutation_step=0.5, round_digits=4),
-        GeneRule(_max=(2 * math.pi), _min=(-2 * math.pi), mutation_step=(math.pi / 2), round_digits=6),
+        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.5, round_digits=4),
+        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.5, round_digits=4),
+        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.5, round_digits=4),
+        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.5, round_digits=4),
+        GeneRule(_max=(math.pi), _min=(-math.pi), mutation_step=(math.pi / 3), round_digits=6),
+        GeneRule(_max=(math.pi), _min=(-math.pi), mutation_step=(math.pi / 3), round_digits=6),
     ]
 
     evolution = BehaviorDiscovery(
@@ -45,8 +50,8 @@ def main():
         crossover_rate=0.7,
         mutation_rate=0.15,
         world_size=[WORLD_WIDTH, WORLD_HEIGHT],
-        lifespan=1200,
-        agents=30,
+        lifespan=300,
+        agents=25,
         k_neighbors=15,
         genotype_rules=gene_rules
     )

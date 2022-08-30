@@ -11,8 +11,8 @@ def main():
     # )
 
     archive = NoveltyArchive(
-        pheno_file="trialD/pheno_g5_gen100_pop100_1661858162.csv",
-        geno_file="trialD/geno_g5_gen100_pop100_1661858162.csv"
+        pheno_file="pheno_g10_gen100_pop100_1661890591.csv",
+        geno_file="geno_g10_gen100_pop100_1661890591.csv"
     )
 
     Trends().graphArchiveComparisons(archive)
