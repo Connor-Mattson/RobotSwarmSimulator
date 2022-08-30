@@ -29,7 +29,7 @@ def main(controller=None):
     paused = False
 
     # Create the simulation world
-    world = RectangularWorld(WORLD_WIDTH, WORLD_HEIGHT, pop_size=20)
+    world = RectangularWorld(WORLD_WIDTH, WORLD_HEIGHT, pop_size=12)
     # world.setup(controller=[-0.7, 0.3, 1.0, 1.0])
     # world.setup(controller=[-0.7, -1.0, 1.0, -1.0])
 
@@ -39,7 +39,6 @@ def main(controller=None):
         # world.setup(controller=[-0.7, 0.3, 1.0, 1.0])
         # world.setup(controller=[-0.7, -1.0, 1.0, -1.0])
         # world.setup(controller=[1, 0.58008062, 0.9649, 0.7992])
-        # world.setup(controller=[0.66, 0.62, 0.14, 0.13])  # "Hive" Behavior
         world.setup(controller=[0.64, 0.75, 0.06, 0.09])  # "Flocking" Behavior
 
     # Create the GUI
@@ -104,10 +103,17 @@ if __name__ == "__main__":
     # call the main function
     # custom_controller = [-0.4516, -0.5024, -0.2318, 1.0, -1.16*math.pi]
 
-    # Complex Circuits
+    # Complex Circuits (For n > 30 this is just a circle)
+    # Use n = 25
     custom_controller = [-0.4, -0.5, -0.2318, 1.0, -1.16 * math.pi]
 
+    # Complex Circuits 2
+    # custom_controller = [0.6836, 0.95, 0.86, -0.9, -1.72*math.pi]
+
+    # Membrane (for N > 50)
+    # custom_controller = [0.6336, 0.95, 0.86, -0.9, -1.72*math.pi]
+
     # Partner Search
-    custom_controller = [-0.549, -0.4532, -0.2683, -1.0, -(math.pi/2)]
+    # custom_controller = [-0.549, -0.4532, -0.2683, -1.0, -(math.pi/2)]
 
     main(controller=custom_controller)
