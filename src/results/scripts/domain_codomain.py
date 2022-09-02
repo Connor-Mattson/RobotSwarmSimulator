@@ -30,7 +30,7 @@ def getDistributionStats(behavior):
 
 def main():
     DENSITY = 20
-    TRIALS = 3
+    TRIALS = 10
     SAMPLE_SIZE = 20
 
     r_0_s = np.linspace(-1.0, 1.0, num=DENSITY)
@@ -45,8 +45,8 @@ def main():
     genome_sample = np.array([genomes[i] for i in index_sample])
 
     # Behaviors at t {behavior_timestep}
-    timesteps = [500 * i for i in range(1, 6)]
-    populations = [5, 10, 15, 20, 25, 30, 35, 40]
+    timesteps = [500 * i for i in range(1, 20)]
+    populations = [5 * i for i in range(1, 20)]
 
     # Test
     # timesteps = [10, 20, 30, 40, 50, 60, 70]
@@ -65,7 +65,7 @@ def main():
     # populations = [10, 20, 30, 40, 50, 60]
 
     # Any Values
-    # timesteps = [1, 2, 3, 4, 5]
+    timesteps = [1, 2, 3, 4, 5]
     # populations = [2, 3]
 
     behavior_dist_metrics = np.zeros((len(timesteps), len(populations), 5, NUM_STATS))
@@ -81,9 +81,9 @@ def main():
             for j, gene in enumerate(genome_sample):
                 world = RectangularWorld(
                     w=500, h=500,
-                    pop_size=pop_size
+                    pop_size=pop_size,
                 )
-                world.setup(controller=gene)
+                world.setup(controller=gene, seed=trial)
                 for step in range(max(timesteps) + 1):
                     world.step()
                     if step in timesteps:
@@ -94,8 +94,6 @@ def main():
                             behavior[index] = np.concatenate((behavior[index], [world.getBehaviorVector()]))
 
             for j, behav in enumerate(behavior):
-                if behav is None:
-                    print("NONE???")
                 my_stats = getDistributionStats(behav)
                 behavior_dist_metrics[j][i] += my_stats
 

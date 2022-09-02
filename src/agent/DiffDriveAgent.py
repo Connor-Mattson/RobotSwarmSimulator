@@ -6,7 +6,7 @@ from src.agent.Agent import Agent
 from src.sensors.BinaryLOSSensor import BinaryLOSSensor
 
 class DifferentialDriveAgent(Agent):
-    def __init__(self, x=None, y=None, controller=None, name=None, angle=None, world_dim=[500, 500]) -> None:
+    def __init__(self, x=None, y=None, controller=None, name=None, angle=None, world_dim=[500, 500], seed=None) -> None:
         """
         Controller is a vector of length 4 that details the velocities of the wheels.
         """

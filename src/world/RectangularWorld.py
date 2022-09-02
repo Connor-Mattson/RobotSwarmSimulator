@@ -25,11 +25,19 @@ class RectangularWorld(World):
         super().__init__(w, h)
         self.population_size = pop_size
 
-    def setup(self, controller=[]):
+    def setup(self, controller=[], seed=None):
+
+        if seed is not None:
+            random.seed(seed)
+
         self.population = [
-            DifferentialDriveAgent(name=f"Bot_{i}",
-                                   controller=controller,
-                                   world_dim=[self.bounded_width, self.bounded_height])
+            DifferentialDriveAgent(
+                name=f"Bot_{i}",
+                x=random.randint(0, self.bounded_width),
+                y=random.randint(0, self.bounded_height),
+                controller=controller,
+                world_dim=[self.bounded_width, self.bounded_height],
+            )
             for i in range(self.population_size)
         ]
 

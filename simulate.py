@@ -34,7 +34,7 @@ def main(controller=None):
     # world.setup(controller=[-0.7, -1.0, 1.0, -1.0])
 
     if controller is not None:
-        world.setup(controller=controller)
+        world.setup(controller=controller, seed=10)
     else:
         # world.setup(controller=[-0.7, 0.3, 1.0, 1.0])
         # world.setup(controller=[-0.7, -1.0, 1.0, -1.0])
@@ -122,8 +122,8 @@ if __name__ == "__main__":
     # custom_controller = [-0.0471, -1.0, -1.0, 0.1820, (-1.3 * math.pi)]
 
     # Normal Aggregation
-    # custom_controller = [-0.7, -1.0, 1.0, -1.0, 0]
+    custom_controller = [-0.7, -1.0, 1.0, -1.0]
 
-    custom_controller = [-0.7, -1.0, 1.0, -0.7, -1.0, 1.0, -1.0, -1.0, 0, math.pi]
+    # custom_controller = [-0.7, -1.0, 1.0, -0.7, -1.0, 1.0, -1.0, -1.0, 0, math.pi]
 
     main(controller=custom_controller)
