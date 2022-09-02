@@ -25,17 +25,17 @@ class DifferentialDriveAgent(Agent):
 
         super().__init__(x, y, name=name)
 
-        if len(controller) == 10:
+        if len(controller) == 4:
             self.vr_0 = controller[0]
             self.vl_0 = controller[1]
             self.vr_1 = controller[2]
             self.vl_1 = controller[3]
-            self.vl_2 = controller[4]
-            self.vr_2 = controller[5]
-            self.vr_3 = controller[6]
-            self.vl_3 = controller[7]
-            self.a_theta = controller[8]
-            self.b_theta = controller[9]
+            # self.vl_2 = controller[4]
+            # self.vr_2 = controller[5]
+            # self.vr_3 = controller[6]
+            # self.vl_3 = controller[7]
+            # self.a_theta = controller[8]
+            # self.b_theta = controller[9]
         else:
             raise Exception("This should not be thrown")
             self.vr_0 = -0.7
@@ -50,8 +50,9 @@ class DifferentialDriveAgent(Agent):
             self.angle = angle
 
         self.sensors = [
-            BinaryLOSSensor(parent=self, angle=self.a_theta),
-            BinaryLOSSensor(parent=self, angle=self.b_theta)
+            BinaryLOSSensor(parent=self, angle=0),
+            # BinaryLOSSensor(parent=self, angle=self.a_theta),
+            # BinaryLOSSensor(parent=self, angle=self.b_theta)
         ]
 
     def step(self, check_for_world_boundaries=None, population=[], check_for_agent_collisions=None) -> None:
@@ -92,18 +93,26 @@ class DifferentialDriveAgent(Agent):
         pygame.draw.line(screen, (255, 255, 255), tail, vec_with_magnitude)
 
     def interpretSensors(self) -> Tuple:
-        if self.sensors[0].on and self.sensors[1].on:
-            vr = self.vr_3
-            vl = self.vl_3
-        elif self.sensors[1].on:
-            vr = self.vr_2
-            vl = self.vl_2
-        elif self.sensors[0].on:
+
+        if self.sensors[0].on:
             vr = self.vr_1
             vl = self.vl_1
         else:
             vr = self.vr_0
             vl = self.vl_0
+
+        # if self.sensors[0].on and self.sensors[1].on:
+        #     vr = self.vr_3
+        #     vl = self.vl_3
+        # elif self.sensors[1].on:
+        #     vr = self.vr_2
+        #     vl = self.vl_2
+        # elif self.sensors[0].on:
+        #     vr = self.vr_1
+        #     vl = self.vl_1
+        # else:
+        #     vr = self.vr_0
+        #     vl = self.vl_0
         return vr, vl
 
     def __str__(self) -> str:

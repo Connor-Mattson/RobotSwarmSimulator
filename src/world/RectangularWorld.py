@@ -50,7 +50,7 @@ class RectangularWorld(World):
             RadialVarianceBehavior(population=self.population, r=world_radius),
             ScatterBehavior(population=self.population, r=world_radius),
             GroupRotationBehavior(population=self.population),
-            SensorOffset(population=self.population, sensor_a_index=0, sensor_b_index=1),
+            # SensorOffset(population=self.population, sensor_a_index=0, sensor_b_index=1),
         ]
 
     def step(self):

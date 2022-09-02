@@ -45,6 +45,7 @@ def main(controller=None):
     gui = DifferentialDriveGUI(x=WORLD_WIDTH, y=0, h=WORLD_HEIGHT, w=GUI_WIDTH)
     gui.set_title("Differential Drive")
 
+
     # Attach the world to the gui and visa versa
     gui.set_world(world)
     world.attach_gui(gui)
