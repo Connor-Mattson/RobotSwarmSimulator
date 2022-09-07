@@ -29,7 +29,7 @@ def main(controller=None):
     paused = False
 
     # Create the simulation world
-    world = RectangularWorld(WORLD_WIDTH, WORLD_HEIGHT, pop_size=30)
+    world = RectangularWorld(WORLD_WIDTH, WORLD_HEIGHT, pop_size=5)
     # world.setup(controller=[-0.7, 0.3, 1.0, 1.0])
     # world.setup(controller=[-0.7, -1.0, 1.0, -1.0])
 
@@ -123,6 +123,9 @@ if __name__ == "__main__":
 
     # Normal Aggregation
     custom_controller = [-0.7, -1.0, 1.0, -1.0]
+
+    # Normal Cyclic Pursuit
+    # custom_controller = [-0.7, 0.3, 1.0, 1.0]
 
     # custom_controller = [-0.7, -1.0, 1.0, -0.7, -1.0, 1.0, -1.0, -1.0, 0, math.pi]
 

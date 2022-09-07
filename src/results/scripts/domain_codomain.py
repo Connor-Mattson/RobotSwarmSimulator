@@ -8,7 +8,6 @@ from src.world.RectangularWorld import RectangularWorld
 
 NUM_STATS = 4
 
-
 def getDummyDist():
     dist = [[0.0 for j in range(NUM_STATS)] for i in range(len(5))]
     return dist
@@ -30,7 +29,7 @@ def getDistributionStats(behavior):
 
 def main():
     DENSITY = 20
-    TRIALS = 10
+    TRIALS = 5
     SAMPLE_SIZE = 20
 
     r_0_s = np.linspace(-1.0, 1.0, num=DENSITY)
@@ -45,8 +44,8 @@ def main():
     genome_sample = np.array([genomes[i] for i in index_sample])
 
     # Behaviors at t {behavior_timestep}
-    timesteps = [500 * i for i in range(1, 20)]
-    populations = [5 * i for i in range(1, 20)]
+    timesteps = [300 * i for i in range(1, 10)]
+    populations = [i for i in range(10, 30, 2)]
 
     # Test
     # timesteps = [10, 20, 30, 40, 50, 60, 70]
@@ -65,7 +64,7 @@ def main():
     # populations = [10, 20, 30, 40, 50, 60]
 
     # Any Values
-    timesteps = [1, 2, 3, 4, 5]
+    # timesteps = [1, 2, 3, 4, 5]
     # populations = [2, 3]
 
     behavior_dist_metrics = np.zeros((len(timesteps), len(populations), 5, NUM_STATS))
