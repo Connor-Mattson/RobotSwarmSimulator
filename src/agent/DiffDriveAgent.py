@@ -62,6 +62,9 @@ class DifferentialDriveAgent(Agent):
         self.dy = (self.wheel_radius / 2) * (vl + vr) * math.sin(self.angle)
         heading = (vr - vl) / (self.radius * 2)
 
+        old_x_pos = self.x_pos
+        old_y_pos = self.y_pos
+
         self.x_pos += self.dx * self.dt
         self.y_pos += self.dy * self.dt
         self.angle += heading * self.dt
@@ -71,6 +74,10 @@ class DifferentialDriveAgent(Agent):
 
         if check_for_agent_collisions is not None:
             check_for_agent_collisions(self)
+
+        # Calculate the 'real' dx, dy after collisions have been calculated.
+        self.dx = self.x_pos - old_x_pos
+        self.dy = self.y_pos - old_y_pos
 
         for sensor in self.sensors:
             sensor.step(population=population)

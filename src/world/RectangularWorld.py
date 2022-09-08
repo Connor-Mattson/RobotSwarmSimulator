@@ -25,7 +25,7 @@ class RectangularWorld(World):
         super().__init__(w, h)
         self.population_size = pop_size
 
-    def setup(self, controller=[], seed=None):
+    def setup(self, controller=[], seed=None, behavior_history_size=100):
 
         if seed is not None:
             random.seed(seed)

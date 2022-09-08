@@ -14,6 +14,7 @@ class DifferentialDriveGUI(AbstractGUI):
 
     def __init__(self, x=0, y=0, w=0, h=0):
         super().__init__(x=x, y=y, w=w, h=h)
+        self.time = 0
 
     def set_selected(self, agent: DifferentialDriveAgent):
         super().set_selected(agent)
@@ -26,6 +27,9 @@ class DifferentialDriveGUI(AbstractGUI):
     def set_world(self, world: World):
         self.world = world
 
+    def set_time(self, time_steps):
+        self.time = time_steps
+
     def draw(self, screen):
         super().draw(screen)
         self.text_baseline = 10
@@ -34,6 +38,8 @@ class DifferentialDriveGUI(AbstractGUI):
                 self.appendTextToGUI(screen, self.title, size=20)
             if self.subtitle:
                 self.appendTextToGUI(screen, self.subtitle, size=18)
+
+            self.appendTextToGUI(screen, f"Timesteps: {self.time}")
             if self.selected:
                 a = self.selected
                 self.appendTextToGUI(screen, f"Current Agent: {a.name}")

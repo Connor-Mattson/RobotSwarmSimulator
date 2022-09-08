@@ -3,8 +3,8 @@ from typing import List
 from src.behavior.AbstractBehavior import AbstractBehavior
 
 class AverageSpeedBehavior(AbstractBehavior):
-    def __init__(self, population: List):
-        super().__init__(name = "Average Speed")
+    def __init__(self, population: List, history=100):
+        super().__init__(name = "Average Speed", history_size=history)
         self.population = population
 
     def calculate(self):

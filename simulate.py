@@ -12,7 +12,7 @@ GUI_WIDTH = 200
 
 
 # define a main function
-def main(controller=None):
+def main(controller=None, seed=None):
     # initialize the pygame module
     pygame.init()
     # load and set the logo
@@ -29,17 +29,12 @@ def main(controller=None):
     paused = False
 
     # Create the simulation world
-    world = RectangularWorld(WORLD_WIDTH, WORLD_HEIGHT, pop_size=5)
+    world = RectangularWorld(WORLD_WIDTH, WORLD_HEIGHT, pop_size=30)
     # world.setup(controller=[-0.7, 0.3, 1.0, 1.0])
     # world.setup(controller=[-0.7, -1.0, 1.0, -1.0])
 
     if controller is not None:
-        world.setup(controller=controller, seed=10)
-    else:
-        # world.setup(controller=[-0.7, 0.3, 1.0, 1.0])
-        # world.setup(controller=[-0.7, -1.0, 1.0, -1.0])
-        # world.setup(controller=[1, 0.58008062, 0.9649, 0.7992])
-        world.setup(controller=[0.64, 0.75, 0.06, 0.09])  # "Flocking" Behavior
+        world.setup(controller=controller, seed=seed)
 
     # Create the GUI
     gui = DifferentialDriveGUI(x=WORLD_WIDTH, y=0, h=WORLD_HEIGHT, w=GUI_WIDTH)
@@ -54,6 +49,8 @@ def main(controller=None):
     steps_taken = 0
     steps_per_frame = 1
 
+    labels = [pygame.K_RETURN, pygame.K_q, pygame.K_0, pygame.K_KP0, pygame.K_1, pygame.K_KP1, pygame.K_2, pygame.K_KP2, pygame.K_3, pygame.K_KP3, pygame.K_4, pygame.K_KP4, pygame.K_5, pygame.K_KP5]
+
     # Main loop
     while running:
         # Looped Event Handling
@@ -64,13 +61,16 @@ def main(controller=None):
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     paused = not paused
-                    print(f"Paused on Simulation Step: {steps_taken}")
+                    # print(f"Paused on Simulation Step: {steps_taken}")
                 if event.key == pygame.K_RSHIFT:
                     steps_per_frame *= 2
                     steps_per_frame = min(steps_per_frame, 50)
                 if event.key == pygame.K_LSHIFT and steps_per_frame > 1:
                     steps_per_frame /= 2
                     steps_per_frame = round(steps_per_frame)
+                if event.key in labels:
+                    return event.key, steps_taken
+
             if event.type == pygame.MOUSEBUTTONUP:
                 pos = pygame.mouse.get_pos()
                 world.onClick(pos)
@@ -86,8 +86,10 @@ def main(controller=None):
                     break
             world.step()
             steps_taken += 1
-            if steps_taken % 100 == 0:
-                print(f"Total steps: {steps_taken}")
+            # if steps_taken % 1000 == 0:
+                # print(f"Total steps: {steps_taken}")
+
+        gui.set_time(steps_taken)
 
         # Draw!
         screen.fill((0, 0, 0))
@@ -122,11 +124,15 @@ if __name__ == "__main__":
     # custom_controller = [-0.0471, -1.0, -1.0, 0.1820, (-1.3 * math.pi)]
 
     # Normal Aggregation
-    custom_controller = [-0.7, -1.0, 1.0, -1.0]
+    # custom_controller = [-0.7, -1.0, 1.0, -1.0]
 
     # Normal Cyclic Pursuit
     # custom_controller = [-0.7, 0.3, 1.0, 1.0]
 
     # custom_controller = [-0.7, -1.0, 1.0, -0.7, -1.0, 1.0, -1.0, -1.0, 0, math.pi]
+    custom_controller = [0.47988, 0.10683, 0.42625, 0.32519]
 
-    main(controller=custom_controller)
+    custom_controller = [-0.35, 0.15, 0.65, 0.75]
+
+    label = main(controller=custom_controller, seed=10)
+    print(label)

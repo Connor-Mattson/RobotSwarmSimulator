@@ -3,8 +3,8 @@ from typing import List
 from src.behavior.AbstractBehavior import AbstractBehavior
 
 class RadialVarianceBehavior(AbstractBehavior):
-    def __init__(self, population: List, r: float):
-        super().__init__(name = "Radial Variance")
+    def __init__(self, population: List, r: float, history=100):
+        super().__init__(name = "Radial Variance", history_size=history)
         self.population = population
         self.world_radius = r
 

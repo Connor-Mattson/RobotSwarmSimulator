@@ -2,9 +2,10 @@ import numpy as np
 from typing import List
 from src.behavior.AbstractBehavior import AbstractBehavior
 
+
 class ScatterBehavior(AbstractBehavior):
-    def __init__(self, population: List, r: float):
-        super().__init__(name = "Scatter")
+    def __init__(self, population: List, r: float, history=100):
+        super().__init__(name="Scatter", history_size=history)
         self.population = population
         self.world_radius = r
 
@@ -22,7 +23,7 @@ class ScatterBehavior(AbstractBehavior):
             distance_list.append(distance)
 
         scatter = sum(distance_list) / (r * r * n)
-        self.set_value(scatter)    
+        self.set_value(scatter)
 
     def center_of_mass(self):
         positions = [
