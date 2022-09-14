@@ -62,6 +62,19 @@ def main(controller=None, seed=None):
                 if event.key == pygame.K_SPACE:
                     paused = not paused
                     # print(f"Paused on Simulation Step: {steps_taken}")
+                if event.key == pygame.K_RIGHT and paused:
+                    # ON Right Arrow Pressed, draw single frame
+                    world.step()
+                    steps_taken += 1
+                    screen.fill((0, 0, 0))
+                    world.draw(screen)
+                    gui.draw(screen)
+                    pygame.display.flip()
+
+                if event.key == pygame.K_r:
+                    world.setup(controller=controller, seed=seed)
+                    steps_taken = 0
+
                 if event.key == pygame.K_RSHIFT:
                     steps_per_frame *= 2
                     steps_per_frame = min(steps_per_frame, 50)
@@ -132,7 +145,14 @@ if __name__ == "__main__":
     # custom_controller = [-0.7, -1.0, 1.0, -0.7, -1.0, 1.0, -1.0, -1.0, 0, math.pi]
     custom_controller = [0.47988, 0.10683, 0.42625, 0.32519]
 
-    custom_controller = [-0.35, 0.15, 0.65, 0.75]
+
+    a = 0.8
+    b = 0.6
+
+    # a = 0.4
+    # b = 0.8
+
+    custom_controller = [0.9, 0.88, 1.0, 1.0]
 
     label = main(controller=custom_controller, seed=10)
     print(label)

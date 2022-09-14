@@ -47,21 +47,21 @@ class BehaviorDiscovery:
         self.initializePopulation()
 
     def initializePopulation(self):
-        BEHAVIOR_SIZE = 6
+        BEHAVIOR_SIZE = 5
         self.population = np.array([
             [rule.fetch() for rule in self.geno_rules] for j in range(self.population_size)
         ])
         self.scores = np.array([0.0 for i in range(self.population_size)])
         self.behavior = np.array([[-1.0 for j in range(BEHAVIOR_SIZE)] for i in range(self.population_size)])
 
-    def runSingleGeneration(self, screen, i):
+    def runSingleGeneration(self, screen, i, seed=None):
         """
         Evaluates the Novelty of a Single Genome located at the ith index
         """
         self.status = "Simulation"
         genome = self.population[i]
         world = RectangularWorld(self.world_size[0], self.world_size[1], pop_size=self.num_agents)
-        world.setup(controller=genome)
+        world.setup(controller=genome, seed=seed)
         world.evaluate(self.lifespan)
         world.draw(screen)
 
@@ -72,10 +72,10 @@ class BehaviorDiscovery:
     def evaluate(self, screen):
         self.status = "Evaluate"
 
-        theta_max = max(self.population[:, 4])
-        theta_min = min(self.population[:, 4])
-        self.max_theta.append(theta_max)
-        self.min_theta.append(theta_min)
+        # theta_max = max(self.population[:, 4])
+        # theta_min = min(self.population[:, 4])
+        # self.max_theta.append(theta_max)
+        # self.min_theta.append(theta_min)
 
         for i, behavior_vector in enumerate(self.behavior):
             novelty = self.archive.getNovelty(k=self.k, vec=behavior_vector)
@@ -108,7 +108,7 @@ class BehaviorDiscovery:
         Trends().graphAverage(self.average_history)
         # Trends().graphArchive(self.archive)
         Trends().plotMetricHistograms(self.archive)
-        Trends().graphThetaDiff(self.max_theta, self.min_theta)
+        # Trends().graphThetaDiff(self.max_theta, self.min_theta)
 
     def tournamentSelection(self, participants=4):
         player_indexes = np.random.randint(0, len(self.population), participants)

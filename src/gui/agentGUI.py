@@ -63,7 +63,7 @@ class DifferentialDriveGUI(AbstractGUI):
                 self.appendTextToGUI(screen, "Behavior", size=18)
                 for b in self.world.behavior:
                     out = b.out_average()
-                    self.appendTextToGUI(screen, "{} : {:0.2f}".format(out[0], out[1]))
+                    self.appendTextToGUI(screen, "{} : {:0.3f}".format(out[0], out[1]))
 
         else:
             print("NO FONT")

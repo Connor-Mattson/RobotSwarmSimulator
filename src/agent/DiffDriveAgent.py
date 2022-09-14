@@ -17,7 +17,7 @@ class DifferentialDriveAgent(Agent):
         self.wheel_radius = 1.0
         self.is_highlighted = False
         self.agent_in_sight = None
-        self.dt = 1.8
+        self.dt = 1.0
 
         if x is None and y is None:
             x = random.randint(0 + self.radius, world_dim[0] - self.radius)

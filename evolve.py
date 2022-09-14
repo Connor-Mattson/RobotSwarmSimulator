@@ -36,22 +36,22 @@ def main():
         GeneRule(_max=1.0, _min=-1.0, mutation_step=0.5, round_digits=4),
         GeneRule(_max=1.0, _min=-1.0, mutation_step=0.5, round_digits=4),
         GeneRule(_max=1.0, _min=-1.0, mutation_step=0.5, round_digits=4),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.5, round_digits=4),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.5, round_digits=4),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.5, round_digits=4),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.5, round_digits=4),
-        GeneRule(_max=(math.pi), _min=(-math.pi), mutation_step=(math.pi / 3), round_digits=6),
-        GeneRule(_max=(math.pi), _min=(-math.pi), mutation_step=(math.pi / 3), round_digits=6),
+        # GeneRule(_max=1.0, _min=-1.0, mutation_step=0.5, round_digits=4),
+        # GeneRule(_max=1.0, _min=-1.0, mutation_step=0.5, round_digits=4),
+        # GeneRule(_max=1.0, _min=-1.0, mutation_step=0.5, round_digits=4),
+        # GeneRule(_max=1.0, _min=-1.0, mutation_step=0.5, round_digits=4),
+        # GeneRule(_max=(math.pi), _min=(-math.pi), mutation_step=(math.pi / 3), round_digits=6),
+        # GeneRule(_max=(math.pi), _min=(-math.pi), mutation_step=(math.pi / 3), round_digits=6),
     ]
 
     evolution = BehaviorDiscovery(
-        generations=100,
-        population_size=100,
+        generations=50,
+        population_size=50,
         crossover_rate=0.7,
         mutation_rate=0.15,
         world_size=[WORLD_WIDTH, WORLD_HEIGHT],
-        lifespan=300,
-        agents=25,
+        lifespan=4000,
+        agents=30,
         k_neighbors=15,
         genotype_rules=gene_rules
     )
@@ -81,7 +81,7 @@ def main():
             screen.fill((0, 0, 0))
 
             evolution.curr_genome = i
-            evolution.runSingleGeneration(screen, i=i)
+            evolution.runSingleGeneration(screen, i=i, seed=i)
             gui.draw(screen=screen)
 
             pygame.display.flip()
