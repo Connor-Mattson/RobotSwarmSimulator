@@ -1,68 +1,69 @@
-from typing import List, Tuple
+from typing import Tuple
 import pygame
 import random
 import math
+from copy import deepcopy
 from src.agent.Agent import Agent
+from src.config.AgentConfig import DiffDriveAgentConfig
 
 
 class DifferentialDriveAgent(Agent):
-    radius = 5
-    wheel_radius = 1.0
-    sensor_on = False
-    is_highlighted = False
-    agent_in_sight = None
 
-    dt = 1.8
+    SEED = -1
 
-    # Circling
-    vr_0 = -0.7
-    vl_0 = 0.3
-    vr_1 = 1
-    vl_1 = 1
+    def __init__(self, config: DiffDriveAgentConfig = None) -> None:
 
-    # Aggregation
-    # vr_0 = -0.7
-    # vl_0 = -1.0
-    # vr_1 = 1.0
-    # vl_1 = -1.0
+        self.controller = config.controller
 
-    def __init__(self, x=None, y=None, controller=None, name=None, angle=None) -> None:
-        """
-        Controller is a vector of length 4 that details the velocities of the wheels.
-        """
-        if controller is None:
-            controller = []
+        if config.seed is not None:
+            self.seed(config.seed)
 
-        if x is None and y is None:
-            x = random.randint(30, 470)
-            y = random.randint(30, 470)
+        if config.x is None:
+            self.x_pos = random.randint(0 + config.agent_radius, config.world.w - config.agent_radius)
+        else:
+            self.x_pos = config.x
 
-        super().__init__(x, y, name=name)
+        if config.y is None:
+            self.y_pos = random.randint(0 + config.agent_radius, config.world.h - config.agent_radius)
+        else:
+            self.y_pos = config.y
 
-        if len(controller) == 4:
-            self.vr_0 = controller[0]
-            self.vl_0 = controller[1]
-            self.vr_1 = controller[2]
-            self.vl_1 = controller[3]
+        super().__init__(self.x_pos, self.y_pos, name="None")
 
-        if angle is None:
+        if config.angle is None:
             self.angle = random.random() * math.pi * 2
         else:
-            self.angle = angle
+            self.angle = config.angle
 
-    def step(self, check_for_sensor=None, check_for_world_boundaries=None, check_for_agent_collisions=None) -> None:
-        super().step()
+        self.radius = config.agent_radius
+        self.wheel_radius = config.wheel_radius
+        self.dt = config.dt
+        self.is_highlighted = False
+        self.agent_in_sight = None
 
-        if not self.sensor_on:
-            vl = self.vl_0
-            vr = self.vr_0
+        self.sensors = deepcopy(config.sensors)
+        self.attach_agent_to_sensors()
+
+    def seed(self, seed):
+        if DifferentialDriveAgent.SEED < 0:
+            DifferentialDriveAgent.SEED = seed
         else:
-            vl = self.vl_1
-            vr = self.vr_1
+            DifferentialDriveAgent.SEED += 1
+        random.seed(DifferentialDriveAgent.SEED)
 
+    def step(self, check_for_world_boundaries=None, population=None, check_for_agent_collisions=None) -> None:
+
+        if population is None:
+            raise Exception("Expected a Valid value for 'population' in step method call")
+
+        super().step()
+        vr, vl = self.interpretSensors()
         self.dx = (self.wheel_radius / 2) * (vl + vr) * math.cos(self.angle)
         self.dy = (self.wheel_radius / 2) * (vl + vr) * math.sin(self.angle)
         heading = (vr - vl) / (self.radius * 2)
+
+        old_x_pos = self.x_pos
+        old_y_pos = self.y_pos
 
         self.x_pos += self.dx * self.dt
         self.y_pos += self.dy * self.dt
@@ -74,35 +75,36 @@ class DifferentialDriveAgent(Agent):
         if check_for_agent_collisions is not None:
             check_for_agent_collisions(self)
 
-        if check_for_sensor is not None:
-            self.sensor_on = check_for_sensor(self)
+        # Calculate the 'real' dx, dy after collisions have been calculated.
+        # This is what we use for velocity in our equations
+        self.dx = self.x_pos - old_x_pos
+        self.dy = self.y_pos - old_y_pos
+
+        for sensor in self.sensors:
+            sensor.step(population=population)
 
     def draw(self, screen) -> None:
         super().draw(screen)
+        for sensor in self.sensors:
+            sensor.draw(screen)
 
         # Draw Cell Membrane
         filled = 0 if self.is_highlighted else 1
         pygame.draw.circle(screen, (255, 255, 255), (self.x_pos, self.y_pos), self.radius, width=filled)
 
-        # Draw Sensory Vector (Vision Vector)
-        sight_color = (255, 0, 0)
-        if (self.sensor_on):
-            sight_color = (0, 255, 0)
-        mangitude = self.radius * (20 if self.is_highlighted else 3)
-        head = (self.x_pos, self.y_pos)
-        tail = (self.x_pos + (mangitude * math.cos(self.angle)), self.y_pos + (mangitude * math.sin(self.angle)))
-        pygame.draw.line(screen, sight_color, head, tail)
+        # "Front" direction vector
+        head = self.getFrontalPoint()
+        tail = self.getPosition()
+        vec = [head[0] - tail[0], head[1] - tail[1]]
+        mag = self.radius * 2
+        vec_with_magnitude = ((vec[0] * mag) + tail[0], (vec[1] * mag) + tail[1])
+        pygame.draw.line(screen, (255, 255, 255), tail, vec_with_magnitude)
 
-    def getFrontalPoint(self) -> Tuple:
-        """
-        Returns the location on the circumference that represents the "front" of the robot
-        """
-        return self.x_pos + math.cos(self.angle), self.y_pos + math.sin(self.angle)
-
-    def getLOSVector(self) -> List:
-        head = (self.x_pos, self.y_pos)
-        tail = self.getFrontalPoint()
-        return [tail[0] - head[0], tail[1] - head[1]]
+    def interpretSensors(self) -> Tuple:
+        sensor_state = self.sensors.getState()
+        vr = self.controller[sensor_state * 2]
+        vl = self.controller[(sensor_state * 2) + 1]
+        return vr, vl
 
     def __str__(self) -> str:
         return "(x: {}, y: {}, r: {}, θ: {})".format(self.x_pos, self.y_pos, self.radius, self.angle)

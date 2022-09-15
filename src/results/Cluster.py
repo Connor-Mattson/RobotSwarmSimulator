@@ -6,6 +6,7 @@ from sklearn_extra.cluster import KMedoids
 
 from src.novelty.NoveltyArchive import NoveltyArchive
 from src.results.ClusterPoint import ClusterPoint
+from src.config.ResultsConfig import ResultsConfig
 
 
 class Cluster:
@@ -26,7 +27,9 @@ class Cluster:
         (133, 146, 158),  # GREY
     ]
 
-    def __init__(self, archive=None):
+    def __init__(self, config: ResultsConfig):
+
+        archive = config.archive
         if archive is None or not issubclass(type(archive), NoveltyArchive):
             raise Exception("Object of type NoveltyArchive must be provided to the Cluster Class")
         self.archive = archive
@@ -36,6 +39,8 @@ class Cluster:
         self.cluster_indices = []
         self.cluster_medoids = []
         self.medoid_genomes = []
+        self.world_config = config.world
+        self.results_config = config
 
         self.initTSNE()
         self.clustering()
@@ -50,14 +55,14 @@ class Cluster:
             n_components=2,
             learning_rate="auto",
             init="pca",
-            perplexity=20,
-            early_exaggeration=12.0
+            perplexity=self.results_config.perplexity,
+            early_exaggeration=self.results_config.early_exaggeration
         ).fit_transform(self.archive.archive)
         print("TSNE Finished!")
 
     def clustering(self):
         print("Starting k-Medoids Clustering")
-        kmedoids = KMedoids(n_clusters=15, random_state=0, init="k-medoids++").fit(self.reduced)
+        kmedoids = KMedoids(n_clusters=self.results_config.k, random_state=0).fit(self.reduced)
         self.cluster_indices = kmedoids.labels_
         self.cluster_medoids = kmedoids.cluster_centers_
         self.medoid_genomes = [[] for _ in self.cluster_medoids]
@@ -98,8 +103,9 @@ class Cluster:
             dist = np.linalg.norm(click_point - medoid_point)
             if dist < self.MEDOID_RADIUS:
                 controller = self.medoid_genomes[i]
-                from simulate import main
-                main(controller)
+                from src.world.simulate import main
+                self.world_config.agentConfig.controller = controller
+                main(world_config=self.world_config)
 
     def runDisplayLoop(self, screen):
         running = True

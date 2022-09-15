@@ -4,6 +4,7 @@ import numpy as np
 from src.novelty.NoveltyArchive import NoveltyArchive
 from src.world.RectangularWorld import RectangularWorld
 from src.results.Trends import Trends
+from src.world.WorldFactory import WorldFactory
 
 
 def getRandomRoundedFloat(lower, _range):
@@ -16,8 +17,8 @@ class BehaviorDiscovery:
     controllers.
     """
 
-    def __init__(self, generations=10, population_size=20, crossover_rate=0.3, mutation_rate=0.1,
-                 lifespan=1000, world_size=[100, 100], agents=30, k_neighbors=15):
+    def __init__(self, generations=10, population_size=20, crossover_rate=0.3, mutation_rate=0.1, genotype_rules=None,
+                 lifespan=200, world_config=None, behavior_config=None, k_neighbors=15):
         self.population = np.array([])
         self.behavior = np.array([])
         self.scores = np.array([])
@@ -26,40 +27,42 @@ class BehaviorDiscovery:
         self.population_size = population_size
         self.crossover_rate = crossover_rate
         self.mutation_rate = mutation_rate
-        self.world_size = world_size
         self.curr_genome = 0
         self.curr_generation = 0
         self.crossovers = 0
         self.mutations = 0
-        self.num_agents = agents
+        self.world_config = world_config
+        self.behavior_config = behavior_config
         self.archive = NoveltyArchive()
         self.k = k_neighbors
         self.status = "Initializing"
         self.score_history = []
         self.average_history = []
+        self.max_theta = []
+        self.min_theta = []
+
+        if genotype_rules is None:
+            raise Exception("BehaviorDiscovery must be initialized with a genotype ruleset.")
+        self.geno_rules = genotype_rules
+
         self.initializePopulation()
 
     def initializePopulation(self):
-        LOWER_BOUND = -1.0
-        UPPER_BOUND = 1.0
-        RANGE = UPPER_BOUND - LOWER_BOUND
-        GENE_SIZE = 4
-        BEHAVIOR_SIZE = 5
-
-        self.population = [
-            [getRandomRoundedFloat(LOWER_BOUND, RANGE) for i in range(GENE_SIZE)] for j in range(self.population_size)
-        ]
+        self.population = np.array([
+            [rule.fetch() for rule in self.geno_rules] for j in range(self.population_size)
+        ])
         self.scores = np.array([0.0 for i in range(self.population_size)])
-        self.behavior = np.array([[-1.0 for j in range(BEHAVIOR_SIZE)] for i in range(self.population_size)])
+        self.behavior = np.array([[-1.0 for j in range(len(self.behavior_config))] for i in range(self.population_size)])
 
-    def runSingleGeneration(self, screen, i):
+    def runSingleGeneration(self, screen, i, seed=None):
         """
         Evaluates the Novelty of a Single Genome located at the ith index
         """
         self.status = "Simulation"
         genome = self.population[i]
-        world = RectangularWorld(self.world_size[0], self.world_size[1], pop_size=self.num_agents)
-        world.setup(controller=genome)
+        self.world_config.agentConfig.controller = genome
+
+        world = WorldFactory.create(self.world_config)
         world.evaluate(self.lifespan)
         world.draw(screen)
 
@@ -68,7 +71,7 @@ class BehaviorDiscovery:
         self.archive.addToArchive(behavior, genome)
 
     def evaluate(self, screen):
-        self.status = "Evaluation"
+        self.status = "Evaluate"
 
         for i, behavior_vector in enumerate(self.behavior):
             novelty = self.archive.getNovelty(k=self.k, vec=behavior_vector)
@@ -99,7 +102,9 @@ class BehaviorDiscovery:
         self.status = "Complete"
         Trends().graphBest(self.score_history)
         Trends().graphAverage(self.average_history)
-        Trends().graphArchive(self.archive)
+        # Trends().graphArchive(self.archive)
+        Trends().plotMetricHistograms(self.archive)
+        # Trends().graphThetaDiff(self.max_theta, self.min_theta)
 
     def tournamentSelection(self, participants=4):
         player_indexes = np.random.randint(0, len(self.population), participants)
@@ -131,11 +136,9 @@ class BehaviorDiscovery:
         for i in range(len(child)):
             if random.random() < self.mutation_rate:
                 self.mutations += 1
-                mutation_size = (random.random() * 0.1) - 0.05
-                if mutation_size < 0:
-                    child[i] = max(-1, child[i] + mutation_size)
-                elif mutation_size > 0:
-                    child[i] = min(1, child[i] + mutation_size)
+                gene_rule = self.geno_rules[i]
+                mutation_size = (gene_rule.mutation_step * 2 * np.random.rand()) - gene_rule.mutation_step
+                child[i] = gene_rule.clip(child[i] + mutation_size)
 
         return child
 

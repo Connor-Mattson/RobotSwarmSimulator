@@ -1,40 +1,47 @@
+import math
+
 import pygame
 import time
 from src.gui.evolutionGUI import EvolutionGUI
 from src.novelty.BehaviorDiscovery import BehaviorDiscovery
+from src.novelty.GeneRule import GeneRule
+from src.config.EvolutionaryConfig import GeneticEvolutionConfig
 
 FRAMERATE = 60
-WORLD_WIDTH = 500
-WORLD_HEIGHT = 500
 GUI_WIDTH = 200
 
 
-def main():
+def main(config: GeneticEvolutionConfig):
+
     # initialize the pygame module
     pygame.init()
     pygame.display.set_caption("Evolutionary Novelty Search")
 
     # screen must be global so that other modules can access + draw to the window
-    screen = pygame.display.set_mode((WORLD_WIDTH + GUI_WIDTH, WORLD_HEIGHT))
+    screen = pygame.display.set_mode((config.world_config.w + GUI_WIDTH, config.world_config.h))
 
     # define a variable to control the main loop
     running = True
     paused = False
+    save_results = config.save_archive
+    display_plots = config.display_novelty
 
     # Create the GUI
-    gui = EvolutionGUI(x=WORLD_WIDTH, y=0, h=WORLD_HEIGHT, w=GUI_WIDTH)
+    gui = EvolutionGUI(x=config.world_config.w, y=0, h=config.world_config.h, w=GUI_WIDTH)
     gui.set_title("Novelty Evolution")
 
     # Initialize GA
+    gene_rules = config.gene_rules
     evolution = BehaviorDiscovery(
-        generations=100,
-        population_size=100,
-        crossover_rate=0.7,
-        mutation_rate=0.1,
-        world_size=[WORLD_WIDTH, WORLD_HEIGHT],
-        lifespan=250,
-        agents=30,
-        k_neighbors=15
+        generations=config.generations,
+        population_size=config.population,
+        crossover_rate=config.crossover_rate,
+        mutation_rate=config.mutation_rate,
+        world_config=config.world_config,
+        lifespan=config.lifespan,
+        k_neighbors=config.k,
+        genotype_rules=gene_rules,
+        behavior_config=config.behavior_config
     )
 
     gui.set_discovery(evolution)
@@ -62,7 +69,7 @@ def main():
             screen.fill((0, 0, 0))
 
             evolution.curr_genome = i
-            evolution.runSingleGeneration(screen, i=i)
+            evolution.runSingleGeneration(screen, i=i, seed=i)
             gui.draw(screen=screen)
 
             pygame.display.flip()
@@ -84,13 +91,13 @@ def main():
         gui.set_elapsed_time(current_time - last_gen_timestamp)
         last_gen_timestamp = current_time
 
-    evolution.archive.saveArchive(f"pheno_{evolution.total_generations}_{len(evolution.population)}")
-    evolution.archive.saveGenotypes(f"geno_{evolution.total_generations}_{len(evolution.population)}")
-    evolution.results()
+    if save_results:
+        evolution.archive.saveArchive(
+            f"pheno_g{len(gene_rules)}_gen{evolution.total_generations}_pop{len(evolution.population)}")
+        evolution.archive.saveGenotypes(
+            f"geno_g{len(gene_rules)}_gen{evolution.total_generations}_pop{len(evolution.population)}")
 
+    if display_plots:
+        evolution.results()
 
-# run the main function only if this module is executed as the main script
-# (if you import this as a module then nothing is executed)
-if __name__ == "__main__":
-    # call the main function
-    main()
+    return evolution.archive

@@ -1,5 +1,6 @@
 from src.gui.abstractGUI import AbstractGUI
 
+
 class World():
 
     def __init__(self, w, h):
@@ -27,3 +28,4 @@ class World():
     def evaluate(self, steps: int):
         for _ in range(steps):
             self.step()
+

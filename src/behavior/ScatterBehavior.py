@@ -2,15 +2,16 @@ import numpy as np
 from typing import List
 from src.behavior.AbstractBehavior import AbstractBehavior
 
+
 class ScatterBehavior(AbstractBehavior):
-    
-    population = []
-    world_radius = 1
-    
-    def __init__(self, population: List, r: float):
-        super().__init__(name = "Scatter")
-        self.population = population
-        self.world_radius = r
+    def __init__(self, history=100):
+        super().__init__(name="Scatter", history_size=history)
+        self.population = None
+        self.world_radius = 0
+
+    def attach_world(self, world):
+        self.population = world.population
+        self.world_radius = world.config.radius
 
     def calculate(self):
         n = len(self.population)
@@ -26,7 +27,7 @@ class ScatterBehavior(AbstractBehavior):
             distance_list.append(distance)
 
         scatter = sum(distance_list) / (r * r * n)
-        self.set_value(scatter)    
+        self.set_value(scatter)
 
     def center_of_mass(self):
         positions = [

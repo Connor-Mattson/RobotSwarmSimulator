@@ -3,12 +3,13 @@ from typing import List
 from src.behavior.AbstractBehavior import AbstractBehavior
 
 class GroupRotationBehavior(AbstractBehavior):
-    
-    population = []
-    
-    def __init__(self, population: List):
-        super().__init__(name = "Group Rotation")
-        self.population = population
+
+    def __init__(self, history=100):
+        super().__init__(name = "Group Rotation", history_size=history)
+        self.population = None
+
+    def attach_world(self, world):
+        self.population = world.population
 
     def calculate(self):
         n = len(self.population)
