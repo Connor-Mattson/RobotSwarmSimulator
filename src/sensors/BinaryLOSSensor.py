@@ -6,9 +6,9 @@ from typing import List
 
 
 class BinaryLOSSensor(AbstractSensor):
-    def __init__(self, parent, angle=None):
+    def __init__(self, parent=None, angle=None):
         super(BinaryLOSSensor, self).__init__(parent=parent)
-        self.on = False
+        self.current_state = 0
         self.angle = angle
 
     def checkForLOSCollisions(self, population) -> None:
@@ -35,11 +35,11 @@ class BinaryLOSSensor(AbstractSensor):
             has_intersection = (r_2 - e_2 + a_2) >= 0
             if has_intersection and a >= 0:
                 self.parent.agent_in_sight = agent
-                self.on = True
+                self.current_state = 1
                 return
 
         self.parent.agent_in_sight = None
-        self.on = False
+        self.current_state = 0
 
     def step(self, population):
         super(BinaryLOSSensor, self).step(population=population)
@@ -50,7 +50,7 @@ class BinaryLOSSensor(AbstractSensor):
 
         # Draw Sensory Vector (Vision Vector)
         sight_color = (255, 0, 0)
-        if self.on:
+        if self.current_state == 1:
             sight_color = (0, 255, 0)
 
         magnitude = self.parent.radius * (20 if self.parent.is_highlighted else 1)

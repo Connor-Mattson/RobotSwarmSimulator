@@ -1,4 +1,4 @@
-import simulate
+from src.world import simulate
 import pygame
 from src.util.datasets.DiffDriveDataset import DiffDriveDataset
 from src.util.datasets.GenomeDataSet import GenomeDataSet

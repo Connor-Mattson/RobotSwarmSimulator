@@ -4,9 +4,12 @@ from src.behavior.AbstractBehavior import AbstractBehavior
 
 class GroupRotationBehavior(AbstractBehavior):
 
-    def __init__(self, population: List, history=100):
+    def __init__(self, history=100):
         super().__init__(name = "Group Rotation", history_size=history)
-        self.population = population
+        self.population = None
+
+    def attach_world(self, world):
+        self.population = world.population
 
     def calculate(self):
         n = len(self.population)

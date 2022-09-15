@@ -1,18 +1,13 @@
-import pygame
-import math, random
-import numpy as np
+import math
+import random
 from typing import List, Tuple
 
-from src.agent.DiffDriveAgent import DifferentialDriveAgent
-from src.behavior.GroupRotationBehavior import GroupRotationBehavior
-from src.behavior.ScatterBehavior import ScatterBehavior
-from src.behavior.RadialVariance import RadialVarianceBehavior
-from src.behavior.AngularMomentum import AngularMomentumBehavior
-from src.behavior.AverageSpeed import AverageSpeedBehavior
-from src.behavior.SensorOffset import SensorOffset
-from src.behavior.SensorRotation import SensorRotation
-from src.world.World import World
+import numpy as np
 from src.agent.Agent import Agent
+from src.agent.DiffDriveAgent import DifferentialDriveAgent
+from src.world.World import World
+from src.config.WorldConfig import RectangularWorldConfig
+from src.agent.AgentFactory import AgentFactory
 
 
 def distance(pointA, pointB) -> float:
@@ -20,46 +15,23 @@ def distance(pointA, pointB) -> float:
 
 
 class RectangularWorld(World):
+    def __init__(self, config: RectangularWorldConfig = None):
+        if config is None:
+            raise Exception("RectangularWorld must be instantiated with a WorldConfig class")
 
-    def __init__(self, w, h, pop_size=20):
-        super().__init__(w, h)
-        self.population_size = pop_size
-
-    def setup(self, controller=[], seed=None, behavior_history_size=100):
-
-        if seed is not None:
-            random.seed(seed)
-
+        super().__init__(config.w, config.h)
+        self.config = config
+        self.population_size = config.population_size
+        self.behavior = config.behavior
+        self.padding = config.padding
         self.population = [
-            DifferentialDriveAgent(
-                name=f"Bot_{i}",
-                x=random.randint(0, self.bounded_width),
-                y=random.randint(0, self.bounded_height),
-                controller=controller,
-                world_dim=[self.bounded_width, self.bounded_height],
-            )
-            for i in range(self.population_size)
+            AgentFactory.create(config.agentConfig) for i in range(self.population_size)
         ]
+        self.behavior = config.behavior
+        for b in self.behavior:
+            b.attach_world(self)
 
-        # self.population = [
-        #     DifferentialDriveAgent(angle=0, controller=[-0.7, -1.0, 1.0, -1.0], x = 700, y = 700),
-        #     DifferentialDriveAgent(angle=0, controller=[-0.7, -1.0, 1.0, -1.0], x = 700, y = 700)
-        # ]
-
-        # Pile On - Testing if stacked collisions work as expected
-        # self.population = [
-        #     DifferentialDriveAgent(angle=math.pi / 2, controller=[0.99, 1, 1, 1], x = 250, y = 250) for i in range(self.population_size)
-        # ]
-
-        world_radius = np.linalg.norm([self.bounded_width / 2, self.bounded_height / 2])
-        self.behavior = [
-            AverageSpeedBehavior(population=self.population),
-            AngularMomentumBehavior(population=self.population, r=world_radius),
-            RadialVarianceBehavior(population=self.population, r=world_radius),
-            ScatterBehavior(population=self.population, r=world_radius),
-            GroupRotationBehavior(population=self.population),
-            # SensorOffset(population=self.population, sensor_a_index=0, sensor_b_index=1),
-        ]
+        print("Hello World")
 
     def step(self):
         """
@@ -103,7 +75,7 @@ class RectangularWorld(World):
     def onClick(self, pos) -> None:
         neighborhood = self.getNeighborsWithinDistance(pos, self.population[0].radius)
 
-        # Remove Highlights from everyone
+        # Remove Highlights from all agents
         for n in self.population:
             n.is_highlighted = False
 
@@ -119,7 +91,7 @@ class RectangularWorld(World):
         """
         Set agent position with respect to the world's boundaries and the bounding box of the agent
         """
-        padding = 10
+        padding = self.padding
 
         # Prevent Left Collisions
         agent.x_pos = max(agent.radius + padding, agent.x_pos)
@@ -151,7 +123,6 @@ class RectangularWorld(World):
             return
 
         remaining_attempts = 10
-
         while len(neighborhood) > 0 and remaining_attempts > 0:
 
             # Check ALL Bagged agents for collisions
