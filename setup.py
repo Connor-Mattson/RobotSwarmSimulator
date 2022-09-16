@@ -13,7 +13,6 @@ setuptools.setup(
     },
     license='MIT',
     packages=[
-        "hatchling",
         "cycler==0.11.0",
         "fonttools==4.35.0",
         "joblib==1.1.0",
