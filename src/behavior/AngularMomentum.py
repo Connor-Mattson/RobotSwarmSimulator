@@ -2,7 +2,6 @@ import numpy as np
 from typing import List
 from src.behavior.AbstractBehavior import AbstractBehavior
 
-
 class AngularMomentumBehavior(AbstractBehavior):
     def __init__(self, history=100):
         super().__init__(name="Angular Momentum", history_size=history)
