@@ -2,9 +2,9 @@ import numpy as np
 from matplotlib import pyplot, colors
 from matplotlib.patches import Patch
 
-from src.novelty.NoveltyArchive import NoveltyArchive
-from src.results.Trends import Trends
-from src.world.RectangularWorld import RectangularWorld
+from novel_swarms.novelty.NoveltyArchive import NoveltyArchive
+from novel_swarms.results.Trends import Trends
+from novel_swarms.world.RectangularWorld import RectangularWorld
 
 NUM_STATS = 4
 

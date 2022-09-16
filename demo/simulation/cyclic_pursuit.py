@@ -7,16 +7,16 @@ Connor Mattson
 University of Utah
 September 2022
 """
-from src.world.simulate import main as simulate
-from src.behavior.AngularMomentum import AngularMomentumBehavior
-from src.behavior.AverageSpeed import AverageSpeedBehavior
-from src.behavior.GroupRotationBehavior import GroupRotationBehavior
-from src.behavior.RadialVariance import RadialVarianceBehavior
-from src.behavior.ScatterBehavior import ScatterBehavior
-from src.sensors.BinaryLOSSensor import BinaryLOSSensor
-from src.sensors.SensorSet import SensorSet
-from src.config.AgentConfig import DiffDriveAgentConfig
-from src.config.WorldConfig import RectangularWorldConfig
+from novel_swarms.world.simulate import main as simulate
+from novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
+from novel_swarms.behavior.AverageSpeed import AverageSpeedBehavior
+from novel_swarms.behavior.GroupRotationBehavior import GroupRotationBehavior
+from novel_swarms.behavior.RadialVariance import RadialVarianceBehavior
+from novel_swarms.behavior.ScatterBehavior import ScatterBehavior
+from novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
+from novel_swarms.sensors.SensorSet import SensorSet
+from novel_swarms.config.AgentConfig import DiffDriveAgentConfig
+from novel_swarms.config.WorldConfig import RectangularWorldConfig
 
 if __name__ == "__main__":
 

@@ -8,9 +8,9 @@ Connor Mattson
 University of Utah
 September 2022
 """
-from src.config.defaults import ConfigurationDefaults
-from src.novelty.NoveltyArchive import NoveltyArchive
-from src.results.results import main as report
+from novel_swarms.config.defaults import ConfigurationDefaults
+from novel_swarms.novelty.NoveltyArchive import NoveltyArchive
+from novel_swarms.results.results import main as report
 
 if __name__ == "__main__":
 

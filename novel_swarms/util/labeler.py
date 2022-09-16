@@ -1,4 +1,4 @@
-from src.world import simulate
+from novel_swarms.world import simulate
 import pygame
 from datasets.DiffDriveDataset import DiffDriveDataset
 from datasets.GenomeDataSet import GenomeDataSet

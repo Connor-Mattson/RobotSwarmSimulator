@@ -7,12 +7,12 @@ Connor Mattson
 University of Utah
 September 2022
 """
-from src.novelty.GeneRule import GeneRule
-from src.novelty.evolve import main as evolve
-from src.results.results import main as report
-from src.config.WorldConfig import RectangularWorldConfig
-from src.config.defaults import ConfigurationDefaults
-from src.config.EvolutionaryConfig import GeneticEvolutionConfig
+from novel_swarms.novelty.GeneRule import GeneRule
+from novel_swarms.novelty.evolve import main as evolve
+from novel_swarms.results.results import main as report
+from novel_swarms.config.WorldConfig import RectangularWorldConfig
+from novel_swarms.config.defaults import ConfigurationDefaults
+from novel_swarms.config.EvolutionaryConfig import GeneticEvolutionConfig
 
 if __name__ == "__main__":
 

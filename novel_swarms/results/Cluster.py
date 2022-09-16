@@ -103,7 +103,7 @@ class Cluster:
             dist = np.linalg.norm(click_point - medoid_point)
             if dist < self.MEDOID_RADIUS:
                 controller = self.medoid_genomes[i]
-                from src.world.simulate import main
+                from novel_swarms.world.simulate import main
                 self.world_config.agentConfig.controller = controller
                 main(world_config=self.world_config)
 
