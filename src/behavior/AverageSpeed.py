@@ -1,6 +1,6 @@
 import numpy as np
 from typing import List
-from src.behavior.AbstractBehavior import AbstractBehavior
+from .AbstractBehavior import AbstractBehavior
 
 
 class AverageSpeedBehavior(AbstractBehavior):

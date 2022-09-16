@@ -1,8 +1,11 @@
 from src.world import simulate
 import pygame
-from src.util.datasets.DiffDriveDataset import DiffDriveDataset
-from src.util.datasets.GenomeDataSet import GenomeDataSet
+from datasets.DiffDriveDataset import DiffDriveDataset
+from datasets.GenomeDataSet import GenomeDataSet
 
+"""
+DEPRECATED - Will not work in current configuration
+"""
 
 def main():
     unknown_genomes = GenomeDataSet(file="../../data/unknown.csv")

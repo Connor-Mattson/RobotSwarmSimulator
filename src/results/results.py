@@ -1,8 +1,6 @@
-from src.novelty.NoveltyArchive import NoveltyArchive
-from src.results.Trends import Trends
-from src.results.Cluster import Cluster
-from src.config.WorldConfig import RectangularWorldConfig
-from src.config.ResultsConfig import ResultsConfig
+from ..config.ResultsConfig import ResultsConfig
+from .Cluster import Cluster
+from .Trends import Trends
 
 
 # define a main function

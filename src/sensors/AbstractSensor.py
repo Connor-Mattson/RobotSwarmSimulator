@@ -1,4 +1,4 @@
-from src.agent.Agent import Agent
+from ..agent.Agent import Agent
 
 
 class AbstractSensor:

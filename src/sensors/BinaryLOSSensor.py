@@ -1,7 +1,7 @@
 import pygame
 import numpy as np
 import math
-from src.sensors.AbstractSensor import AbstractSensor
+from .AbstractSensor import AbstractSensor
 from typing import List
 
 

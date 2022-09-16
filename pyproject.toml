@@ -1,0 +1,23 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "novel_swarms"
+version = "0.0.1"
+authors = [
+  { name="Connor Mattson", email="c.mattson@utah.edu" },
+]
+description = "A package to simulation computation free swarm behaviors"
+readme = "README.md"
+license = { file="LICENSE" }
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/Connor-Mattson/NovelSwarmBehavior"
+"Bug Tracker" = "https://github.com/Connor-Mattson/NovelSwarmBehavior/issues"

@@ -1,8 +1,7 @@
 import pygame
-from src.novelty.BehaviorDiscovery import BehaviorDiscovery
-from src.agent.DiffDriveAgent import DifferentialDriveAgent
-from src.gui.abstractGUI import AbstractGUI
-from src.world.World import World
+from ..novelty.BehaviorDiscovery import BehaviorDiscovery
+from .abstractGUI import AbstractGUI
+from ..world.World import World
 
 class EvolutionGUI(AbstractGUI):
 

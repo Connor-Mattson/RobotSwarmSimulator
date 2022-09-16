@@ -1,10 +1,9 @@
 import math
 import random
 import numpy as np
-from src.novelty.NoveltyArchive import NoveltyArchive
-from src.world.RectangularWorld import RectangularWorld
-from src.results.Trends import Trends
-from src.world.WorldFactory import WorldFactory
+from .NoveltyArchive import NoveltyArchive
+from ..results.Trends import Trends
+from ..world.WorldFactory import WorldFactory
 
 
 def getRandomRoundedFloat(lower, _range):

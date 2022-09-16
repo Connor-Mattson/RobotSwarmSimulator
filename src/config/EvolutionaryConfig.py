@@ -1,4 +1,4 @@
-from src.novelty.GeneRule import GeneRule
+from ..novelty.GeneRule import GeneRule
 
 
 class GeneticEvolutionConfig:

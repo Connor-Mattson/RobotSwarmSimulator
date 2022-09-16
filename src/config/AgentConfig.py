@@ -2,8 +2,8 @@ import random
 
 from pygame import math
 
-from src.config.WorldConfig import RectangularWorldConfig
-from src.sensors.SensorSet import SensorSet
+from .WorldConfig import RectangularWorldConfig
+from ..sensors.SensorSet import SensorSet
 
 
 class DiffDriveAgentConfig:

@@ -1,9 +1,6 @@
 import math
-
 import numpy
-from abc import abstractmethod
 from typing import Tuple
-from src.sensors.SensorSet import SensorSet
 
 
 class Agent:

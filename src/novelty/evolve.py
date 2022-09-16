@@ -1,13 +1,8 @@
-import math
-
-import pygame
 import time
-
-from src.config.OutputTensorConfig import OutputTensorConfig
-from src.gui.evolutionGUI import EvolutionGUI
-from src.novelty.BehaviorDiscovery import BehaviorDiscovery
-from src.novelty.GeneRule import GeneRule
-from src.config.EvolutionaryConfig import GeneticEvolutionConfig
+import pygame
+from ..config.EvolutionaryConfig import GeneticEvolutionConfig
+from ..gui.evolutionGUI import EvolutionGUI
+from .BehaviorDiscovery import BehaviorDiscovery
 
 FRAMERATE = 60
 GUI_WIDTH = 200

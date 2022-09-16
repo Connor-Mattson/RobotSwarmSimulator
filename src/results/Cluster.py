@@ -4,9 +4,9 @@ import pygame
 from sklearn.manifold import TSNE
 from sklearn_extra.cluster import KMedoids
 
-from src.novelty.NoveltyArchive import NoveltyArchive
-from src.results.ClusterPoint import ClusterPoint
-from src.config.ResultsConfig import ResultsConfig
+from ..novelty.NoveltyArchive import NoveltyArchive
+from .ClusterPoint import ClusterPoint
+from ..config.ResultsConfig import ResultsConfig
 
 
 class Cluster:

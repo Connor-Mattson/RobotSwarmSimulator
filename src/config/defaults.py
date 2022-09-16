@@ -1,13 +1,13 @@
-from src.behavior.AngularMomentum import AngularMomentumBehavior
-from src.behavior.AverageSpeed import AverageSpeedBehavior
-from src.behavior.GroupRotationBehavior import GroupRotationBehavior
-from src.behavior.RadialVariance import RadialVarianceBehavior
-from src.behavior.ScatterBehavior import ScatterBehavior
-from src.config.AgentConfig import DiffDriveAgentConfig
-from src.config.ResultsConfig import ResultsConfig
-from src.config.WorldConfig import RectangularWorldConfig
-from src.sensors.BinaryLOSSensor import BinaryLOSSensor
-from src.sensors.SensorSet import SensorSet
+from ..behavior.AngularMomentum import AngularMomentumBehavior
+from ..behavior.AverageSpeed import AverageSpeedBehavior
+from ..behavior.GroupRotationBehavior import GroupRotationBehavior
+from ..behavior.RadialVariance import RadialVarianceBehavior
+from ..behavior.ScatterBehavior import ScatterBehavior
+from .AgentConfig import DiffDriveAgentConfig
+from .ResultsConfig import ResultsConfig
+from .WorldConfig import RectangularWorldConfig
+from ..sensors.BinaryLOSSensor import BinaryLOSSensor
+from ..sensors.SensorSet import SensorSet
 
 
 class ConfigurationDefaults:

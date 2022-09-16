@@ -1,5 +1,5 @@
-from src.config.AgentConfig import *
-from src.agent.DiffDriveAgent import DifferentialDriveAgent
+from ..config.AgentConfig import DiffDriveAgentConfig
+from .DiffDriveAgent import DifferentialDriveAgent
 
 
 class AgentFactory:

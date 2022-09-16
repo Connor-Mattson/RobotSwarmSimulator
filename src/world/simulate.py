@@ -1,7 +1,6 @@
-
 import pygame
-from src.gui.agentGUI import DifferentialDriveGUI
-from src.world.WorldFactory import WorldFactory
+from ..gui.agentGUI import DifferentialDriveGUI
+from .WorldFactory import WorldFactory
 
 screen = None
 FRAMERATE = 128

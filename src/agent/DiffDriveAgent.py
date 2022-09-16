@@ -3,9 +3,8 @@ import pygame
 import random
 import math
 from copy import deepcopy
-from src.agent.Agent import Agent
-from src.config.AgentConfig import DiffDriveAgentConfig
-
+from .Agent import Agent
+from ..config.AgentConfig import DiffDriveAgentConfig
 
 class DifferentialDriveAgent(Agent):
 

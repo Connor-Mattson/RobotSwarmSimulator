@@ -1,13 +1,12 @@
 import math
 import random
-from typing import List, Tuple
-
 import numpy as np
-from src.agent.Agent import Agent
-from src.agent.DiffDriveAgent import DifferentialDriveAgent
-from src.world.World import World
-from src.config.WorldConfig import RectangularWorldConfig
-from src.agent.AgentFactory import AgentFactory
+from typing import List, Tuple
+from ..agent.Agent import Agent
+from ..agent.DiffDriveAgent import DifferentialDriveAgent
+from ..config.WorldConfig import RectangularWorldConfig
+from ..agent.AgentFactory import AgentFactory
+from .World import World
 
 
 def distance(pointA, pointB) -> float:

@@ -1,7 +1,7 @@
 import numpy as np
 from matplotlib import pyplot, colors
 import os
-from src.world.RectangularWorld import RectangularWorld
+from ..world.RectangularWorld import RectangularWorld
 
 
 def categorized_box_plot():

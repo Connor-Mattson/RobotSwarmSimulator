@@ -1,7 +1,7 @@
 import pygame
-from src.agent.DiffDriveAgent import DifferentialDriveAgent
-from src.gui.abstractGUI import AbstractGUI
-from src.world.World import World
+from ..agent.DiffDriveAgent import DifferentialDriveAgent
+from .abstractGUI import AbstractGUI
+from ..world.World import World
 
 
 class DifferentialDriveGUI(AbstractGUI):
