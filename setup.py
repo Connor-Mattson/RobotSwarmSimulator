@@ -13,6 +13,9 @@ setuptools.setup(
     },
     license='MIT',
     packages=[
+        "novel_swarms"
+    ],
+    install_requires=[
         "cycler==0.11.0",
         "fonttools==4.35.0",
         "joblib==1.1.0",
@@ -28,7 +31,6 @@ setuptools.setup(
         "scikit-learn-extra==0.2.0",
         "scipy==1.9.0",
         "six==1.16.0",
-        "threadpoolctl==3.1.0",
+        "threadpoolctl==3.1.0"
     ],
-    install_requires=["pygame==2.1.2"],
 )
