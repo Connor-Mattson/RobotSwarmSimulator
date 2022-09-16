@@ -31,8 +31,6 @@ class RectangularWorld(World):
         for b in self.behavior:
             b.attach_world(self)
 
-        print("Hello World")
-
     def step(self):
         """
         Cycle through the entire population and take one step. Calculate Behavior if needed.

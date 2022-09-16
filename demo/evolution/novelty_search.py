@@ -57,6 +57,7 @@ if __name__ == "__main__":
         simulation_lifespan=300,
         display_novelty=False,
         save_archive=False,
+        show_gui=True
     )
 
     # Novelty Search through Genetic Evolution

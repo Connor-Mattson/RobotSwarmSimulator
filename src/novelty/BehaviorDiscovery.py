@@ -54,7 +54,7 @@ class BehaviorDiscovery:
         self.scores = np.array([0.0 for i in range(self.population_size)])
         self.behavior = np.array([[-1.0 for j in range(len(self.behavior_config))] for i in range(self.population_size)])
 
-    def runSingleGeneration(self, screen, i, seed=None):
+    def runSinglePopulation(self, screen, i, seed=None, output_config=None):
         """
         Evaluates the Novelty of a Single Genome located at the ith index
         """
@@ -63,7 +63,7 @@ class BehaviorDiscovery:
         self.world_config.agentConfig.controller = genome
 
         world = WorldFactory.create(self.world_config)
-        world.evaluate(self.lifespan)
+        world.evaluate(self.lifespan, output_capture=output_config)
         world.draw(screen)
 
         behavior = world.getBehaviorVector()

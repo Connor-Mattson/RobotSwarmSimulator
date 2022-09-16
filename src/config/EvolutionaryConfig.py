@@ -14,6 +14,7 @@ class GeneticEvolutionConfig:
                  simulation_lifespan=0,
                  display_novelty=False,
                  save_archive=False,
+                 show_gui=True
                  ):
 
         if gene_rules is None or not isinstance(gene_rules, list) or len(gene_rules) == 0:
@@ -32,3 +33,4 @@ class GeneticEvolutionConfig:
         self.lifespan = simulation_lifespan
         self.display_novelty = display_novelty
         self.save_archive = save_archive
+        self.show_gui = show_gui

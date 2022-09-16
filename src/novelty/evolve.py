@@ -2,6 +2,8 @@ import math
 
 import pygame
 import time
+
+from src.config.OutputTensorConfig import OutputTensorConfig
 from src.gui.evolutionGUI import EvolutionGUI
 from src.novelty.BehaviorDiscovery import BehaviorDiscovery
 from src.novelty.GeneRule import GeneRule
@@ -18,7 +20,10 @@ def main(config: GeneticEvolutionConfig):
     pygame.display.set_caption("Evolutionary Novelty Search")
 
     # screen must be global so that other modules can access + draw to the window
-    screen = pygame.display.set_mode((config.world_config.w + GUI_WIDTH, config.world_config.h))
+    width = config.world_config.w
+    if config.show_gui:
+        width += GUI_WIDTH
+    screen = pygame.display.set_mode((width, config.world_config.h))
 
     # define a variable to control the main loop
     running = True
@@ -27,8 +32,9 @@ def main(config: GeneticEvolutionConfig):
     display_plots = config.display_novelty
 
     # Create the GUI
-    gui = EvolutionGUI(x=config.world_config.w, y=0, h=config.world_config.h, w=GUI_WIDTH)
-    gui.set_title("Novelty Evolution")
+    if config.show_gui:
+        gui = EvolutionGUI(x=config.world_config.w, y=0, h=config.world_config.h, w=GUI_WIDTH)
+        gui.set_title("Novelty Evolution")
 
     # Initialize GA
     gene_rules = config.gene_rules
@@ -44,7 +50,8 @@ def main(config: GeneticEvolutionConfig):
         behavior_config=config.behavior_config
     )
 
-    gui.set_discovery(evolution)
+    if config.show_gui:
+        gui.set_discovery(evolution)
     last_gen_timestamp = time.time()
 
     # Generation Loop
@@ -69,8 +76,10 @@ def main(config: GeneticEvolutionConfig):
             screen.fill((0, 0, 0))
 
             evolution.curr_genome = i
-            evolution.runSingleGeneration(screen, i=i, seed=i)
-            gui.draw(screen=screen)
+            evolution.runSinglePopulation(screen, i=i, seed=i, output_config=None)
+
+            if config.show_gui:
+                gui.draw(screen=screen)
 
             pygame.display.flip()
 
@@ -79,16 +88,19 @@ def main(config: GeneticEvolutionConfig):
 
         screen.fill((0, 0, 0))
         evolution.evaluate(screen=screen)
-        gui.draw(screen=screen)
+        if config.show_gui:
+            gui.draw(screen=screen)
         pygame.display.flip()
 
-        screen.fill((0, 0, 0))
         evolution.evolve()
-        gui.draw(screen=screen)
-        pygame.display.flip()
+        if config.show_gui:
+            screen.fill((0, 0, 0))
+            gui.draw(screen=screen)
+            pygame.display.flip()
 
         current_time = time.time()
-        gui.set_elapsed_time(current_time - last_gen_timestamp)
+        if config.show_gui:
+            gui.set_elapsed_time(current_time - last_gen_timestamp)
         last_gen_timestamp = current_time
 
     if save_results:

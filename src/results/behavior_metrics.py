@@ -5,7 +5,6 @@ from src.world.RectangularWorld import RectangularWorld
 
 
 def categorized_box_plot():
-    print("Hello World!")
     print(os.getcwd())
 
     from src.util.datasets.DiffDriveDataset import DiffDriveDataset
