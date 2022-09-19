@@ -62,13 +62,14 @@ class BehaviorDiscovery:
         self.world_config.agentConfig.controller = genome
 
         world = WorldFactory.create(self.world_config)
-        world.evaluate(self.lifespan, output_capture=output_config)
+        output = world.evaluate(self.lifespan, output_capture=output_config)
         if screen is not None:
             world.draw(screen)
 
         behavior = world.getBehaviorVector()
         self.behavior[i] = behavior
         self.archive.addToArchive(behavior, genome)
+        return output
 
     def evaluate(self):
         self.status = "Evaluate"
