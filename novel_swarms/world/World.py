@@ -61,12 +61,15 @@ class World():
                     pygame.display.flip()
 
             if output_capture:
-                if step in frame_markers:
+                if not output_capture.timeless and step in frame_markers:
                     screen_capture = pygame.surfarray.array2d(screen)
                     if output is None:
                         output = np.array([screen_capture])
                     else:
                         output = np.concatenate((output, [screen_capture]))
+
+        if output_capture.timeless:
+            output = pygame.surfarray.array2d(screen)
 
         return output
 
