@@ -71,7 +71,7 @@ def main(config: GeneticEvolutionConfig):
             screen.fill((0, 0, 0))
 
             evolution.curr_genome = i
-            evolution.runSinglePopulation(screen, i=i, seed=i, output_config=None)
+            evolution.runSinglePopulation(screen=screen, i=i, seed=i, output_config=None)
 
             if config.show_gui:
                 gui.draw(screen=screen)
