@@ -15,6 +15,7 @@ setuptools.setup(
     packages=[
         "novel_swarms"
     ],
+    include_package_data=True,
     install_requires=[
         "cycler==0.11.0",
         "fonttools==4.35.0",
