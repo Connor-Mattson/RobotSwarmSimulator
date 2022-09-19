@@ -1,5 +1,5 @@
-from novel_swarms.config.WorldConfig import RectangularWorldConfig
-from novel_swarms.world.RectangularWorld import RectangularWorld
+from ..config.WorldConfig import RectangularWorldConfig
+from .RectangularWorld import RectangularWorld
 
 
 class WorldFactory:

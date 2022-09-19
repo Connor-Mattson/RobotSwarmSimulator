@@ -1,7 +1,7 @@
 import pygame
 
-from novel_swarms.gui.abstractGUI import AbstractGUI
-from novel_swarms.config.OutputTensorConfig import OutputTensorConfig
+from ..gui.abstractGUI import AbstractGUI
+from ..config.OutputTensorConfig import OutputTensorConfig
 import numpy as np
 
 class World():
