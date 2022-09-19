@@ -21,10 +21,12 @@ Test Evolution (Novelty Search) - Will take a long time to evolve.
 
 You're good to go!
 
-## Use as Package
-You can now install this repository as a pip package under the name novel_swarms==0.0.1
+[//]: # (## Use as Package)
 
-    pip install --upgrade git+ssh://git@github.com/Connor-Mattson/NovelSwarmBehavior.git@master
+[//]: # (You can now install this repository as a pip package under the name novel_swarms==0.0.1)
+
+[//]: # ()
+[//]: # (    pip install --upgrade git+ssh://git@github.com/Connor-Mattson/NovelSwarmBehavior.git@master)
 
 ## Demos
 
