@@ -21,7 +21,9 @@ from novel_swarms.config.WorldConfig import RectangularWorldConfig
 
 if __name__ == "__main__":
 
-    CUSTOM_GENOME = [0.0, 0.0, 0.0, 0.0]
+    a = 0.8
+    b = 0.4
+    CUSTOM_GENOME = [a - 0.03, a, a - 0.03, a]
     SEED = None
 
     sensors = SensorSet([

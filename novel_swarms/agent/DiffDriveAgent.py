@@ -56,10 +56,10 @@ class DifferentialDriveAgent(Agent):
             raise Exception("Expected a Valid value for 'population' in step method call")
 
         super().step()
-        vr, vl = self.interpretSensors()
+        vl, vr = self.interpretSensors()
         self.dx = (self.wheel_radius / 2) * (vl + vr) * math.cos(self.angle)
         self.dy = (self.wheel_radius / 2) * (vl + vr) * math.sin(self.angle)
-        heading = (vr - vl) / (self.radius * 2)
+        heading = (vl - vr) / (self.radius * 2)
 
         old_x_pos = self.x_pos
         old_y_pos = self.y_pos
@@ -101,9 +101,9 @@ class DifferentialDriveAgent(Agent):
 
     def interpretSensors(self) -> Tuple:
         sensor_state = self.sensors.getState()
-        vr = self.controller[sensor_state * 2]
-        vl = self.controller[(sensor_state * 2) + 1]
-        return vr, vl
+        vl = self.controller[sensor_state * 2]
+        vr = self.controller[(sensor_state * 2) + 1]
+        return vl, vr
 
     def __str__(self) -> str:
         return "(x: {}, y: {}, r: {}, θ: {})".format(self.x_pos, self.y_pos, self.radius, self.angle)

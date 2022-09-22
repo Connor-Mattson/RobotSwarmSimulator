@@ -1,3 +1,12 @@
+from novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
+from novel_swarms.behavior.AverageSpeed import AverageSpeedBehavior
+from novel_swarms.behavior.GroupRotationBehavior import GroupRotationBehavior
+from novel_swarms.behavior.RadialVariance import RadialVarianceBehavior
+from novel_swarms.behavior.ScatterBehavior import ScatterBehavior
+from novel_swarms.config.AgentConfig import DiffDriveAgentConfig
+from novel_swarms.config.WorldConfig import RectangularWorldConfig
+from novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
+from novel_swarms.sensors.SensorSet import SensorSet
 from novel_swarms.world import simulate
 import pygame
 from datasets.DiffDriveDataset import DiffDriveDataset
@@ -6,6 +15,7 @@ from datasets.GenomeDataSet import GenomeDataSet
 """
 DEPRECATED - Will not work in current configuration
 """
+
 
 def main():
     unknown_genomes = GenomeDataSet(file="../../data/unknown.csv")
@@ -32,7 +42,33 @@ def main():
     }
 
     for i, genome in enumerate(unknown_genomes.data):
-        classified_pattern_keydown, time = simulate.main(controller=genome)
+
+        sensors = SensorSet([
+            BinaryLOSSensor(angle=0),
+        ])
+
+        agent_config = DiffDriveAgentConfig(
+            controller=genome,
+            sensors=sensors,
+        )
+
+        behavior = [
+            AverageSpeedBehavior(),
+            AngularMomentumBehavior(),
+            RadialVarianceBehavior(),
+            ScatterBehavior(),
+            GroupRotationBehavior(),
+        ]
+
+        world_config = RectangularWorldConfig(
+            size=(500, 500),
+            n_agents=30,
+            behavior=behavior,
+            agentConfig=agent_config,
+            padding=15
+        )
+
+        classified_pattern_keydown, time = simulate.main(world_config=world_config)
 
         if classified_pattern_keydown in key_mapping:
             key_mapping[classified_pattern_keydown].append(genome)
@@ -49,6 +85,7 @@ def main():
 
     unknown_genomes.overwrite_data([])
     unknown_genomes.save()
+
 
 if __name__ == "__main__":
     main()
