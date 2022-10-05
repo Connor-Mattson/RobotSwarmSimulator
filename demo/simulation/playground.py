@@ -23,7 +23,7 @@ if __name__ == "__main__":
 
     a = 0.8
     b = 0.4
-    CUSTOM_GENOME = [a - 0.03, a, a - 0.03, a]
+    CUSTOM_GENOME = [0.7, 0.68, 1.0, 1.0]
     SEED = None
 
     sensors = SensorSet([
