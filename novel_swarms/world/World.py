@@ -68,7 +68,7 @@ class World():
                     else:
                         output = np.concatenate((output, [screen_capture]))
 
-        if output_capture.timeless:
+        if output_capture and output_capture.timeless:
             output = pygame.surfarray.array2d(screen)
 
         return output
