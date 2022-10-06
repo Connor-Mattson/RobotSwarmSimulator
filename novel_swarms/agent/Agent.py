@@ -1,5 +1,5 @@
 import math
-import numpy
+from numpy import array
 from typing import Tuple
 
 
@@ -22,10 +22,10 @@ class Agent:
         pass
 
     def getPosition(self):
-        return numpy.array([self.x_pos, self.y_pos])
+        return array([self.x_pos, self.y_pos])
 
     def getVelocity(self):
-        return numpy.array([self.dx, self.dy])
+        return array([self.dx, self.dy])
 
     def getFrontalPoint(self) -> Tuple:
         """

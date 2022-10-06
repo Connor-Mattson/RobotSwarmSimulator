@@ -76,7 +76,7 @@ class RectangularWorld(World):
         for n in self.population:
             n.is_highlighted = False
 
-        if len(neighborhood) == 0:
+        if self.gui is not None and len(neighborhood) == 0:
             self.gui.set_selected(None)
             return
 

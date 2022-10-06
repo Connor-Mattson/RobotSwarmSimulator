@@ -82,7 +82,7 @@ def main(config: GeneticEvolutionConfig):
             pygame.time.Clock().tick(FRAMERATE)
 
         screen.fill((0, 0, 0))
-        evolution.evaluate(screen=screen)
+        evolution.evaluate()
         if config.show_gui:
             gui.draw(screen=screen)
         pygame.display.flip()

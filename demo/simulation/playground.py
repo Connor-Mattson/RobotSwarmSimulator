@@ -15,19 +15,27 @@ from novel_swarms.behavior.GroupRotationBehavior import GroupRotationBehavior
 from novel_swarms.behavior.RadialVariance import RadialVarianceBehavior
 from novel_swarms.behavior.ScatterBehavior import ScatterBehavior
 from novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
+from novel_swarms.sensors.BinaryFOVSensor import BinaryFOVSensor
 from novel_swarms.sensors.SensorSet import SensorSet
 from novel_swarms.config.AgentConfig import DiffDriveAgentConfig
 from novel_swarms.config.WorldConfig import RectangularWorldConfig
 
 if __name__ == "__main__":
-
     a = 0.8
     b = 0.4
-    CUSTOM_GENOME = [0.7, 0.68, 1.0, 1.0]
+
+    # CUSTOM_GENOME = [-0.7, -1.0, 1.0, -1.0]  # Aggregation
+    # CUSTOM_GENOME = [-0.7, 0.3, 1.0, 1.0]  # Cyclic Pursuit
+    # CUSTOM_GENOME = [0.2, 0.7, -0.5, -0.1]  # Dispersal
+    # CUSTOM_GENOME = [-0.69, -0.77, 0.05, -0.4]  # Milling
+    CUSTOM_GENOME = [1.0, 0.98, 1.0, 1.0]  # Wall Following
+    # CUSTOM_GENOME = [-0.83, -0.75, 0.27, -0.57]  # Random
+
     SEED = None
 
     sensors = SensorSet([
-        BinaryLOSSensor(angle=0),
+        # BinaryLOSSensor(angle=0),
+        BinaryFOVSensor(theta=14 / 2, distance=125, degrees=True)
     ])
 
     agent_config = DiffDriveAgentConfig(

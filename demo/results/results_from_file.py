@@ -14,7 +14,7 @@ from novel_swarms.results.results import main as report
 
 if __name__ == "__main__":
 
-    agent_config = ConfigurationDefaults.DIFF_DRIVE_AGENT
+    agent_config = ConfigurationDefaults.FOV_DIFF_DRIVE_AGENT
     world_config = ConfigurationDefaults.RECTANGULAR_WORLD
     world_config.addAgentConfig(agent_config)
 
@@ -22,8 +22,8 @@ if __name__ == "__main__":
     # Evolutionary archives are saved to files if GeneticEvolutionConfig.save_archive
     #   is set to True. Files can be found in /out,
     archive = NoveltyArchive(
-        pheno_file="trialA/pheno_100_100_1661362911.csv",
-        geno_file="trialA/geno_100_100_1661362911.csv"
+        pheno_file="GMU/GMUpheno.csv",
+        geno_file="GMU/GMUgenome.csv"
     )
 
     results_config = ConfigurationDefaults.RESULTS

@@ -6,6 +6,7 @@ from ..behavior.ScatterBehavior import ScatterBehavior
 from .AgentConfig import DiffDriveAgentConfig
 from .ResultsConfig import ResultsConfig
 from .WorldConfig import RectangularWorldConfig
+from ..sensors.BinaryFOVSensor import BinaryFOVSensor
 from ..sensors.BinaryLOSSensor import BinaryLOSSensor
 from ..sensors.SensorSet import SensorSet
 
@@ -16,8 +17,16 @@ class ConfigurationDefaults:
         BinaryLOSSensor(angle=0),
     ])
 
+    FOV_LOS_SENSOR = SensorSet([
+        BinaryFOVSensor(theta=14 / 2, distance=200, degrees=True)
+    ])
+
     DIFF_DRIVE_AGENT = DiffDriveAgentConfig(
         sensors=SIMPLE_SENSOR,
+    )
+
+    FOV_DIFF_DRIVE_AGENT = DiffDriveAgentConfig(
+        sensors=FOV_LOS_SENSOR,
     )
 
     BEHAVIOR_VECTOR = [

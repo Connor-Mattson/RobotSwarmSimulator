@@ -49,10 +49,7 @@ class DifferentialDriveGUI(AbstractGUI):
                 self.appendTextToGUI(screen, f"dx: {a.dx}")
                 self.appendTextToGUI(screen, f"dy: {a.dy}")
                 self.appendTextToGUI(screen, f"")
-                self.appendTextToGUI(screen, f"VR 0: {a.vr_0}")
-                self.appendTextToGUI(screen, f"VL 0: {a.vl_0}")
-                self.appendTextToGUI(screen, f"VR 1: {a.vr_1}")
-                self.appendTextToGUI(screen, f"VL 1: {a.vl_1}")
+                self.appendTextToGUI(screen, f"controller: {a.controller}")
                 self.appendTextToGUI(screen, f"")
                 self.appendTextToGUI(screen, f"θ: {a.angle}")
                 if a.agent_in_sight is not None:

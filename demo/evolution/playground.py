@@ -17,6 +17,7 @@ from novel_swarms.behavior.AverageSpeed import AverageSpeedBehavior
 from novel_swarms.behavior.GroupRotationBehavior import GroupRotationBehavior
 from novel_swarms.behavior.RadialVariance import RadialVarianceBehavior
 from novel_swarms.behavior.ScatterBehavior import ScatterBehavior
+from novel_swarms.sensors.BinaryFOVSensor import BinaryFOVSensor
 from novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
 from novel_swarms.sensors.SensorSet import SensorSet
 from novel_swarms.config.AgentConfig import DiffDriveAgentConfig
@@ -28,7 +29,8 @@ if __name__ == "__main__":
     SEED = None
 
     sensors = SensorSet([
-        BinaryLOSSensor(angle=0),
+        # BinaryLOSSensor(angle=0),
+        BinaryFOVSensor(theta=14 / 2, distance=200, degrees=True)
     ])
 
     agent_config = DiffDriveAgentConfig(
@@ -63,15 +65,15 @@ if __name__ == "__main__":
     novelty_config = GeneticEvolutionConfig(
         gene_rules=genotype,
         phenotype_config=phenotype,
-        n_generations=10,
-        n_population=10,
+        n_generations=100,
+        n_population=100,
         crossover_rate=0.7,
         mutation_rate=0.15,
         world_config=world_config,
-        k_nn=8,
-        simulation_lifespan=3,
+        k_nn=15,
+        simulation_lifespan=600,
         display_novelty=False,
-        save_archive=False,
+        save_archive=True,
         show_gui=True
     )
 
