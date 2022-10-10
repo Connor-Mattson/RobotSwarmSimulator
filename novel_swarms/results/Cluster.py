@@ -106,6 +106,17 @@ class Cluster:
                 from novel_swarms.world.simulate import main
                 self.world_config.agentConfig.controller = controller
                 main(world_config=self.world_config)
+                return
+
+        for i, point in enumerate(self.point_population):
+            poi = np.array([point.x, point.y])
+            dist = np.linalg.norm(click_point - poi)
+            if dist < self.MEDOID_RADIUS:
+                controller = self.archive.genotypes[i]
+                from novel_swarms.world.simulate import main
+                self.world_config.agentConfig.controller = controller
+                main(world_config=self.world_config)
+                return
 
     def runDisplayLoop(self, screen):
         running = True
