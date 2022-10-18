@@ -44,10 +44,6 @@ class DifferentialDriveAgent(Agent):
         self.attach_agent_to_sensors()
 
     def seed(self, seed):
-        if DifferentialDriveAgent.SEED < 0:
-            DifferentialDriveAgent.SEED = seed
-        else:
-            DifferentialDriveAgent.SEED += 1
         random.seed(DifferentialDriveAgent.SEED)
 
     def step(self, check_for_world_boundaries=None, population=None, check_for_agent_collisions=None) -> None:
