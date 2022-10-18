@@ -23,14 +23,16 @@ class RectangularWorld(World):
         self.population_size = config.population_size
         self.behavior = config.behavior
         self.padding = config.padding
-        random.seed(config.seed)
+
+        if config.seed is not None:
+            random.seed(config.seed)
 
         self.population = [
             AgentFactory.create(config.agentConfig) for i in range(self.population_size)
         ]
 
         ac = config.agentConfig
-        if ac.x is None:
+        if ac.x is None and config.seed is not None:
             for agent in self.population:
                 agent.x_pos = random.randint(0 + ac.agent_radius, ac.world.w - ac.agent_radius)
                 agent.y_pos = random.randint(0 + ac.agent_radius, ac.world.h - ac.agent_radius)
