@@ -11,6 +11,9 @@ class SensorSet:
         for sensor in self.sensors:
             yield sensor
 
+    def __index__(self, i):
+        return self.sensors[i]
+
     def __len__(self):
         return len(self.sensors)
 

@@ -5,6 +5,8 @@ import math
 from copy import deepcopy
 from .Agent import Agent
 from ..config.AgentConfig import DiffDriveAgentConfig
+from ..sensors.GenomeDependentSensor import GenomeBinarySensor
+
 
 class DifferentialDriveAgent(Agent):
 
@@ -41,6 +43,10 @@ class DifferentialDriveAgent(Agent):
         self.agent_in_sight = None
 
         self.sensors = deepcopy(config.sensors)
+        for sensor in self.sensors:
+            if isinstance(sensor, GenomeBinarySensor):
+                sensor.augment_from_genome(config.controller)
+
         self.attach_agent_to_sensors()
 
     def seed(self, seed):

@@ -1,5 +1,6 @@
 import time
 import pygame
+import os
 from ..config.EvolutionaryConfig import GeneticEvolutionConfig
 from ..gui.evolutionGUI import EvolutionGUI
 from .BehaviorDiscovery import BehaviorDiscovery
@@ -30,6 +31,9 @@ def main(config: GeneticEvolutionConfig):
     if config.show_gui:
         gui = EvolutionGUI(x=config.world_config.w, y=0, h=config.world_config.h, w=GUI_WIDTH)
         gui.set_title("Novelty Evolution")
+
+    # Create a trial folder in the specified location
+    trial_name = f"{str(int(time.time()))}"
 
     # Initialize GA
     gene_rules = config.gene_rules
@@ -98,11 +102,14 @@ def main(config: GeneticEvolutionConfig):
             gui.set_elapsed_time(current_time - last_gen_timestamp)
         last_gen_timestamp = current_time
 
+        if save_results and config.save_every is not None:
+            if generation % config.save_every == 0:
+                evolution.archive.saveArchive(f"b_{trial_name}_{generation}")
+                evolution.archive.saveGenotypes(f"g_{trial_name}_{generation}")
+
     if save_results:
-        evolution.archive.saveArchive(
-            f"pheno_g{len(gene_rules)}_gen{evolution.total_generations}_pop{len(evolution.population)}")
-        evolution.archive.saveGenotypes(
-            f"geno_g{len(gene_rules)}_gen{evolution.total_generations}_pop{len(evolution.population)}")
+        evolution.archive.saveArchive(f"b_{trial_name}_final")
+        evolution.archive.saveGenotypes(f"g_{trial_name}_final")
 
     if display_plots:
         evolution.results()
