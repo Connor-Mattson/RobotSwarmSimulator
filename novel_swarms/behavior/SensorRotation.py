@@ -7,7 +7,7 @@ from .AbstractBehavior import AbstractBehavior
 
 class SensorRotation(AbstractBehavior):
 
-    def __init__(self, sensor_index=0, history=100):
+    def __init__(self, sensor_index, history=100):
         super().__init__(name="SensorRotation", history_size=history)
         self.population = None
         self.i = sensor_index
@@ -16,6 +16,6 @@ class SensorRotation(AbstractBehavior):
         self.population = world.population
 
     def calculate(self):
-        sensor_angle = self.population[0].sensors[self.i].angle / (2 * math.pi)
+        sensor_angle = self.population[0].controller[self.i] / (2 * math.pi)
         self.set_value(sensor_angle)
 
