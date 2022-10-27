@@ -30,10 +30,12 @@ if __name__ == "__main__":
 
     sensors = SensorSet([
         # BinaryLOSSensor(angle=0),
-        BinaryFOVSensor(theta=14 / 2, distance=200, degrees=True)
+        BinaryFOVSensor(theta=14 / 2, distance=(10 * 13.25), degrees=True)
     ])
 
     agent_config = DiffDriveAgentConfig(
+        agent_radius=5,
+        wheel_radius=(10 * 0.44),
         sensors=sensors,
         seed=SEED,
     )
@@ -54,8 +56,8 @@ if __name__ == "__main__":
     ]
 
     world_config = RectangularWorldConfig(
-        size=(500, 500),
-        n_agents=30,
+        size=(315, 315),
+        n_agents=9,
         seed=SEED,
         behavior=phenotype,
         agentConfig=agent_config,
@@ -72,9 +74,10 @@ if __name__ == "__main__":
         world_config=world_config,
         k_nn=15,
         simulation_lifespan=600,
-        display_novelty=False,
+        display_novelty=True,
         save_archive=True,
-        show_gui=True
+        show_gui=True,
+        save_every=1
     )
 
     # Novelty Search through Genetic Evolution

@@ -5,13 +5,13 @@ from sklearn.neighbors import NearestNeighbors
 
 class NoveltyArchive:
 
-    def __init__(self, max_size=None, pheno_file=None, geno_file=None):
+    def __init__(self, max_size=None, pheno_file=None, geno_file=None, absolute=False):
         self.genotypes = np.array([])
         self.archive = np.array([])
         self.max_size = max_size
         self.time_stamp = None
         if pheno_file is not None and geno_file is not None:
-            self.initializeFromFile(pheno_file, geno_file)
+            self.initializeFromFile(pheno_file, geno_file, absolute=absolute)
 
     def addToArchive(self, vec, genome=[]):
         if len(self.archive) == 0:
@@ -79,8 +79,10 @@ class NoveltyArchive:
 
         f.close()
 
-    def initializeFromFile(self, phenotype_file, genotype_file):
+    def initializeFromFile(self, phenotype_file, genotype_file, absolute=False):
         name = "out/" + phenotype_file
+        if absolute:
+            name = phenotype_file
         f = open(name, "r")
         lines = f.readlines()
         for line in lines:
@@ -95,6 +97,8 @@ class NoveltyArchive:
                 self.archive = np.concatenate((self.archive, float_list))
 
         name = "out/" + genotype_file
+        if absolute:
+            name = genotype_file
         f = open(name, "r")
         lines = f.readlines()
         for line in lines:

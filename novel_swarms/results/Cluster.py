@@ -105,6 +105,7 @@ class Cluster:
                 controller = self.medoid_genomes[i]
                 from ..world.simulate import main
                 self.world_config.agentConfig.controller = controller
+                print(f"Display Controller (Medoid): {controller}")
                 main(world_config=self.world_config)
                 return
 
@@ -115,6 +116,7 @@ class Cluster:
                 controller = self.archive.genotypes[i]
                 from novel_swarms.world.simulate import main
                 self.world_config.agentConfig.controller = controller
+                print(f"Display Controller: {controller}")
                 main(world_config=self.world_config)
                 return
 

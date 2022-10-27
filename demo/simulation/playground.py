@@ -27,21 +27,25 @@ if __name__ == "__main__":
 
     # CUSTOM_GENOME = [-0.7, -1.0, 1.0, -1.0]  # Aggregation
     CUSTOM_GENOME = [-0.7, 0.3, 1.0, 1.0]  # Cyclic Pursuit
+    CUSTOM_GENOME = [-0.35, 0.15, 0.5, 0.5]
     # CUSTOM_GENOME = [0.2, 0.7, -0.5, -0.1]  # Dispersal
     # CUSTOM_GENOME = [-0.69, -0.77, 0.05, -0.4]  # Milling
-    #CUSTOM_GENOME = [1.0, 0.98, 1.0, 1.0]  # Wall Following
+    # CUSTOM_GENOME = [1.0, 0.98, 1.0, 1.0]  # Wall Following
     # CUSTOM_GENOME = [-0.83, -0.75, 0.27, -0.57]  # Random
     # CUSTOM_GENOME = [0.8346  ,   0.5136 ,    0.87086294, 0.7218    ]
 
     SEED = None
 
     sensors = SensorSet([
-        BinaryLOSSensor(angle=-(np.pi/4)),
-        # BinaryFOVSensor(theta=14 / 2, distance=125, degrees=True)
+        # BinaryLOSSensor(angle=0),
+        BinaryFOVSensor(theta=14 / 2, distance=132, degrees=True)
     ])
 
     agent_config = DiffDriveAgentConfig(
         controller=CUSTOM_GENOME,
+        agent_radius=5,
+        dt=0.2,
+        wheel_radius=(10 * 0.44),
         sensors=sensors,
         seed=SEED,
     )
@@ -55,8 +59,8 @@ if __name__ == "__main__":
     ]
 
     world_config = RectangularWorldConfig(
-        size=(500, 500),
-        n_agents=30,
+        size=(290, 290),
+        n_agents=10,
         seed=SEED,
         behavior=behavior,
         agentConfig=agent_config,
