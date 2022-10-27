@@ -15,7 +15,7 @@ class DiffDriveAgentConfig:
                  world_config: RectangularWorldConfig = None,
                  seed=None,
                  agent_radius=5,
-                 wheel_radius=1.0,
+                 wheel_radius=2.0,
                  dt=1.0,
                  sensors: SensorSet = None):
 
