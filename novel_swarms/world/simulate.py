@@ -1,6 +1,7 @@
 import pygame
 from ..gui.agentGUI import DifferentialDriveGUI
 from .WorldFactory import WorldFactory
+from ..util.timer import Timer
 
 screen = None
 FRAMERATE = 128
@@ -85,7 +86,10 @@ def main(world_config):
                 # noinspection PyTypeChecker
                 if steps_taken > total_allowed_steps:
                     break
+            t1 = Timer("World Step")
             world.step()
+            t1.stop()
+
             steps_taken += 1
             # if steps_taken % 1000 == 0:
             # print(f"Total steps: {steps_taken}")

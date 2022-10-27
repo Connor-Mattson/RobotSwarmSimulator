@@ -51,7 +51,7 @@ if __name__ == "__main__":
         AverageSpeedBehavior(),
         AngularMomentumBehavior(),
         RadialVarianceBehavior(),
-        ScatterBehavior(),
+        # ScatterBehavior(),
         GroupRotationBehavior(),
     ]
 
@@ -67,7 +67,7 @@ if __name__ == "__main__":
     novelty_config = GeneticEvolutionConfig(
         gene_rules=genotype,
         phenotype_config=phenotype,
-        n_generations=100,
+        n_generations=25,
         n_population=100,
         crossover_rate=0.7,
         mutation_rate=0.15,
