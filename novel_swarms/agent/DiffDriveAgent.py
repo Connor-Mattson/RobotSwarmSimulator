@@ -6,7 +6,7 @@ from copy import deepcopy
 from .Agent import Agent
 from ..config.AgentConfig import DiffDriveAgentConfig
 from ..sensors.GenomeDependentSensor import GenomeBinarySensor
-
+from ..util.timer import Timer
 
 class DifferentialDriveAgent(Agent):
 
@@ -57,8 +57,10 @@ class DifferentialDriveAgent(Agent):
         if population is None:
             raise Exception("Expected a Valid value for 'population' in step method call")
 
+        # timer = Timer("Calculations")
         super().step()
         vl, vr = self.interpretSensors()
+
         self.dx = (self.wheel_radius / 2) * (vl + vr) * math.cos(self.angle)
         self.dy = (self.wheel_radius / 2) * (vl + vr) * math.sin(self.angle)
         heading = (vl - vr) / (self.radius * 2)
@@ -80,9 +82,12 @@ class DifferentialDriveAgent(Agent):
         # This is what we use for velocity in our equations
         self.dx = self.x_pos - old_x_pos
         self.dy = self.y_pos - old_y_pos
+        # timer = timer.check_watch()
 
+        # timer = Timer("Sensors")
         for sensor in self.sensors:
             sensor.step(population=population)
+        # timer = timer.check_watch()
 
     def draw(self, screen) -> None:
         super().draw(screen)

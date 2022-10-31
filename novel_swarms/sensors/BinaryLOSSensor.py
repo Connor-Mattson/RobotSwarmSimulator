@@ -19,27 +19,43 @@ class BinaryLOSSensor(AbstractSensor):
         d = np.array(self.getLOSVector())
         d_hat = d / np.linalg.norm(d)
 
+        # Check seen agent from last frame first, to avoid expensive computation
+        if self.parent.agent_in_sight is not None:
+            agent = self.parent.agent_in_sight
+            if self.agent_in_sight(agent, p_0, d_hat):
+                self.parent.agent_in_sight = agent
+                self.current_state = 1
+                return
+
         # O(n) brute computation search, does not work with environment obstacles yet
         for agent in population:
-            if agent == self.parent:
-                continue
-
-            c = np.array(agent.getPosition())
-            e = c - p_0
-            a = np.dot(e, d_hat)
-
-            r_2 = agent.radius * agent.radius
-            e_2 = np.dot(e, e)
-            a_2 = a * a
-
-            has_intersection = (r_2 - e_2 + a_2) >= 0
-            if has_intersection and a >= 0:
+            if self.agent_in_sight(agent, p_0, d_hat):
                 self.parent.agent_in_sight = agent
                 self.current_state = 1
                 return
 
         self.parent.agent_in_sight = None
         self.current_state = 0
+
+    def agent_in_sight(self, agent, p_0, d_hat):
+        if agent == self.parent:
+            return False
+
+        c = np.array(agent.getPosition())
+        e = c - p_0
+        a = np.dot(e, d_hat)
+        if a < 0:
+            return False
+
+        r_2 = agent.radius * agent.radius
+        e_2 = np.dot(e, e)
+        a_2 = a * a
+
+        has_intersection = (r_2 - e_2 + a_2) >= 0
+        if has_intersection:
+            return True
+
+        return False
 
     def step(self, population):
         super(BinaryLOSSensor, self).step(population=population)

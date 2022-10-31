@@ -29,8 +29,10 @@ if __name__ == "__main__":
     SEED = None
 
     sensors = SensorSet([
-        # BinaryLOSSensor(angle=0),
-        BinaryFOVSensor(theta=14 / 2, distance=(10 * 13.25), degrees=True)
+        BinaryLOSSensor(angle=0),
+        # BinaryLOSSensor(angle=45),
+        # BinaryLOSSensor(angle=45)
+        # BinaryFOVSensor(theta=14 / 2, distance=(20 * 13.25), degrees=True)
     ])
 
     agent_config = DiffDriveAgentConfig(
@@ -51,7 +53,7 @@ if __name__ == "__main__":
         AverageSpeedBehavior(),
         AngularMomentumBehavior(),
         RadialVarianceBehavior(),
-        # ScatterBehavior(),
+        ScatterBehavior(),
         GroupRotationBehavior(),
     ]
 
@@ -67,17 +69,17 @@ if __name__ == "__main__":
     novelty_config = GeneticEvolutionConfig(
         gene_rules=genotype,
         phenotype_config=phenotype,
-        n_generations=25,
+        n_generations=100,
         n_population=100,
         crossover_rate=0.7,
         mutation_rate=0.15,
         world_config=world_config,
         k_nn=15,
-        simulation_lifespan=600,
+        simulation_lifespan=1000,
         display_novelty=True,
         save_archive=True,
         show_gui=True,
-        save_every=1
+        # save_every=1
     )
 
     # Novelty Search through Genetic Evolution

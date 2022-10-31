@@ -7,6 +7,7 @@ from ..agent.DiffDriveAgent import DifferentialDriveAgent
 from ..config.WorldConfig import RectangularWorldConfig
 from ..agent.AgentFactory import AgentFactory
 from .World import World
+from ..util.timer import Timer
 
 
 def distance(pointA, pointB) -> float:
@@ -45,6 +46,7 @@ class RectangularWorld(World):
         """
         Cycle through the entire population and take one step. Calculate Behavior if needed.
         """
+        agent_step_timer = Timer("Population Step")
         for agent in self.population:
             if not issubclass(type(agent), DifferentialDriveAgent):
                 raise Exception("Agents must be subtype of Agent, not {}".format(type(agent)))
@@ -54,9 +56,13 @@ class RectangularWorld(World):
                 check_for_agent_collisions=self.preventAgentCollisions,
                 population=self.population
             )
+        # agent_step_timer.check_watch()
 
+        behavior_timer = Timer("Behavior Calculation Step")
         for behavior in self.behavior:
             behavior.calculate()
+        # behavior_timer.check_watch()
+
 
     def draw(self, screen):
         """

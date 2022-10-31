@@ -4,7 +4,7 @@ import numpy as np
 from .NoveltyArchive import NoveltyArchive
 from ..results.Trends import Trends
 from ..world.WorldFactory import WorldFactory
-
+from ..util.timer import Timer
 
 def getRandomRoundedFloat(lower, _range):
     return round(((np.random.rand() * _range) + lower), 4)
@@ -57,22 +57,30 @@ class BehaviorDiscovery:
         """
         Evaluates the Novelty of a Single Genome located at the ith index
         """
+        time_me = Timer("Single Population")
         if genome is None:
             genome = self.population[i]
 
         self.status = "Simulation"
         self.world_config.agentConfig.controller = genome
 
+        time_world = Timer("World Factory")
         world = WorldFactory.create(self.world_config)
+        time_world.check_watch()
+
+        time_world = Timer("World Eval")
         output = world.evaluate(self.lifespan, output_capture=output_config)
+        time_world.check_watch()
         if screen is not None:
             world.draw(screen)
 
         behavior = world.getBehaviorVector()
+        time_me.check_watch()
         if save:
             self.behavior[i] = behavior
             self.archive.addToArchive(behavior, genome)
             return output
+
 
         return output, behavior
 

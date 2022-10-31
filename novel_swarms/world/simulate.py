@@ -4,7 +4,7 @@ from .WorldFactory import WorldFactory
 from ..util.timer import Timer
 
 screen = None
-FRAMERATE = 128
+FRAMERATE = 500
 GUI_WIDTH = 200
 
 
@@ -32,7 +32,7 @@ def main(world_config):
     gui.set_world(world)
     world.attach_gui(gui)
 
-    total_allowed_steps = None
+    total_allowed_steps = 1000
     steps_taken = 0
     steps_per_frame = 1
 
@@ -40,6 +40,7 @@ def main(world_config):
               pygame.K_3, pygame.K_KP3, pygame.K_4, pygame.K_KP4, pygame.K_5, pygame.K_KP5]
 
     # Main loop
+    time_me = Timer("World Step")
     while running:
         # Looped Event Handling
         for event in pygame.event.get():
@@ -85,11 +86,11 @@ def main(world_config):
             if total_allowed_steps is not None:
                 # noinspection PyTypeChecker
                 if steps_taken > total_allowed_steps:
+                    time_me.check_watch()
+                    running=False
                     break
-            t1 = Timer("World Step")
-            world.step()
-            t1.stop()
 
+            world.step()
             steps_taken += 1
             # if steps_taken % 1000 == 0:
             # print(f"Total steps: {steps_taken}")
@@ -104,3 +105,5 @@ def main(world_config):
 
         # Limit the FPS of the simulation to FRAMERATE
         pygame.time.Clock().tick(FRAMERATE)
+
+
