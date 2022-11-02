@@ -32,7 +32,7 @@ def main(world_config):
     gui.set_world(world)
     world.attach_gui(gui)
 
-    total_allowed_steps = 1000
+    total_allowed_steps = None
     steps_taken = 0
     steps_per_frame = 1
 
