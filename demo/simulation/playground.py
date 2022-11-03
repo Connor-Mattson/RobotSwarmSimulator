@@ -43,7 +43,7 @@ if __name__ == "__main__":
 
     sensors = SensorSet([
         # StaticSensor(),
-        BinaryLOSSensor(angle=0),
+        BinaryLOSSensor(angle=0, draw=False),
         # BinaryFOVSensor(theta=14 / 2, distance=300, degrees=True)
     ])
 

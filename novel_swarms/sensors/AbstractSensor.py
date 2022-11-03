@@ -2,7 +2,7 @@ from ..agent.Agent import Agent
 
 
 class AbstractSensor:
-    def __init__(self, parent, static_position=None, n_possible_states=0):
+    def __init__(self, parent, static_position=None, n_possible_states=0, draw=True):
         """
         Initialize the abstract class.
             Sensors should typically have a parent that is assigned to them that must be of subclass 'Agent'
@@ -12,6 +12,7 @@ class AbstractSensor:
             raise Exception("The parent must be of type Agent")
 
         self.parent = parent
+        self.show = draw
         self.static_position = static_position
         self.n_possible_states = n_possible_states
         self.current_state = 0

@@ -6,8 +6,8 @@ from typing import List
 
 
 class BinaryLOSSensor(AbstractSensor):
-    def __init__(self, parent=None, angle=None):
-        super(BinaryLOSSensor, self).__init__(parent=parent)
+    def __init__(self, parent=None, angle=None, draw=True):
+        super(BinaryLOSSensor, self).__init__(parent=parent, draw=draw)
         self.current_state = 0
         self.angle = angle
 
@@ -62,6 +62,8 @@ class BinaryLOSSensor(AbstractSensor):
         self.checkForLOSCollisions(population=population)
 
     def draw(self, screen):
+        if not self.show:
+            return
         super(BinaryLOSSensor, self).draw(screen)
 
         # Draw Sensory Vector (Vision Vector)
