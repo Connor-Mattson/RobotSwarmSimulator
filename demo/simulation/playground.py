@@ -9,6 +9,7 @@ University of Utah
 September 2022
 """
 from novel_swarms.sensors.AbstractSensor import AbstractSensor
+from novel_swarms.sensors.GenomeDependentSensor import GenomeBinarySensor
 from novel_swarms.sensors.StaticSensor import StaticSensor
 from novel_swarms.world.simulate import main as simulate
 from novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
@@ -43,7 +44,8 @@ if __name__ == "__main__":
 
     sensors = SensorSet([
         # StaticSensor(),
-        BinaryLOSSensor(angle=0, draw=False),
+        GenomeBinarySensor(0, draw=False),
+        # BinaryLOSSensor(angle=0, draw=False),
         # BinaryFOVSensor(theta=14 / 2, distance=300, degrees=True)
     ])
 
