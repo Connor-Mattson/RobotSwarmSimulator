@@ -10,11 +10,18 @@ class RectangularWorldConfig:
                  behavior=None,
                  agentConfig=None,
                  padding=0,
-                 show_walls=False
+                 show_walls=False,
+                 agent_initialization = None
                  ):
 
         if behavior is None:
             behavior = []
+
+        if agent_initialization is not None:
+            self.defined_start = True
+            self.agent_init = agent_initialization
+            if len(agent_initialization) != n_agents:
+                raise Exception(f"Length of Predefined Starting Locations ({len(agent_initialization)}) must equal number of agents ({n_agents})")
 
         self.behavior = behavior
         self.w = size[0]

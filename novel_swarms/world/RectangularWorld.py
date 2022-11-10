@@ -36,7 +36,15 @@ class RectangularWorld(World):
         ]
 
         ac = config.agentConfig
-        if ac.x is None and config.seed is not None:
+        if config.defined_start:
+            for i in range(len(config.agent_init)):
+                init = config.agent_init[i]
+                self.population[i].x_pos = init[0]
+                self.population[i].y_pos = init[1]
+                if len(init) > 2:
+                    self.population[i].angle = init[2]
+            
+        elif ac.x is None and config.seed is not None:
             for agent in self.population:
                 agent.x_pos = random.randint(0 + ac.agent_radius, ac.world.w - ac.agent_radius)
                 agent.y_pos = random.randint(0 + ac.agent_radius, ac.world.h - ac.agent_radius)

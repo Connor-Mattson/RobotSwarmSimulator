@@ -35,8 +35,8 @@ if __name__ == "__main__":
     # Note that in Vega et al. v_0 = v_1
     # CUSTOM_GENOME = [17.5, 0.25, 17.5, -0.25]  # Dispersion
     # CUSTOM_GENOME = [15, 0.75, 15, -0.75]  # Stable Milling
-    CUSTOM_GENOME = [7.5, 1.0, 7.5, -1.0]  # Semi-Stable Milling
-    # CUSTOM_GENOME = [2.5, 2.0, 2.5, -2.0]  # Colliding Unstable
+    # CUSTOM_GENOME = [7.5, 1.0, 7.5, -1.0]  # Semi-Stable Milling
+    CUSTOM_GENOME = [2.5, 2.0, 2.5, -2.0]  # Colliding Unstable
 
     SEED = None
 
@@ -62,14 +62,23 @@ if __name__ == "__main__":
     ]
 
     GUI_PADDING = 15
+    N_AGENTS = 9
+
+    r = 50
+    pi_slice = (2 * np.pi) / N_AGENTS
+    center = (int(BL * 29.8) / 2, int(BL * 29.8) / 2)
+    init_positions = [(r*np.cos(t * pi_slice), r*np.sin(t * pi_slice), t * pi_slice) for t in range(0, N_AGENTS)]
+    init_positions = [(center[0] + x, center[1] + y, t) for x, y, t in init_positions]
+    
     world_config = RectangularWorldConfig(
         size=(int(BL * 29.8) + GUI_PADDING, int(BL * 29.8) + GUI_PADDING),
-        n_agents=9,
+        n_agents=N_AGENTS,
         seed=SEED,
         behavior=behavior,
         agentConfig=agent_config,
         padding=GUI_PADDING,
-        show_walls=True
+        show_walls=True,
+        agent_initialization=init_positions
     )
 
     simulate(world_config=world_config)
