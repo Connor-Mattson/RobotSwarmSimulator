@@ -6,13 +6,17 @@ from typing import List
 
 
 class BinaryFOVSensor(AbstractSensor):
-    def __init__(self, parent=None, theta=10, distance=10, degrees=False):
+    def __init__(self, parent=None, theta=10, distance=10, degrees=False, bias=0.0, false_positive=0.0, false_negative=0.0):
         super(BinaryFOVSensor, self).__init__(parent=parent)
         self.current_state = 0
         self.angle = 0
         self.theta = theta
+        self.bias = bias
+        self.fp = false_positive
+        self.fn = false_negative
         if degrees:
             self.theta = np.deg2rad(self.theta)
+            self.bias = np.deg2rad(self.bias)
         self.r = distance
 
     def checkForLOSCollisions(self, population) -> None:
@@ -28,8 +32,7 @@ class BinaryFOVSensor(AbstractSensor):
                 bag.append(agent)
 
         if not bag:
-            self.parent.agent_in_sight = None
-            self.current_state = 0
+            self.determineState(False, None)
             return
 
         e_left, e_right = self.getSectorVectors()
@@ -46,13 +49,49 @@ class BinaryFOVSensor(AbstractSensor):
                 added_signs = sign_l - sign_r
                 sector_boundaries = np.all(added_signs == 0)
                 if sector_boundaries:
-                    self.parent.agent_in_sight = agent
-                    self.current_state = 1
+                    self.determineState(True, agent)
                     return
 
-        self.parent.agent_in_sight = None
-        self.current_state = 0
+                # It may also be the case that the center of the agent is not within the FOV, but that some part of the
+                # circle is visible and on the edges of the left and right viewing vectors.
+                # LinAlg Calculations obtained from https://www.bluebill.net/circle_ray_intersection.html
+
+                # u, defined earlier is the vector from the point of interest to the center of the circle
+                # Project u onto e_left and e_right
+                u_l = np.dot(u, e_left) * e_left
+                u_r = np.dot(u, e_right) * e_right
+
+                # Determine the minimum distance between the agent's center (center of circle) and the projected vector
+                dist_l = np.linalg.norm(u - u_l)
+                dist_r = np.linalg.norm(u - u_r)
+
+                radius = self.parent.radius    # Note: Assumes homogenous radius
+                if dist_l < radius or dist_r < radius:
+                    self.determineState(True, agent)
+                    return
+
+        self.determineState(False, None)
         return
+
+    def determineState(self, real_value, agent):
+        if real_value:
+            # Consider Reporting False Negative
+            if np.random.random_sample() < self.fn:
+                self.parent.agent_in_sight = None
+                self.current_state = 0
+                return
+
+            self.parent.agent_in_sight = agent
+            self.current_state = 1
+        else:
+            # Consider Reporting False Positive
+            if np.random.random_sample() < self.fp:
+                self.parent.agent_in_sight = None
+                self.current_state = 1
+                return
+
+            self.parent.agent_in_sight = None
+            self.current_state = 0
 
     def step(self, population):
         super(BinaryFOVSensor, self).step(population=population)
@@ -97,15 +136,19 @@ class BinaryFOVSensor(AbstractSensor):
             self.angle + self.parent.angle)
 
     def getSectorVectors(self):
+
+        theta_l = self.theta + self.bias
+        theta_r = -self.theta + self.bias
+
         rot_z_left = np.array([
-            [np.cos(self.theta), -np.sin(self.theta), 0],
-            [np.sin(self.theta), np.cos(self.theta), 0],
+            [np.cos(theta_l), -np.sin(theta_l), 0],
+            [np.sin(theta_l), np.cos(theta_l), 0],
             [0, 0, 1]
         ])
 
         rot_z_right = np.array([
-            [np.cos(-self.theta), -np.sin(-self.theta), 0],
-            [np.sin(-self.theta), np.cos(-self.theta), 0],
+            [np.cos(theta_r), -np.sin(theta_r), 0],
+            [np.sin(theta_r), np.cos(theta_r), 0],
             [0, 0, 1]
         ])
 

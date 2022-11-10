@@ -10,6 +10,7 @@ class RectangularWorldConfig:
                  behavior=None,
                  agentConfig=None,
                  padding=0,
+                 show_walls=False
                  ):
 
         if behavior is None:
@@ -23,6 +24,7 @@ class RectangularWorldConfig:
         self.padding = padding
         self.agentConfig = agentConfig
         self.radius = np.linalg.norm([self.w / 2, self.h / 2])
+        self.show_walls = show_walls
 
         if self.agentConfig:
             self.agentConfig.attach_world_config(self.getShallowCopy())

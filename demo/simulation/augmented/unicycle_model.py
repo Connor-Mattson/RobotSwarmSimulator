@@ -8,6 +8,9 @@ Connor Mattson
 University of Utah
 September 2022
 """
+from novel_swarms.sensors.AbstractSensor import AbstractSensor
+from novel_swarms.sensors.GenomeDependentSensor import GenomeBinarySensor
+from novel_swarms.sensors.StaticSensor import StaticSensor
 from novel_swarms.world.simulate import main as simulate
 from novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
 from novel_swarms.behavior.AverageSpeed import AverageSpeedBehavior
@@ -15,40 +18,39 @@ from novel_swarms.behavior.GroupRotationBehavior import GroupRotationBehavior
 from novel_swarms.behavior.RadialVariance import RadialVarianceBehavior
 from novel_swarms.behavior.ScatterBehavior import ScatterBehavior
 from novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
-from novel_swarms.sensors.GenomeDependentSensor import GenomeBinarySensor
 from novel_swarms.sensors.BinaryFOVSensor import BinaryFOVSensor
 from novel_swarms.sensors.SensorSet import SensorSet
-from novel_swarms.config.AgentConfig import DiffDriveAgentConfig
+from novel_swarms.config.AgentConfig import UnicycleAgentConfig
 from novel_swarms.config.WorldConfig import RectangularWorldConfig
 import numpy as np
 
 if __name__ == "__main__":
-    a = 0.8
-    b = 0.4
 
-    # CUSTOM_GENOME = [-0.7, -1.0, 1.0, -1.0]  # Aggregation
-    CUSTOM_GENOME = [-0.7, 0.3, 1.0, 1.0]  # Cyclic Pursuit
-    # CUSTOM_GENOME = [0.2, 0.7, -0.5, -0.1]  # Dispersal
-    # CUSTOM_GENOME = [-0.69, -0.77, 0.05, -0.4]  # Milling
-    #CUSTOM_GENOME = [1.0, 0.98, 1.0, 1.0]  # Wall Following
-    # CUSTOM_GENOME = [-0.83, -0.75, 0.27, -0.57]  # Random
-    # CUSTOM_GENOME = [0.8346  ,   0.5136 ,    0.87086294, 0.7218    ]
+    # Set Data Relative to Body Length
+    BL = 15.1
 
-    CUSTOM_GENOME = [0.5375002,      0.940188,      -0.75132048,     -0.48969879,      0.90855447,  1.,     0.59844588,     0.07282897,   -0.96174765,  1.42534261]
+    # Controllers of the Form: [v_0, w_0, v_1, w_1]
+    # v_0, v_1 is forward speed for sensor off/on, respectively
+    # w_0, w_1 is turning rate for sensor off/on, respectively
+    # Note that in Vega et al. v_0 = v_1
+    # CUSTOM_GENOME = [17.5, 0.25, 17.5, -0.25]  # Dispersion
+    # CUSTOM_GENOME = [15, 0.75, 15, -0.75]  # Stable Milling
+    CUSTOM_GENOME = [7.5, 1.0, 7.5, -1.0]  # Semi-Stable Milling
+    # CUSTOM_GENOME = [2.5, 2.0, 2.5, -2.0]  # Colliding Unstable
 
     SEED = None
 
     sensors = SensorSet([
-        # BinaryLOSSensor(angle=-(np.pi/4)),
-        GenomeBinarySensor(genome_id=8),
-        GenomeBinarySensor(genome_id=9)
-        # BinaryFOVSensor(theta=14 / 2, distance=125, degrees=True)
+        BinaryFOVSensor(theta=14 / 2, distance=(BL * 13.25), bias=-10, degrees=True, false_positive=0.1, false_negative=0.05)
     ])
 
-    agent_config = DiffDriveAgentConfig(
+    agent_config = UnicycleAgentConfig(
         controller=CUSTOM_GENOME,
+        agent_radius=BL / 2,
+        dt=0.13,  # 130ms sampling period
         sensors=sensors,
-        seed=SEED,
+        seed=None,
+        idiosyncrasies=True
     )
 
     behavior = [
@@ -59,13 +61,15 @@ if __name__ == "__main__":
         GroupRotationBehavior(),
     ]
 
+    GUI_PADDING = 15
     world_config = RectangularWorldConfig(
-        size=(500, 500),
-        n_agents=30,
+        size=(int(BL * 29.8) + GUI_PADDING, int(BL * 29.8) + GUI_PADDING),
+        n_agents=9,
         seed=SEED,
         behavior=behavior,
         agentConfig=agent_config,
-        padding=15
+        padding=GUI_PADDING,
+        show_walls=True
     )
 
     simulate(world_config=world_config)

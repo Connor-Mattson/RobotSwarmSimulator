@@ -4,7 +4,7 @@ from .WorldFactory import WorldFactory
 from ..util.timer import Timer
 
 screen = None
-FRAMERATE = 500
+FRAMERATE = 30
 GUI_WIDTH = 200
 
 

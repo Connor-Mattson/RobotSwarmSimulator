@@ -48,6 +48,9 @@ class DifferentialDriveGUI(AbstractGUI):
                 self.appendTextToGUI(screen, f"y: {a.y_pos}")
                 self.appendTextToGUI(screen, f"dx: {a.dx}")
                 self.appendTextToGUI(screen, f"dy: {a.dy}")
+                if hasattr(a, "i_1") and hasattr(a, "i_2"):
+                    self.appendTextToGUI(screen, f"Idio_1: {a.i_1}")
+                    self.appendTextToGUI(screen, f"Idio_2: {a.i_2}")
                 self.appendTextToGUI(screen, f"")
                 self.appendTextToGUI(screen, f"controller: {a.controller}")
                 self.appendTextToGUI(screen, f"")

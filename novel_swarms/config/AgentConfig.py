@@ -32,3 +32,30 @@ class DiffDriveAgentConfig:
 
     def attach_world_config(self, world_config):
         self.world = world_config
+
+class UnicycleAgentConfig:
+    def __init__(self,
+                 x=None,
+                 y=None,
+                 controller=None,
+                 angle=None,
+                 world_config: RectangularWorldConfig = None,
+                 seed=None,
+                 agent_radius=5,
+                 dt=1.0,
+                 sensors: SensorSet = None,
+                 idiosyncrasies=False):
+
+        self.x = x
+        self.y = y
+        self.angle = angle
+        self.world = world_config
+        self.seed = seed
+        self.dt = dt
+        self.agent_radius = agent_radius
+        self.controller = controller
+        self.sensors = sensors
+        self.idiosyncrasies = idiosyncrasies
+
+    def attach_world_config(self, world_config):
+        self.world = world_config

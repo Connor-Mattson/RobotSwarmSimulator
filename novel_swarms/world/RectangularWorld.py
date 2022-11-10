@@ -2,6 +2,9 @@ import math
 import random
 import numpy as np
 from typing import List, Tuple
+
+import pygame.draw
+
 from ..agent.Agent import Agent
 from ..agent.DiffDriveAgent import DifferentialDriveAgent
 from ..config.WorldConfig import RectangularWorldConfig
@@ -29,7 +32,7 @@ class RectangularWorld(World):
             random.seed(config.seed)
 
         self.population = [
-            AgentFactory.create(config.agentConfig) for i in range(self.population_size)
+            AgentFactory.create(config.agentConfig, name=f"{i}") for i in range(self.population_size)
         ]
 
         ac = config.agentConfig
@@ -48,7 +51,7 @@ class RectangularWorld(World):
         """
         agent_step_timer = Timer("Population Step")
         for agent in self.population:
-            if not issubclass(type(agent), DifferentialDriveAgent):
+            if not issubclass(type(agent), Agent):
                 raise Exception("Agents must be subtype of Agent, not {}".format(type(agent)))
 
             agent.step(
@@ -66,10 +69,16 @@ class RectangularWorld(World):
 
     def draw(self, screen):
         """
-        Cycle through the entire population and draw the agents.
+        Cycle through the entire population and draw the agents. Draw Environment Walls if needed.
         """
+        if self.config.show_walls:
+            p = self.config.padding
+            w = self.config.w
+            h = self.config.h
+            pygame.draw.rect(screen, (200, 200, 200), pygame.Rect((p, p), (w - (2*p), h - (2*p))), 1)
+
         for agent in self.population:
-            if not issubclass(type(agent), DifferentialDriveAgent):
+            if not issubclass(type(agent), Agent):
                 raise Exception("Agents must be subtype of Agent, not {}".format(type(agent)))
             agent.draw(screen)
 
