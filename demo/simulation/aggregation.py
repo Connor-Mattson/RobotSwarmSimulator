@@ -18,6 +18,7 @@ from novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
 from novel_swarms.sensors.SensorSet import SensorSet
 from novel_swarms.config.AgentConfig import DiffDriveAgentConfig
 from novel_swarms.config.WorldConfig import RectangularWorldConfig
+from novel_swarms.config.defaults import ConfigurationDefaults
 
 if __name__ == "__main__":
 
@@ -34,13 +35,7 @@ if __name__ == "__main__":
         seed=SEED,
     )
 
-    behavior = [
-        AverageSpeedBehavior(),
-        AngularMomentumBehavior(),
-        RadialVarianceBehavior(),
-        ScatterBehavior(),
-        GroupRotationBehavior(),
-    ]
+    behavior = ConfigurationDefaults.BEHAVIOR_VECTOR
 
     world_config = RectangularWorldConfig(
         size=(500, 500),

@@ -17,11 +17,15 @@ from novel_swarms.behavior.AverageSpeed import AverageSpeedBehavior
 from novel_swarms.behavior.GroupRotationBehavior import GroupRotationBehavior
 from novel_swarms.behavior.RadialVariance import RadialVarianceBehavior
 from novel_swarms.behavior.ScatterBehavior import ScatterBehavior
+from novel_swarms.behavior.Squareness import SquarenessBehavior
+from novel_swarms.behavior.MeanNeighbors import MeanNeighborDistance
+from novel_swarms.behavior.KNN import KNNBehavior
 from novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
 from novel_swarms.sensors.BinaryFOVSensor import BinaryFOVSensor
 from novel_swarms.sensors.SensorSet import SensorSet
 from novel_swarms.config.AgentConfig import DiffDriveAgentConfig
 from novel_swarms.config.WorldConfig import RectangularWorldConfig
+from novel_swarms.config.defaults import ConfigurationDefaults
 import numpy as np
 
 if __name__ == "__main__":
@@ -58,13 +62,7 @@ if __name__ == "__main__":
         seed=None,
     )
 
-    behavior = [
-        AverageSpeedBehavior(),
-        AngularMomentumBehavior(),
-        RadialVarianceBehavior(),
-        ScatterBehavior(),
-        GroupRotationBehavior(),
-    ]
+    behavior = ConfigurationDefaults.BEHAVIOR_VECTOR
 
     world_config = RectangularWorldConfig(
         size=(500, 500),
