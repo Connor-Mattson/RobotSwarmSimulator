@@ -32,7 +32,7 @@ def main(world_config):
     gui.set_world(world)
     world.attach_gui(gui)
 
-    total_allowed_steps = None
+    total_allowed_steps = world_config.stop_at
     steps_taken = 0
     steps_per_frame = 1
 
@@ -88,7 +88,7 @@ def main(world_config):
                 if steps_taken > total_allowed_steps:
                     time_me.check_watch()
                     running=False
-                    break
+                    return world
 
             world.step()
             steps_taken += 1

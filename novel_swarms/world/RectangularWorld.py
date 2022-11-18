@@ -30,6 +30,7 @@ class RectangularWorld(World):
 
         if config.seed is not None:
             random.seed(config.seed)
+            np.random.seed(config.seed)
 
         self.population = [
             AgentFactory.create(config.agentConfig, name=f"{i}") for i in range(self.population_size)
@@ -39,10 +40,13 @@ class RectangularWorld(World):
         if config.defined_start:
             for i in range(len(config.agent_init)):
                 init = config.agent_init[i]
-                self.population[i].x_pos = init[0]
-                self.population[i].y_pos = init[1]
+                noise_x = ((np.random.random() * 2) - 1) * 20
+                noise_y = ((np.random.random() * 2) - 1) * 20
+                noise_theta = ((np.random.random() * 2) - 1) * (np.pi / 8)
+                self.population[i].x_pos = init[0] + noise_x
+                self.population[i].y_pos = init[1] + noise_y
                 if len(init) > 2:
-                    self.population[i].angle = init[2]
+                    self.population[i].angle = init[2] + noise_theta
             
         elif ac.x is None and config.seed is not None:
             for agent in self.population:
@@ -139,15 +143,9 @@ class RectangularWorld(World):
         # agent.angle += (math.pi / 720)
 
     def preventAgentCollisions(self, agent: DifferentialDriveAgent) -> None:
-        """
-        Using a set of neighbors that collide with the agent and the bounding box of those neighbors,
-            push the agent to the edge of the box and continue checking for collisions until the agent is in a
-            safe location OR we have expired the defined timeout.
-        """
-
         agent_center = agent.getPosition()
         minimum_distance = agent.radius * 2
-        target_distance = minimum_distance + 0.1
+        target_distance = minimum_distance + 0.001
 
         neighborhood = self.getNeighborsWithinDistance(agent_center, minimum_distance, excluded=agent)
         if len(neighborhood) == 0:
@@ -163,7 +161,11 @@ class RectangularWorld(World):
                 center_distance = distance(agent_center, colliding_agent.getPosition())
 
                 if center_distance > minimum_distance:
+                    # colliding_agent.collision_flag = False
                     continue
+
+                agent.collision_flag = True
+                colliding_agent.collision_flag = True
 
                 # print(f"Overlap. A: {agent_center}, B: {colliding_agent.getPosition()}")
                 distance_needed = target_distance - center_distance

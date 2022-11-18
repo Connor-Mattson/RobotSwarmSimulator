@@ -14,6 +14,7 @@ class UnicycleAgent(Agent):
     SEED = -1
 
     def __init__(self, config: UnicycleAgentConfig = None, name=None) -> None:
+
         self.controller = config.controller
 
         if config.seed is not None:
@@ -40,11 +41,11 @@ class UnicycleAgent(Agent):
         self.dt = config.dt
         self.is_highlighted = False
         self.agent_in_sight = None
-
+        self.idiosyncrasies = config.idiosyncrasies
         I1_MEAN, I1_SD = 0.93, 0.08
         I2_MEAN, I2_SD = 0.95, 0.06
-        self.i_1 = np.random.normal(I1_MEAN, I1_SD) if config.idiosyncrasies else 1.0
-        self.i_2 = np.random.normal(I2_MEAN, I2_SD) if config.idiosyncrasies else 1.0
+        self.i_1 = np.random.normal(I1_MEAN, I1_SD) if self.idiosyncrasies else 1.0
+        self.i_2 = np.random.normal(I2_MEAN, I2_SD) if self.idiosyncrasies else 1.0
 
         self.sensors = deepcopy(config.sensors)
         for sensor in self.sensors:
@@ -103,8 +104,9 @@ class UnicycleAgent(Agent):
             sensor.draw(screen)
 
         # Draw Cell Membrane
-        filled = 0 if self.is_highlighted else 1
-        pygame.draw.circle(screen, (255, 255, 255), (self.x_pos, self.y_pos), self.radius, width=filled)
+        filled = 0 if self.is_highlighted or self.collision_flag else 1
+        color = (255, 255, 255) if not self.collision_flag else (255,255,51)
+        pygame.draw.circle(screen, color, (self.x_pos, self.y_pos), self.radius, width=filled)
 
         # "Front" direction vector
         head = self.getFrontalPoint()

@@ -29,8 +29,8 @@ if __name__ == "__main__":
     # b = 0.4
 
     # CUSTOM_GENOME = [-0.7, -1.0, 1.0, -1.0]  # Aggregation
-    CUSTOM_GENOME = [-0.7, 0.3, 1.0, 1.0]  # Cyclic Pursuit
-    # CUSTOM_GENOME = [0.2, 0.7, -0.5, -0.1]  # Dispersal
+    # CUSTOM_GENOME = [-0.7, 0.3, 1.0, 1.0]  # Cyclic Pursuit
+    CUSTOM_GENOME = [0.2, 0.7, -0.5, -0.1]  # Dispersal
     # CUSTOM_GENOME = [-0.69, -0.77, 0.05, -0.4]  # Milling
     # CUSTOM_GENOME = [1.0, 0.98, 1.0, 1.0]  # Wall Following
     # CUSTOM_GENOME = [-0.83, -0.75, 0.27, -0.57]  # Random
@@ -44,16 +44,16 @@ if __name__ == "__main__":
 
     sensors = SensorSet([
         # StaticSensor(),
-        GenomeBinarySensor(0, draw=False),
-        # BinaryLOSSensor(angle=0, draw=False),
+        # GenomeBinarySensor(0, draw=False),
+        BinaryLOSSensor(angle=0, draw=True),
         # BinaryFOVSensor(theta=14 / 2, distance=300, degrees=True)
     ])
 
     agent_config = DiffDriveAgentConfig(
         controller=CUSTOM_GENOME,
         agent_radius=5,
-        dt=1.0,
-        wheel_radius=1,
+        dt=0.13,
+        wheel_radius=4.4,
         sensors=sensors,
         seed=None,
     )
@@ -72,7 +72,7 @@ if __name__ == "__main__":
         seed=SEED,
         behavior=behavior,
         agentConfig=agent_config,
-        padding=100
+        padding=15
     )
 
     simulate(world_config=world_config)

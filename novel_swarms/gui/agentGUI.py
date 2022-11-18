@@ -2,6 +2,7 @@ import pygame
 from ..agent.DiffDriveAgent import DifferentialDriveAgent
 from .abstractGUI import AbstractGUI
 from ..world.World import World
+import numpy as np
 
 
 class DifferentialDriveGUI(AbstractGUI):
@@ -54,7 +55,7 @@ class DifferentialDriveGUI(AbstractGUI):
                 self.appendTextToGUI(screen, f"")
                 self.appendTextToGUI(screen, f"controller: {a.controller}")
                 self.appendTextToGUI(screen, f"")
-                self.appendTextToGUI(screen, f"θ: {a.angle}")
+                self.appendTextToGUI(screen, f"θ: {a.angle % (2 * np.pi)}")
                 if a.agent_in_sight is not None:
                     self.appendTextToGUI(screen, f"sees: {a.agent_in_sight.name}")
             else:

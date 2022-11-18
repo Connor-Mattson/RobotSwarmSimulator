@@ -11,12 +11,14 @@ class RectangularWorldConfig:
                  agentConfig=None,
                  padding=0,
                  show_walls=False,
-                 agent_initialization = None
+                 agent_initialization = None,
+                 stop_at=None
                  ):
 
         if behavior is None:
             behavior = []
 
+        self.defined_start = False
         if agent_initialization is not None:
             self.defined_start = True
             self.agent_init = agent_initialization
@@ -32,6 +34,7 @@ class RectangularWorldConfig:
         self.agentConfig = agentConfig
         self.radius = np.linalg.norm([self.w / 2, self.h / 2])
         self.show_walls = show_walls
+        self.stop_at = stop_at
 
         if self.agentConfig:
             self.agentConfig.attach_world_config(self.getShallowCopy())
