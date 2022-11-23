@@ -12,14 +12,6 @@ from novel_swarms.sensors.AbstractSensor import AbstractSensor
 from novel_swarms.sensors.GenomeDependentSensor import GenomeBinarySensor
 from novel_swarms.sensors.StaticSensor import StaticSensor
 from novel_swarms.world.simulate import main as simulate
-from novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
-from novel_swarms.behavior.AverageSpeed import AverageSpeedBehavior
-from novel_swarms.behavior.GroupRotationBehavior import GroupRotationBehavior
-from novel_swarms.behavior.RadialVariance import RadialVarianceBehavior
-from novel_swarms.behavior.ScatterBehavior import ScatterBehavior
-from novel_swarms.behavior.Squareness import SquarenessBehavior
-from novel_swarms.behavior.MeanNeighbors import MeanNeighborDistance
-from novel_swarms.behavior.KNN import KNNBehavior
 from novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
 from novel_swarms.sensors.BinaryFOVSensor import BinaryFOVSensor
 from novel_swarms.sensors.SensorSet import SensorSet
@@ -48,7 +40,7 @@ if __name__ == "__main__":
 
     sensors = SensorSet([
         # StaticSensor(),
-        GenomeBinarySensor(0, draw=False),
+        GenomeBinarySensor(0, draw=False)
         # BinaryLOSSensor(angle=0, draw=False),
         # BinaryFOVSensor(theta=14 / 2, distance=300, degrees=True)
     ])
@@ -66,11 +58,11 @@ if __name__ == "__main__":
 
     world_config = RectangularWorldConfig(
         size=(500, 500),
-        n_agents=10,
+        n_agents=30,
         seed=SEED,
         behavior=behavior,
         agentConfig=agent_config,
-        padding=100
+        padding=0
     )
 
     simulate(world_config=world_config)

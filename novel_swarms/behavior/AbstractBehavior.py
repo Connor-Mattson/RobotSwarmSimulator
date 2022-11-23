@@ -4,17 +4,22 @@ from numpy import average
 
 class AbstractBehavior():
 
-    def __init__(self, name: str, history_size=100):
+    def __init__(self, name: str, history_size=100, archiveMode=False):
         self.name = name
         self.current_value = 0
         self.history_size = history_size
         self.value_history = []
+        self.archiveMode = archiveMode
+        if self.archiveMode:
+            self.archive = []
 
     def set_value(self, value):
         # Keep Track of the [self.history_size] most recent values
         self.value_history.append(value)
         if self.history_size is not None and len(self.value_history) > self.history_size:
             self.value_history = self.value_history[1:]
+        if self.archiveMode:
+            self.archive.append(value)
 
         self.current_value = value
 
@@ -23,3 +28,9 @@ class AbstractBehavior():
 
     def out_average(self) -> Tuple:
         return (self.name, average(self.value_history))
+
+    def get_archive(self):
+        if self.archiveMode:
+            return self.archive
+        else:
+            raise Exception("archiveMode is not enabled")

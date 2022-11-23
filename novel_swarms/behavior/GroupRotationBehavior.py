@@ -4,8 +4,8 @@ from .AbstractBehavior import AbstractBehavior
 
 class GroupRotationBehavior(AbstractBehavior):
 
-    def __init__(self, history=100):
-        super().__init__(name = "Group Rotation", history_size=history)
+    def __init__(self, history=100, archiveMode=False):
+        super().__init__(name = "Group Rotation", history_size=history, archiveMode=archiveMode)
         self.population = None
 
     def attach_world(self, world):

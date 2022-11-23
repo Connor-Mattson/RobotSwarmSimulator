@@ -3,6 +3,10 @@ from ..behavior.AverageSpeed import AverageSpeedBehavior
 from ..behavior.GroupRotationBehavior import GroupRotationBehavior
 from ..behavior.RadialVariance import RadialVarianceBehavior
 from ..behavior.ScatterBehavior import ScatterBehavior
+from ..behavior.Squareness import SquarenessBehavior
+from ..behavior.KNN import KNNBehavior
+from ..behavior.MeanNeighbors import MeanNeighborDistance
+from ..behavior.LargestSeparation import LargestSeparationBehavior
 from .AgentConfig import DiffDriveAgentConfig
 from .ResultsConfig import ResultsConfig
 from .WorldConfig import RectangularWorldConfig
@@ -30,11 +34,15 @@ class ConfigurationDefaults:
     )
 
     BEHAVIOR_VECTOR = [
-        AverageSpeedBehavior(),
-        AngularMomentumBehavior(),
-        RadialVarianceBehavior(),
-        ScatterBehavior(),
-        GroupRotationBehavior(),
+        AverageSpeedBehavior(archiveMode=False),
+        AngularMomentumBehavior(archiveMode=False),
+        RadialVarianceBehavior(archiveMode=False),
+        ScatterBehavior(archiveMode=False),
+        GroupRotationBehavior(archiveMode=False),
+        SquarenessBehavior(archiveMode=False),
+        MeanNeighborDistance(archiveMode=False),
+        KNNBehavior(archiveMode=False),
+        LargestSeparationBehavior(archiveMode=False)
     ]
 
     RECTANGULAR_WORLD = RectangularWorldConfig(

@@ -4,8 +4,8 @@ from .AbstractBehavior import AbstractBehavior
 
 
 class ScatterBehavior(AbstractBehavior):
-    def __init__(self, history=100):
-        super().__init__(name="Scatter", history_size=history)
+    def __init__(self, history=100, archiveMode=False):
+        super().__init__(name="Scatter", history_size=history, archiveMode=archiveMode)
         self.population = None
         self.world_radius = 0
 

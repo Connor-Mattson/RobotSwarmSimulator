@@ -8,11 +8,6 @@ University of Utah
 September 2022
 """
 from novel_swarms.world.simulate import main as simulate
-from novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
-from novel_swarms.behavior.AverageSpeed import AverageSpeedBehavior
-from novel_swarms.behavior.GroupRotationBehavior import GroupRotationBehavior
-from novel_swarms.behavior.RadialVariance import RadialVarianceBehavior
-from novel_swarms.behavior.ScatterBehavior import ScatterBehavior
 from novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
 from novel_swarms.sensors.SensorSet import SensorSet
 from novel_swarms.config.AgentConfig import DiffDriveAgentConfig

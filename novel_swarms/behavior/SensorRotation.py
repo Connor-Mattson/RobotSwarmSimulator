@@ -7,8 +7,8 @@ from .AbstractBehavior import AbstractBehavior
 
 class SensorRotation(AbstractBehavior):
 
-    def __init__(self, sensor_index, history=100):
-        super().__init__(name="SensorRotation", history_size=history)
+    def __init__(self, sensor_index, history=100, archiveMode=False):
+        super().__init__(name="SensorRotation", history_size=history, archiveMode=archiveMode)
         self.population = None
         self.i = sensor_index
 
