@@ -19,6 +19,7 @@ class KNNBehavior(AbstractBehavior):
             dist = self.euclideanDistance(agent, targetAgent)
             if dist < min(nearestAgents):
                 nearestAgents = [dist] + nearestAgents[:2]
+        # CHANGE NORMALIZATION
         return sum(nearestAgents) / (3 * 500)
 
     def calculate(self):
