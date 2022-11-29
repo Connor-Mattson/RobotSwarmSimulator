@@ -24,9 +24,7 @@ import os
 import shutil
 from collections import namedtuple
 import csv
-import matplotlib as mpl
 import matplotlib.pyplot as plt
-import numpy as np
 
 Genome = namedtuple("Genome", "name controller")
 Behavior = namedtuple("Behavior", "name content dirPath")
@@ -129,7 +127,7 @@ if __name__ == '__main__':
                 ax.set_ylabel(behavior.name)
                 ax.set_title(f"{behavior.name} over time for the \"{genome_name}\" genome")
                 ax.axis([0, len(data), min(data), max(data)])
-                ax.set_ylim(min(data), max(data))
+                ax.set_ylim(-1, 1)
                 fig.tight_layout()
                 convergence_point = convergence_dict[genome_name]
                 if convergence_point is not None:
