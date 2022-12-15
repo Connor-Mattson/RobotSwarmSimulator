@@ -46,6 +46,7 @@ class UnicycleAgent(Agent):
         I2_MEAN, I2_SD = 0.95, 0.06
         self.i_1 = np.random.normal(I1_MEAN, I1_SD) if self.idiosyncrasies else 1.0
         self.i_2 = np.random.normal(I2_MEAN, I2_SD) if self.idiosyncrasies else 1.0
+        self.stop_on_collision = config.stop_on_collision
 
         self.sensors = deepcopy(config.sensors)
         for sensor in self.sensors:
@@ -58,6 +59,7 @@ class UnicycleAgent(Agent):
         random.seed(UnicycleAgent.SEED)
 
     def step(self, check_for_world_boundaries=None, population=None, check_for_agent_collisions=None) -> None:
+
 
         if population is None:
             raise Exception("Expected a Valid value for 'population' in step method call")
@@ -77,8 +79,13 @@ class UnicycleAgent(Agent):
         old_x_pos = self.x_pos
         old_y_pos = self.y_pos
 
-        self.x_pos += self.dx * self.dt
-        self.y_pos += self.dy * self.dt
+        if self.stopped_duration > 0:
+            self.stopped_duration -= 1
+
+        else:
+            self.x_pos += self.dx * self.dt
+            self.y_pos += self.dy * self.dt
+
         self.angle += dw * self.dt
 
         if check_for_world_boundaries is not None:
@@ -104,8 +111,8 @@ class UnicycleAgent(Agent):
             sensor.draw(screen)
 
         # Draw Cell Membrane
-        filled = 0 if self.is_highlighted or self.collision_flag else 1
-        color = (255, 255, 255) if not self.collision_flag else (255,255,51)
+        filled = 0 if self.is_highlighted or self.stopped_duration else 1
+        color = (255, 255, 255) if not self.stopped_duration else (255,255,51)
         pygame.draw.circle(screen, color, (self.x_pos, self.y_pos), self.radius, width=filled)
 
         # "Front" direction vector

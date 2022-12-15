@@ -35,18 +35,13 @@ if __name__ == "__main__":
         # BinaryFOVSensor(theta=14 / 2, distance=(20 * 13.25), degrees=True)
     ])
 
-    agent_config = DiffDriveAgentConfig(
-        agent_radius=5,
-        wheel_radius=(10 * 0.44),
-        sensors=sensors,
-        seed=SEED,
-    )
+    agent_config = ConfigurationDefaults.DIFF_DRIVE_AGENT
 
     genotype = [
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=4),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=4),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=4),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=4),
+        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=2),
+        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=2),
+        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=2),
+        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=2),
     ]
 
     phenotype = [
@@ -58,8 +53,8 @@ if __name__ == "__main__":
     ]
 
     world_config = RectangularWorldConfig(
-        size=(315, 315),
-        n_agents=9,
+        size=(500, 500),
+        n_agents=24,
         seed=SEED,
         behavior=phenotype,
         agentConfig=agent_config,
@@ -69,17 +64,17 @@ if __name__ == "__main__":
     novelty_config = GeneticEvolutionConfig(
         gene_rules=genotype,
         phenotype_config=phenotype,
-        n_generations=100,
+        n_generations=10,
         n_population=100,
         crossover_rate=0.7,
         mutation_rate=0.15,
         world_config=world_config,
         k_nn=15,
-        simulation_lifespan=1000,
+        simulation_lifespan=1200,
         display_novelty=True,
         save_archive=True,
         show_gui=True,
-        # save_every=1
+        save_every=1
     )
 
     # Novelty Search through Genetic Evolution

@@ -54,7 +54,7 @@ if __name__ == "__main__":
         mutation_rate=0.15,
         world_config=world_config,
         k_nn=15,
-        simulation_lifespan=300,
+        simulation_lifespan=1200,
         display_novelty=False,
         save_archive=False,
         show_gui=True

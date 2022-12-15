@@ -5,17 +5,18 @@ from ..util.timer import Timer
 
 screen = None
 FRAMERATE = 30
-GUI_WIDTH = 200
 
-
-def main(world_config):
+def main(world_config, gui=None):
     # initialize the pygame module
     pygame.init()
     pygame.display.set_caption("Swarm Simulation")
 
     # screen must be global so that other modules can access + draw to the window
     global screen
-    screen = pygame.display.set_mode((world_config.w + GUI_WIDTH, world_config.h))
+    gui_width = 200
+    if gui:
+        gui_width = gui.w
+    screen = pygame.display.set_mode((world_config.w + gui_width, world_config.h))
 
     # define a variable to control the main loop
     running = True
@@ -25,8 +26,8 @@ def main(world_config):
     world = WorldFactory.create(world_config)
 
     # Create the GUI
-    gui = DifferentialDriveGUI(x=world_config.w, y=0, h=world_config.h, w=GUI_WIDTH)
-    gui.set_title("Differential Drive")
+    if not gui:
+        gui = DifferentialDriveGUI(x=world_config.w, y=0, h=world_config.h, w=gui_width)
 
     # Attach the world to the gui and vice versa
     gui.set_world(world)
@@ -55,6 +56,7 @@ def main(world_config):
                     # ON Right Arrow Pressed, draw single frame
                     world.step()
                     steps_taken += 1
+                    gui.set_time(steps_taken)
                     screen.fill((0, 0, 0))
                     world.draw(screen)
                     gui.draw(screen)

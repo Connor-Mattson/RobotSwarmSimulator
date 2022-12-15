@@ -11,8 +11,8 @@ class RectangularWorldConfig:
                  agentConfig=None,
                  padding=0,
                  show_walls=False,
-                 agent_initialization = None,
-                 stop_at=None
+                 agent_initialization=None,
+                 stop_at=None,
                  ):
 
         if behavior is None:

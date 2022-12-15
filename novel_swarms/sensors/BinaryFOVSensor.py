@@ -38,7 +38,7 @@ class BinaryFOVSensor(AbstractSensor):
             self.bias = np.deg2rad(self.bias)
         self.r = distance
 
-    def checkForLOSCollisions(self, population) -> None:
+    def checkForLOSCollisions(self, population: object) -> None:
         # Mathematics obtained from Sundaram Ramaswamy
         # https://legends2k.github.io/2d-fov/design.html
         # See section 3.1.1.2
@@ -164,7 +164,10 @@ class BinaryFOVSensor(AbstractSensor):
         super(BinaryFOVSensor, self).step(population=population)
         self.checkForLOSCollisions(population=population)
         if self.store_history:
-            self.history.append(self.current_state)
+            if self.parent.agent_in_sight:
+                self.history.append(int(self.parent.agent_in_sight.name))
+            else:
+                self.history.append(-1)
 
     def draw(self, screen):
         super(BinaryFOVSensor, self).draw(screen)

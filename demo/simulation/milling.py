@@ -20,7 +20,8 @@ from novel_swarms.config.WorldConfig import RectangularWorldConfig
 
 if __name__ == "__main__":
 
-    MILLING_GENOME = [-0.69, -0.77, 0.05, -0.4]
+    # MILLING_GENOME = [0.69, 1.0, 0.3, 0.4]
+    MILLING_GENOME = [0.65, 1.0, 0.4, 0.5]
     SEED = None
 
     sensors = SensorSet([

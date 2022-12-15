@@ -44,7 +44,8 @@ class UnicycleAgentConfig:
                  agent_radius=5,
                  dt=1.0,
                  sensors: SensorSet = None,
-                 idiosyncrasies=False):
+                 idiosyncrasies=False,
+                 stop_on_collide=False):
 
         self.x = x
         self.y = y
@@ -56,6 +57,7 @@ class UnicycleAgentConfig:
         self.controller = controller
         self.sensors = sensors
         self.idiosyncrasies = idiosyncrasies
+        self.stop_on_collision = stop_on_collide
 
     def attach_world_config(self, world_config):
         self.world = world_config

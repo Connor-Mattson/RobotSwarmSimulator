@@ -14,6 +14,8 @@ class Agent:
         self.angle = angle
         self.sensors = sensors
         self.collision_flag = False
+        self.stop_on_collision = False
+        self.stopped_duration = 0
         pass
 
     def step(self, check_for_world_boundaries=None) -> None:
