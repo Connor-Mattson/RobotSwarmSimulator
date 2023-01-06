@@ -42,14 +42,14 @@ if __name__ == "__main__":
     )
 
     genotype = [
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.15, round_digits=4, exclude=[(-0.15, 0.15)]),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.15, round_digits=4, exclude=[(-0.15, 0.15)]),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.15, round_digits=4, exclude=[(-0.15, 0.15)]),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.15, round_digits=4, exclude=[(-0.15, 0.15)]),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.15, round_digits=4, exclude=[(-0.15, 0.15)]),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.15, round_digits=4, exclude=[(-0.15, 0.15)]),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.15, round_digits=4, exclude=[(-0.15, 0.15)]),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.15, round_digits=4, exclude=[(-0.15, 0.15)]),
+        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.15, round_digits=4),
+        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.15, round_digits=4),
+        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.15, round_digits=4),
+        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.15, round_digits=4),
+        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.15, round_digits=4),
+        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.15, round_digits=4),
+        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.15, round_digits=4),
+        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.15, round_digits=4),
         GeneRule(_max=((1/3) * np.pi), _min=-((2/3) * np.pi), mutation_step=(np.pi/8), round_digits=4),
         GeneRule(_max=((2/3) * np.pi), _min=-((1/3) * np.pi), mutation_step=(np.pi/8), round_digits=4),
     ]
@@ -60,7 +60,7 @@ if __name__ == "__main__":
         RadialVarianceBehavior(),
         ScatterBehavior(),
         GroupRotationBehavior(),
-        GeneElementDifference(8, 9)
+        # GeneElementDifference(8, 9)
     ]
 
     world_config = RectangularWorldConfig(
@@ -75,13 +75,13 @@ if __name__ == "__main__":
     novelty_config = GeneticEvolutionConfig(
         gene_rules=genotype,
         phenotype_config=phenotype,
-        n_generations=100,
+        n_generations=15,
         n_population=100,
         crossover_rate=0.7,
         mutation_rate=0.15,
         world_config=world_config,
         k_nn=15,
-        simulation_lifespan=600,
+        simulation_lifespan=1200,
         display_novelty=True,
         save_archive=True,
         show_gui=True,

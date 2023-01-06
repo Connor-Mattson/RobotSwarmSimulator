@@ -175,23 +175,23 @@ class RectangularWorld(World):
                 a_to_b = agent_center - colliding_agent.getPosition()
 
                 # If distance super close to 0, we have a problem. Add noise.
-                # SIGNIFICANCE = 0.0001
-                # if a_to_b[0] < SIGNIFICANCE and a_to_b[1] < SIGNIFICANCE:
-                #     MAGNITUDE = 0.001
-                #     direction = 1
-                #     if random.random() > 0.5:
-                #         direction = -1
-                #     agent.x_pos += random.random() * direction * MAGNITUDE
-                #
-                #     direction = 1
-                #     if random.random() > 0.5:
-                #         direction = -1
-                #     agent.y_pos += random.random() * direction * MAGNITUDE
-                #
-                #     agent_center = agent.getPosition()
-                #     center_distance = distance(agent_center, colliding_agent.getPosition())
-                #     distance_needed = target_distance - center_distance
-                #     a_to_b = agent_center - colliding_agent.getPosition()
+                SIGNIFICANCE = 0.0001
+                if a_to_b[0] < SIGNIFICANCE and a_to_b[1] < SIGNIFICANCE:
+                    MAGNITUDE = 0.001
+                    direction = 1
+                    if random.random() > 0.5:
+                        direction = -1
+                    agent.x_pos += random.random() * direction * MAGNITUDE
+
+                    direction = 1
+                    if random.random() > 0.5:
+                        direction = -1
+                    agent.y_pos += random.random() * direction * MAGNITUDE
+
+                    agent_center = agent.getPosition()
+                    center_distance = distance(agent_center, colliding_agent.getPosition())
+                    distance_needed = target_distance - center_distance
+                    a_to_b = agent_center - colliding_agent.getPosition()
 
                 pushback = (a_to_b / np.linalg.norm(a_to_b)) * distance_needed
 

@@ -4,7 +4,7 @@ from .WorldFactory import WorldFactory
 from ..util.timer import Timer
 
 screen = None
-FRAMERATE = 30
+FRAMERATE = 200
 
 def main(world_config, gui=None):
     # initialize the pygame module

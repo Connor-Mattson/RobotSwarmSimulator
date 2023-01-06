@@ -36,7 +36,7 @@ if __name__ == "__main__":
     # CUSTOM_CONTROLLER = [17.5, 0.25, 17.5, -0.25]  # Dispersion
     CUSTOM_CONTROLLER = [12.5, 0.5, 12.5, -0.5]  # Stable Milling
     # CUSTOM_CONTROLLER = [17.5, 1.25, 17.5, -1.25]  # Semi-Stable Milling
-    # CUSTOM_CONTROLLER = [2.5, 2.0, 2.5, -2.0]  # Colliding Unstable
+    CUSTOM_CONTROLLER = [2.5, 2.0, 2.5, -2.0]  # Colliding Unstable
 
     # CUSTOM_CONTROLLER = [4.5, 0.3, -3, 0.4]  # Our Dispersal Gene
 
@@ -84,7 +84,7 @@ if __name__ == "__main__":
     init_positions = [(r*np.cos(t * pi_slice), r*np.sin(t * pi_slice), t * pi_slice) for t in range(0, N_AGENTS)]
     init_positions = [(center[0] + x, center[1] + y, t) for x, y, t in init_positions]
 
-    EVAL_TIL = 600
+    EVAL_TIL = None
     world_config = RectangularWorldConfig(
         size=(WIDTH + GUI_PADDING, HEIGHT + GUI_PADDING),
         n_agents=N_AGENTS,
@@ -97,19 +97,19 @@ if __name__ == "__main__":
         stop_at=EVAL_TIL
     )
 
-    import matplotlib.pyplot as plot
+    # import matplotlib.pyplot as plot
     world = simulate(world_config=world_config)
-    neighbors_at = int(input("Time of Neighbor?"))
-    converged_at = int(input("Time of Convergence?"))
-    for i, agent in enumerate(world.population):
-        print(agent.sensors.sensors[0].history)
-        f = plot.figure()
-        f.set_figwidth(18)
-        f.set_figheight(5)
-        plot.step([x for x in range(EVAL_TIL + 1)], agent.sensors.sensors[0].history, where='post')
-        plot.axvline(x=neighbors_at, color='r', linestyle='dashed', label='vline_multiple - full height')
-        plot.axvline(x=converged_at, color='r', linestyle='dashed', label='vline_multiple - full height')
-        plot.xlabel("Time (Frames)")
-        plot.ylabel("Sensor Value")
-        plot.title(f"Sensor Activity for Agent {i + 1} during Milling Behavior")
-        plot.show()
+    # neighbors_at = int(input("Time of Neighbor?"))
+    # converged_at = int(input("Time of Convergence?"))
+    # for i, agent in enumerate(world.population):
+    #     print(agent.sensors.sensors[0].history)
+    #     f = plot.figure()
+    #     f.set_figwidth(18)
+    #     f.set_figheight(5)
+    #     plot.step([x for x in range(EVAL_TIL + 1)], agent.sensors.sensors[0].history, where='post')
+    #     plot.axvline(x=neighbors_at, color='r', linestyle='dashed', label='vline_multiple - full height')
+    #     plot.axvline(x=converged_at, color='r', linestyle='dashed', label='vline_multiple - full height')
+    #     plot.xlabel("Time (Frames)")
+    #     plot.ylabel("Sensor Value")
+    #     plot.title(f"Sensor Activity for Agent {i + 1} during Milling Behavior")
+    #     plot.show()

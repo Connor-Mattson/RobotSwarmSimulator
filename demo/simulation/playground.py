@@ -28,9 +28,10 @@ if __name__ == "__main__":
     # a = 0.8
     # b = 0.4
 
-    # CUSTOM_GENOME = [-0.7, -1.0, 1.0, -1.0]  # Aggregation
+    # [vl_0, vr_0, vl_1, vr_1]
+    CUSTOM_GENOME = [-0.7, -1.0, 1.0, -1.0]  # Aggregation
     # CUSTOM_GENOME = [-0.7, 0.3, 1.0, 1.0]  # Cyclic Pursuit
-    CUSTOM_GENOME = [0.2, 0.7, -0.5, -0.1]  # Dispersal
+    # CUSTOM_GENOME = [0.2, 0.7, -0.5, -0.1]  # Dispersal
     # CUSTOM_GENOME = [-0.69, -0.77, 0.05, -0.4]  # Milling
     # CUSTOM_GENOME = [1.0, 0.98, 1.0, 1.0]  # Wall Following
     # CUSTOM_GENOME = [-0.83, -0.75, 0.27, -0.57]  # Random
@@ -68,7 +69,7 @@ if __name__ == "__main__":
 
     world_config = RectangularWorldConfig(
         size=(500, 500),
-        n_agents=10,
+        n_agents=9,
         seed=SEED,
         behavior=behavior,
         agentConfig=agent_config,
