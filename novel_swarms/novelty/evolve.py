@@ -5,7 +5,7 @@ from ..config.EvolutionaryConfig import GeneticEvolutionConfig
 from ..gui.evolutionGUI import EvolutionGUI
 from .BehaviorDiscovery import BehaviorDiscovery
 
-FRAMERATE = 60
+FRAMERATE = 200
 GUI_WIDTH = 200
 
 
@@ -36,7 +36,7 @@ def main(config: GeneticEvolutionConfig):
     trial_name = f"{str(int(time.time()))}"
 
     # Initialize GA
-    gene_rules = config.gene_rules
+    gene_builder = config.gene_builder
     evolution = BehaviorDiscovery(
         generations=config.generations,
         population_size=config.population,
@@ -45,8 +45,9 @@ def main(config: GeneticEvolutionConfig):
         world_config=config.world_config,
         lifespan=config.lifespan,
         k_neighbors=config.k,
-        genotype_rules=gene_rules,
-        behavior_config=config.behavior_config
+        genome_builder=gene_builder,
+        behavior_config=config.behavior_config,
+        mutation_flip_chance=config.mutation_flip_chance
     )
 
     if config.show_gui:

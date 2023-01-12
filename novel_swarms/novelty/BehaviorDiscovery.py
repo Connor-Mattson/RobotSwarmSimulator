@@ -6,9 +6,6 @@ from ..results.Trends import Trends
 from ..world.WorldFactory import WorldFactory
 from ..util.timer import Timer
 
-def getRandomRoundedFloat(lower, _range):
-    return round(((np.random.rand() * _range) + lower), 4)
-
 
 class BehaviorDiscovery:
     """
@@ -16,8 +13,8 @@ class BehaviorDiscovery:
     controllers.
     """
 
-    def __init__(self, generations=10, population_size=20, crossover_rate=0.3, mutation_rate=0.1, genotype_rules=None,
-                 lifespan=200, world_config=None, behavior_config=None, k_neighbors=15):
+    def __init__(self, generations=10, population_size=20, crossover_rate=0.3, mutation_rate=0.1, genome_builder=None,
+                 lifespan=200, world_config=None, behavior_config=None, k_neighbors=15, tournament_members=10, mutation_flip_chance = 0.2):
         self.population = np.array([])
         self.behavior = np.array([])
         self.scores = np.array([])
@@ -30,6 +27,7 @@ class BehaviorDiscovery:
         self.curr_generation = 0
         self.crossovers = 0
         self.mutations = 0
+        self.mutation_flip_chance = mutation_flip_chance
         self.world_config = world_config
         self.behavior_config = behavior_config
         self.archive = NoveltyArchive()
@@ -39,16 +37,17 @@ class BehaviorDiscovery:
         self.average_history = []
         self.max_theta = []
         self.min_theta = []
+        self.tournament_members = tournament_members
 
-        if genotype_rules is None:
+        if genome_builder is None:
             raise Exception("BehaviorDiscovery must be initialized with a genotype ruleset.")
-        self.geno_rules = genotype_rules
+        self.gene_builder = genome_builder
 
         self.initializePopulation()
 
     def initializePopulation(self):
         self.population = np.array([
-            [rule.fetch() for rule in self.geno_rules] for j in range(self.population_size)
+            self.gene_builder.fetch_random_genome() for j in range(self.population_size)
         ])
         self.scores = np.array([0.0 for i in range(self.population_size)])
         self.behavior = np.array([[-1.0 for j in range(len(self.behavior_config))] for i in range(self.population_size)])
@@ -62,13 +61,33 @@ class BehaviorDiscovery:
 
         self.status = "Simulation"
         self.world_config.agentConfig.controller = genome
+        behavior = None
+        output = None
 
-        world = WorldFactory.create(self.world_config)
-        output = world.evaluate(self.lifespan, output_capture=output_config)
-        if screen is not None:
-            world.draw(screen)
+        # There is a chance we will be asked to simulate the same genome twice,
+        #   if a repeat genome is discovered do not re-simulate it just copy the appropriate phenome.
 
-        behavior = world.getBehaviorVector()
+        # TODO: Can we retrieve the output for the already simulated genome is the output was stored somewhere? So we don't have to recalculate.
+        genome_index = -1
+        for j in range(len(self.archive.genotypes)):
+            if np.array_equal(self.archive.genotypes[j], genome):
+                genome_index = j
+                break
+
+        if genome_index >= 0 and not output_config:
+            behavior = self.archive.archive[genome_index]
+            print("I've seen this genome before!")
+            print(genome_index, behavior)
+            print(f"Controller: {genome}")
+
+        # If the genome is new, simulate
+        else:
+            world = WorldFactory.create(self.world_config)
+            output = world.evaluate(self.lifespan, output_capture=output_config)
+            if screen is not None:
+                world.draw(screen)
+            behavior = world.getBehaviorVector()
+
         if save:
             self.behavior[i] = behavior
             self.archive.addToArchive(behavior, genome)
@@ -98,9 +117,34 @@ class BehaviorDiscovery:
         for i in range(0, len(selection), 2):
             parent_A = selection[i]
             parent_B = selection[i + 1]
-            child_A, child_B = self.crossOver(parent_A, parent_B)
-            child_A = self.mutation(child_A)
-            child_B = self.mutation(child_B)
+
+            searching = True
+            child_A, child_B = None, None
+            while searching:
+                child_A, child_B = self.crossOver(parent_A, parent_B)
+
+                force_mutation = False
+                if np.array_equal(child_A, child_B):
+                    force_mutation = True
+
+                if force_mutation:
+                    print("Forcing Mutation!")
+                    a_mutated = False
+                    while not a_mutated:
+                        child_A, a_mutated = self.mutation(child_A)
+                    b_mutated = False
+                    while not b_mutated:
+                        child_B, b_mutated = self.mutation(child_B)
+                else:
+                    child_A, _ = self.mutation(child_A)
+                    child_B, _ = self.mutation(child_B)
+
+                # Obey the rules established by the GeneBuilder
+                if self.gene_builder.is_valid(child_A) and self.gene_builder.is_valid(child_B):
+                    searching = False
+                    child_A = self.gene_builder.round_to(child_A)
+                    child_B = self.gene_builder.round_to(child_B)
+
             self.addToPopulation(child_A)
             self.addToPopulation(child_B)
 
@@ -139,19 +183,30 @@ class BehaviorDiscovery:
         return c1, c2
 
     def mutation(self, child):
+        has_mutated = False
         for i in range(len(child)):
             if random.random() < self.mutation_rate:
-                self.mutations += 1
-                gene_rule = self.geno_rules[i]
-                mutation_size = (gene_rule.mutation_step * 2 * np.random.rand()) - gene_rule.mutation_step
-                child[i] = gene_rule.clip(child[i] + mutation_size)
+                # There is a of flipping the bit vs shaking it
+                # Flip
+                if random.random() < self.mutation_flip_chance:
+                    gene_rule = self.gene_builder.rules[i]
+                    child[i] = gene_rule.clip(-child[i])
+                # Flip
+                else:
+                    gene_rule = self.gene_builder.rules[i]
+                    mutation_size = (gene_rule.mutation_step * 2 * np.random.rand()) - gene_rule.mutation_step
+                    child[i] = gene_rule.clip(child[i] + mutation_size)
 
-        return child
+                self.mutations += 1
+                has_mutated = True
+
+        return child, has_mutated
 
     def addToPopulation(self, vector):
         if len(self.population) == 0:
             self.population = np.array([vector])
             return
+        print(vector)
         self.population = np.concatenate((self.population, [vector]))
 
     def getBestScore(self):

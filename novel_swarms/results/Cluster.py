@@ -2,6 +2,7 @@ import numpy
 import numpy as np
 import pygame
 from sklearn.manifold import TSNE
+from sklearn.cluster import AgglomerativeClustering
 from sklearn_extra.cluster import KMedoids
 
 from ..novelty.NoveltyArchive import NoveltyArchive
@@ -62,14 +63,19 @@ class Cluster:
 
     def clustering(self):
         print("Starting k-Medoids Clustering")
-        kmedoids = KMedoids(n_clusters=self.results_config.k, random_state=0).fit(self.reduced)
-        self.cluster_indices = kmedoids.labels_
-        self.cluster_medoids = kmedoids.cluster_centers_
-        self.medoid_genomes = [[] for _ in self.cluster_medoids]
-        for i, medoid in enumerate(self.cluster_medoids):
-            index = numpy.where(self.reduced == medoid)[0][0]
-            if index > -1:
-                self.medoid_genomes[i] = self.archive.genotypes[index]
+        MEDOIDS = False
+        if MEDOIDS:
+            kmedoids = KMedoids(n_clusters=self.results_config.k, random_state=0).fit(self.reduced)
+            self.cluster_indices = kmedoids.labels_
+            self.cluster_medoids = kmedoids.cluster_centers_
+            self.medoid_genomes = [[] for _ in self.cluster_medoids]
+            for i, medoid in enumerate(self.cluster_medoids):
+                index = numpy.where(self.reduced == medoid)[0][0]
+                if index > -1:
+                    self.medoid_genomes[i] = self.archive.genotypes[index]
+        else:
+            kmedoids = AgglomerativeClustering(n_clusters=self.results_config.k).fit(self.reduced)
+            self.cluster_indices = kmedoids.labels_
 
         print("k-Medoids Finished!")
 

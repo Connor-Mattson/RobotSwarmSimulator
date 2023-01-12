@@ -1,29 +1,32 @@
-from ..novelty.GeneRule import GeneRule
-
+from ..novelty.GeneRule import GeneRule, GeneBuilder
+from warnings import warn
 
 class GeneticEvolutionConfig:
     def __init__(self,
                  gene_rules=None,
+                 gene_builder=None,
                  phenotype_config=None,
                  n_generations=0,
                  n_population=0,
                  crossover_rate=0.0,
                  mutation_rate=0.0,
+                 mutation_flip_chance=0.2,
                  world_config=None,
                  k_nn=15,
                  simulation_lifespan=0,
                  display_novelty=False,
                  save_archive=False,
                  show_gui=True,
-                 save_every=None
+                 save_every=None,
                  ):
 
-        if gene_rules is None or not isinstance(gene_rules, list) or len(gene_rules) == 0:
-            raise Exception("Gene Rules with length > 0 must be provided to an instantiation of GeneticEvolutionConfig")
-        if not isinstance(gene_rules[0], GeneRule):
-            raise Exception("Elements of GeneRules parameter must be instances of GeneRule")
+        if gene_rules and not gene_builder:
+            warn("The gene_rules parameter has been deprecated and will be removed in future versions. Use the gene_builder param instead in association with the GeneBuilder class", DeprecationWarning, stacklevel=2)
+            self.gene_builder = GeneBuilder(rules=gene_rules)
 
-        self.gene_rules = gene_rules
+        else:
+            self.gene_builder = gene_builder
+
         self.generations = n_generations
         self.population = n_population
         self.crossover_rate = crossover_rate
@@ -36,3 +39,5 @@ class GeneticEvolutionConfig:
         self.save_archive = save_archive
         self.show_gui = show_gui
         self.save_every = save_every
+        self.mutation_flip_chance = mutation_flip_chance
+

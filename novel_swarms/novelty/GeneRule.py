@@ -1,5 +1,132 @@
 import numpy as np
 
+class GeneBuilder:
+    def __init__(self,
+                 rules=None,
+                 require_single_elem_gt=None,
+                 require_magnitude_gt=None,
+                 round_to_digits=2,
+                 heuristic_validation=False
+              ):
+
+        if rules is None or not isinstance(rules, list) or len(rules) == 0:
+            print(rules)
+            raise Exception("Gene Rules with length > 0 must be provided to an instantiation of GeneBuilder")
+        if not isinstance(rules[0], GeneRule):
+            raise Exception("Elements of GeneRules parameter must be instances of GeneRule")
+        if require_magnitude_gt and require_single_elem_gt:
+            raise Exception("Either require_magnitude_gt or require_single_elem_gt may be set -- not both.")
+
+        self.rules = rules
+        self.elem_gt = require_single_elem_gt
+        self.magnitude_gt = require_magnitude_gt
+        self.round_to_digits = round_to_digits
+        self.heuristic_validation = heuristic_validation
+
+    def fetch_random_genome(self):
+        ret = [rule.fetch() for rule in self.rules]
+        while not self.is_valid(ret):
+            ret = [rule.fetch() for rule in self.rules]
+        for i, elem in enumerate(ret):
+            ret[i] = round(elem, self.round_to_digits)
+        return ret
+
+    def is_valid(self, controller):
+        if not self.heuristic_validation:
+            return True
+        v0_l, v0_r = controller[0], controller[1]
+        v1_l, v1_r = controller[2], controller[3]
+        v0_l, v0_r, v1_l, v1_r = round(v0_l, 1), round(v0_r, 1), round(v1_l, 1), round(v1_r, 1)
+
+        k = 0.5
+        max_elem_score = max(-min(controller), max(controller))
+        max_elem_score = -max_elem_score if max_elem_score < k else max_elem_score
+
+        k_2 = 0.75
+        magnitude_score = np.linalg.norm(controller)
+        magnitude_score = -magnitude_score if magnitude_score < k_2 else magnitude_score
+
+        k_3 = 0.3
+        average_score = np.average(np.sqrt(np.power(controller, 2)))
+        average_score = -average_score if average_score < k_3 else average_score
+
+        # Sensor off magnitude (trial i)
+        on_magnitude = (v0_l ** 2) + (v0_r ** 2)
+
+        # Sensor on magnitude (trial i)
+        off_magnitude = (v1_l ** 2) + (v1_r ** 2)
+
+        # Spinning Detection (sensor off - trial ii)
+        if v0_l == 0.0 and v0_r == 0.0:
+            off_spin_variance = 1
+        else:
+            denom = v0_l if v0_l != 0.0 else v0_r
+            off_spin_variance = min(abs((v0_l + v0_r) / denom), 1.0)
+
+        # Spinning Detection (sensor on - trial ii)
+        if v1_l == 0.0 and v1_r == 0.0:
+            on_spin_variance = 0.0
+        else:
+            denom = v1_l if v1_l != 0.0 else v1_r
+            on_spin_variance = min(abs((v1_l + v1_r) / denom), 1)
+
+        # Mirror Property
+        mirrored_controller = np.array([v0_l, v0_r, -v0_l, -v0_r])
+        mirror_score = np.linalg.norm(mirrored_controller - controller)
+
+        # Independence Property
+        independent_controller = np.array([v0_l, v0_r, v0_l, v0_r])
+        indep = np.linalg.norm(independent_controller - controller)
+
+        attributes = [
+            indep,
+            mirror_score,
+            on_spin_variance,
+            off_spin_variance,
+            on_magnitude,
+            off_magnitude,
+            max_elem_score,
+            magnitude_score,
+            average_score,
+        ]
+
+        weights = [5.3943, 4.5802, 3.3803, 1.7969, -4.1899, -3.9899, -7.3916, 2.5855, 10.1178]
+        mx = np.dot(np.array(attributes), np.array(weights))
+        return mx > 10.5
+
+    def round_to(self, vec):
+        ret = vec
+        for i, elem in enumerate(ret):
+            ret[i] = round(elem, self.round_to_digits)
+        return ret
+
+    def validate(self, vec):
+        ret = self.valid_element(self.valid_magnitude(vec))
+        for i, elem in enumerate(ret):
+            ret[i] = round(elem, self.round_to_digits)
+        return ret
+
+    def valid_magnitude(self, vec):
+        if self.magnitude_gt:
+            while self.magnitude(vec) < self.magnitude_gt:
+                for i in range(len(vec)):
+                    vec[i] += 0.01
+        return vec
+
+    def valid_element(self, vec):
+        vec = np.array(vec)
+        if self.elem_gt and (max(vec) < self.elem_gt):
+            if min(vec) > -self.elem_gt and max(vec) < self.elem_gt:
+                if -self.elem_gt - min(vec) < self.elem_gt - max(vec):
+                    target = min(vec)
+                else:
+                    target = max(vec)
+                ind = np.where(vec == target)[0][0]
+                vec[ind] = self.elem_gt
+        return vec
+
+    def magnitude(self, vec):
+        return np.linalg.norm(np.array(vec))
 
 class GeneRule:
     def __init__(self, _max=1.0, _min=-1.0, mutation_step=0.5, round_digits=None, exclude=None):

@@ -29,7 +29,7 @@ if __name__ == "__main__":
     # b = 0.4
 
     # [vl_0, vr_0, vl_1, vr_1]
-    CUSTOM_GENOME = [-0.7, -1.0, 1.0, -1.0]  # Aggregation
+    # CUSTOM_GENOME = [-0.7, -1.0, 1.0, -1.0]  # Aggregation
     # CUSTOM_GENOME = [-0.7, 0.3, 1.0, 1.0]  # Cyclic Pursuit
     # CUSTOM_GENOME = [0.2, 0.7, -0.5, -0.1]  # Dispersal
     # CUSTOM_GENOME = [-0.69, -0.77, 0.05, -0.4]  # Milling
@@ -39,7 +39,7 @@ if __name__ == "__main__":
     # CUSTOM_GENOME = [-0.788, 0.7441, 0.9298, -0.4975]
     # CUSTOM_GENOME = [1.0, 0.95, 0.99, 1.0] # Wall-F
     # CUSTOM_GENOME = [-0.942, -0.592, -1.0, -0.132]
-    # CUSTOM_GENOME = [0.667, -1.0, 1.0, 0.05]
+    CUSTOM_GENOME = [0.49494949, -0.39393939, -0.29292929,  0.37373737]
 
     SEED = None
 
@@ -69,11 +69,12 @@ if __name__ == "__main__":
 
     world_config = RectangularWorldConfig(
         size=(500, 500),
-        n_agents=9,
+        n_agents=24,
         seed=SEED,
         behavior=behavior,
         agentConfig=agent_config,
-        padding=15
+        padding=15,
+        stop_at=None
     )
 
     simulate(world_config=world_config)
