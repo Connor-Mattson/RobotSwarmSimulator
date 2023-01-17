@@ -10,7 +10,8 @@ class ExternalSimulationArchive:
         self.depth = depth
 
     def traverse_or_null(self, path: list):
-        str_path = self.base_path + "/" + "/".join(path)
+        str_path_list = [str(i) for i in path]
+        str_path = self.base_path + "/" + "/".join(str_path_list)
         if not os.path.exists(str_path):
             return None
         return str_path
@@ -19,21 +20,25 @@ class ExternalSimulationArchive:
         p = self.traverse_or_null(path)
         if p is None:
             return None, None
-        behavior_file = os.path.join(p, "test.csv")
+        behavior_file = os.path.join(p, "behavior.csv")
         behavior = np.loadtxt(behavior_file, delimiter=",", dtype=float)
         if with_image:
             image = np.array(Image.open(os.path.join(p, "behavior.png")).convert('L'))
-            if image:
+            if image is not None:
                 return behavior, image
         return behavior, None
 
-    def save(self, path, behavior, image=None, size=(50,50)):
-        str_path = self.base_path + "/" + "/".join(path)
+    def save_if_empty(self, path, behavior, image=None, size=(50,50)):
+        p = self.traverse_or_null(path)
+        if p is not None:
+            return False
+        str_path_list = [str(i) for i in path]
+        str_path = self.base_path + "/" + "/".join(str_path_list)
         os.makedirs(str_path, exist_ok=False)
-        behavior_file = os.path.join(str_path, "test.csv")
+        behavior_file = os.path.join(str_path, "behavior.csv")
         np.savetxt(behavior_file, behavior, delimiter=",")
-        if image:
+        if image is not None:
             frame = image.astype(np.uint8)
             save_image = cv2.resize(frame, dsize=size, interpolation=cv2.INTER_AREA)
-            matplotlib.image.imsave(os.path.join(path, "behavior.png"), save_image, cmap='gray')
-
+            matplotlib.image.imsave(os.path.join(str_path, "behavior.png"), save_image, cmap='gray')
+        return True
