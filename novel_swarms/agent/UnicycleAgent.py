@@ -58,15 +58,17 @@ class UnicycleAgent(Agent):
     def seed(self, seed):
         random.seed(UnicycleAgent.SEED)
 
-    def step(self, check_for_world_boundaries=None, population=None, check_for_agent_collisions=None) -> None:
+    def step(self, check_for_world_boundaries=None, world=None, check_for_agent_collisions=None) -> None:
 
-
-        if population is None:
-            raise Exception("Expected a Valid value for 'population' in step method call")
+        if world is None:
+            raise Exception("Expected a Valid value for 'World' in step method call - Unicycle Agent")
 
         # timer = Timer("Calculations")
         super().step()
-        v, omega = self.interpretSensors()
+        if world.goals[0].agent_achieved_goal(self):
+            v, omega = 0, 0
+        else:
+            v, omega = self.interpretSensors()
 
         # Define Idiosyncrasies that may occur in actuation/sensing
         idiosync_1 = self.i_1
@@ -102,7 +104,7 @@ class UnicycleAgent(Agent):
 
         # timer = Timer("Sensors")
         for sensor in self.sensors:
-            sensor.step(population=population)
+            sensor.step(world=world)
         # timer = timer.check_watch()
 
     def draw(self, screen) -> None:

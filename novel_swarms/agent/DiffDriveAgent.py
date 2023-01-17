@@ -52,14 +52,17 @@ class DifferentialDriveAgent(Agent):
     def seed(self, seed):
         random.seed(DifferentialDriveAgent.SEED)
 
-    def step(self, check_for_world_boundaries=None, population=None, check_for_agent_collisions=None) -> None:
+    def step(self, check_for_world_boundaries=None, world=None, check_for_agent_collisions=None) -> None:
 
-        if population is None:
-            raise Exception("Expected a Valid value for 'population' in step method call")
+        if world is None:
+            raise Exception("Expected a Valid value for 'World' in step method call")
 
         # timer = Timer("Calculations")
         super().step()
-        vl, vr = self.interpretSensors()
+        if world.goals[0].agent_achieved_goal(self):
+            vl, vr = 0, 0
+        else:
+            vl, vr = self.interpretSensors()
 
         self.dx = (self.wheel_radius / 2) * (vl + vr) * math.cos(self.angle)
         self.dy = (self.wheel_radius / 2) * (vl + vr) * math.sin(self.angle)
@@ -86,7 +89,7 @@ class DifferentialDriveAgent(Agent):
 
         # timer = Timer("Sensors")
         for sensor in self.sensors:
-            sensor.step(population=population)
+            sensor.step(world=world)
         # timer = timer.check_watch()
 
     def draw(self, screen) -> None:

@@ -17,7 +17,7 @@ class AbstractSensor:
         self.n_possible_states = n_possible_states
         self.current_state = 0
 
-    def step(self, population):
+    def step(self, world):
         if self.parent is None and self.static_position is None:
             raise Exception("Either a parent of type 'Agent' must be provided or a static position in the form (x, y)")
         pass

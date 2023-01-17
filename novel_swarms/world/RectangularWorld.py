@@ -2,9 +2,7 @@ import math
 import random
 import numpy as np
 from typing import List, Tuple
-
 import pygame.draw
-
 from ..agent.Agent import Agent
 from ..agent.DiffDriveAgent import DifferentialDriveAgent
 from ..config.WorldConfig import RectangularWorldConfig
@@ -27,6 +25,8 @@ class RectangularWorld(World):
         self.population_size = config.population_size
         self.behavior = config.behavior
         self.padding = config.padding
+        self.objects = config.objects
+        self.goals = config.goals
 
         if config.seed is not None:
             random.seed(config.seed)
@@ -53,6 +53,9 @@ class RectangularWorld(World):
                 agent.x_pos = random.randint(0 + ac.agent_radius, ac.world.w - ac.agent_radius)
                 agent.y_pos = random.randint(0 + ac.agent_radius, ac.world.h - ac.agent_radius)
 
+        for i in range(len(self.objects)):
+            self.objects[i].world = self
+
         self.behavior = config.behavior
         for b in self.behavior:
             b.attach_world(self)
@@ -69,7 +72,7 @@ class RectangularWorld(World):
             agent.step(
                 check_for_world_boundaries=self.withinWorldBoundaries,
                 check_for_agent_collisions=self.preventAgentCollisions,
-                population=self.population
+                world=self
             )
         # agent_step_timer.check_watch()
 
@@ -88,6 +91,12 @@ class RectangularWorld(World):
             w = self.config.w
             h = self.config.h
             pygame.draw.rect(screen, (200, 200, 200), pygame.Rect((p, p), (w - (2*p), h - (2*p))), 1)
+
+        for world_obj in self.objects:
+            world_obj.draw(screen)
+
+        for world_goal in self.goals:
+            world_goal.draw(screen)
 
         for agent in self.population:
             if not issubclass(type(agent), Agent):

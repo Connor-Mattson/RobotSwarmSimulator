@@ -11,7 +11,7 @@ class BinaryLOSSensor(AbstractSensor):
         self.current_state = 0
         self.angle = angle
 
-    def checkForLOSCollisions(self, population) -> None:
+    def checkForLOSCollisions(self, world) -> None:
         sensor_position = self.parent.getPosition()
 
         # Equations taken from Dunn's 3D Math Primer for Graphics, section A.12
@@ -27,8 +27,7 @@ class BinaryLOSSensor(AbstractSensor):
                 self.current_state = 1
                 return
 
-        # O(n) brute computation search, does not work with environment obstacles yet
-        for agent in population:
+        for agent in world.population:
             if self.agent_in_sight(agent, p_0, d_hat):
                 self.parent.agent_in_sight = agent
                 self.current_state = 1
@@ -57,9 +56,9 @@ class BinaryLOSSensor(AbstractSensor):
 
         return False
 
-    def step(self, population):
-        super(BinaryLOSSensor, self).step(population=population)
-        self.checkForLOSCollisions(population=population)
+    def step(self, world):
+        super(BinaryLOSSensor, self).step(world=world)
+        self.checkForLOSCollisions(world=world)
 
     def draw(self, screen):
         if not self.show:

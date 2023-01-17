@@ -13,6 +13,8 @@ class RectangularWorldConfig:
                  show_walls=False,
                  agent_initialization=None,
                  stop_at=None,
+                 objects=[],
+                 goals=[]
                  ):
 
         if behavior is None:
@@ -35,6 +37,8 @@ class RectangularWorldConfig:
         self.radius = np.linalg.norm([self.w / 2, self.h / 2])
         self.show_walls = show_walls
         self.stop_at = stop_at
+        self.objects = objects
+        self.goals = goals
 
         if self.agentConfig:
             self.agentConfig.attach_world_config(self.getShallowCopy())
@@ -49,5 +53,5 @@ class RectangularWorldConfig:
             size=(self.w, self.h),
             n_agents=self.population_size,
             seed=self.seed,
-            padding=self.padding
+            padding=self.padding,
         )

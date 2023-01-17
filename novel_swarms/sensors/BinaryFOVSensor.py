@@ -38,7 +38,7 @@ class BinaryFOVSensor(AbstractSensor):
             self.bias = np.deg2rad(self.bias)
         self.r = distance
 
-    def checkForLOSCollisions(self, population: object) -> None:
+    def checkForLOSCollisions(self, world: object) -> None:
         # Mathematics obtained from Sundaram Ramaswamy
         # https://legends2k.github.io/2d-fov/design.html
         # See section 3.1.1.2
@@ -53,17 +53,14 @@ class BinaryFOVSensor(AbstractSensor):
 
         # First, bag all agents that lie within radius r of the parent
         bag = []
-        for agent in population:
+        for agent in world.population:
             if self.getDistance(sensor_origin, agent.getPosition()) < self.r:
                 bag.append(agent)
 
-        if not bag:
-            self.determineState(False, None)
-            return
-
         e_left, e_right = self.getSectorVectors()
 
-        # Detect Walls
+        # Detect Outer Walls
+        # TODO: Rewrite all this to use WorldObjects
         # see https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
         if self.walls is not None:
             # Get e_left, e_right line_segments
@@ -77,20 +74,11 @@ class BinaryFOVSensor(AbstractSensor):
             # Brute Check for intersection with each wall
             for wall in [wall_top, wall_right, wall_bottom, wall_left]:
                 for line in [l, r]:
-                    p1 = line[0]
-                    q1 = line[1]
-                    p2 = wall[0]
-                    q2 = wall[1]
-                    o1 = self.point_orientation(p1, q1, p2)
-                    o2 = self.point_orientation(p1, q1, q2)
-                    o3 = self.point_orientation(p2, q2, p1)
-                    o4 = self.point_orientation(p2, q2, q1)
-                    checkA = o1 != o2
-                    checkB = o3 != o4
-                    if checkA and checkB:
+                    if self.lines_segments_intersect(line, wall):
                         self.determineState(True, None)
                         return
 
+        # Detect Other Agents
         for agent in bag:
             u = agent.getPosition() - sensor_origin
             directional = np.dot(u, self.getLOSVector())
@@ -125,8 +113,32 @@ class BinaryFOVSensor(AbstractSensor):
                     self.determineState(True, agent)
                     return
 
+        # Detect for World Objects
+        for world_obj in world.objects:
+            if not world_obj.detectable:
+                continue
+            l = [sensor_origin, sensor_origin + (e_left[:2] * self.wall_sensing_range)]
+            r = [sensor_origin, sensor_origin + (e_right[:2] * self.wall_sensing_range)]
+            for segment in world_obj.get_sensing_segments():
+                if self.lines_segments_intersect(segment, l) or self.lines_segments_intersect(segment, r):
+                    self.determineState(True, None)
+                    return
+
         self.determineState(False, None)
         return
+
+    def lines_segments_intersect(self, l1, l2):
+        p1, q1 = l1
+        p2, q2 = l2
+        o1 = self.point_orientation(p1, q1, p2)
+        o2 = self.point_orientation(p1, q1, q2)
+        o3 = self.point_orientation(p2, q2, p1)
+        o4 = self.point_orientation(p2, q2, q1)
+        checkA = o1 != o2
+        checkB = o3 != o4
+        if checkA and checkB:
+            return True
+        return False
 
     def point_orientation(self, p1, p2, p3):
         """
@@ -160,9 +172,9 @@ class BinaryFOVSensor(AbstractSensor):
                 self.parent.agent_in_sight = None
                 self.current_state = 0
 
-    def step(self, population):
-        super(BinaryFOVSensor, self).step(population=population)
-        self.checkForLOSCollisions(population=population)
+    def step(self, world):
+        super(BinaryFOVSensor, self).step(world=world)
+        self.checkForLOSCollisions(world=world)
         if self.store_history:
             if self.parent.agent_in_sight:
                 self.history.append(int(self.parent.agent_in_sight.name))
