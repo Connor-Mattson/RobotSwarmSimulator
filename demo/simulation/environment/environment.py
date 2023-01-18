@@ -33,14 +33,14 @@ if __name__ == "__main__":
     # Note that in Vega et al. v_0 = v_1
 
     # CUSTOM_CONTROLLER = [17.5, 0.25, 17.5, -0.25]  # Dispersion
-    CUSTOM_CONTROLLER = [12.5, 0.5, 12.5, -0.5]  # Stable Milling
+    CUSTOM_CONTROLLER = [12.5, 0.75, 12.5, -0.75]  # Stable Milling
     # CUSTOM_CONTROLLER = [17.5, 1.25, 17.5, -1.25]  # Semi-Stable Milling
     # CUSTOM_CONTROLLER = [2.5, 2.0, 2.5, -2.0]  # Colliding Unstable
     # CUSTOM_CONTROLLER = [4.5, 0.3, -3, 0.4]  # Our Dispersal Gene
 
     SEED = None
     GUI_PADDING = 15
-    N_AGENTS = 5
+    N_AGENTS = 9
     WIDTH, HEIGHT = int(BL * 29.8), int(BL * 29.8)
 
     sensors = SensorSet([
@@ -82,13 +82,42 @@ if __name__ == "__main__":
     init_positions = [(0, 0, t * pi_slice) for t in range(0, N_AGENTS)]
     init_positions = [(start[0] + x, start[1] + y, t) for x, y, t in init_positions]
 
-    # Generate a Maze factory given the parameters
-    # Maze(World Width, World Height, Num_Cells_Tall, Num_Cells_Wide)
-    maze = Maze(WIDTH, HEIGHT, 5, 5, padding=GUI_PADDING)
+    # Original Example
+    objects = [
+        Wall(None, 104, 104, 2, 400),
+        Wall(None, 193, 104, 2, 400),
+        Wall(None, 282, 104, 2, 400),
+        Wall(None, 371, 104, 2, 400),
+    ]
+
+    # Simple Maze
+    objects = [
+        Wall(None, 193, 15, 2, 91),
+        Wall(None, 371, 15, 2, 91),
+        Wall(None, 15, 104, 91, 2),
+        Wall(None, 193, 104, 2, 91),
+        Wall(None, 193, 104, 91, 2),
+        Wall(None, 371, 104, 2, 91),
+        Wall(None, 104, 193, 2, 91),
+        Wall(None, 193, 193, 2, 91),
+        Wall(None, 282, 193, 2, 91),
+        Wall(None, 282, 282, 2, 91),
+        Wall(None, 371, 282, 2, 91),
+        Wall(None, 104, 371, 91, 2),
+    ]
 
     # Use the maze object to generate a maze and return the wall objects associated with it
-    objects = maze.solve_and_return()
-    goals = [AreaGoal(200, 200, 75, 75)]
+    # Generate a Maze factory given the parameters
+    # Maze(World Width, World Height, Num_Cells_Tall, Num_Cells_Wide)
+
+    # maze = Maze(WIDTH, HEIGHT, 5, 5, padding=GUI_PADDING)
+    # objects = maze.solve_and_return()
+    # for o in objects:
+    #     print(repr(o))
+
+    # Add Goal
+    goals = []
+    # goals = [AreaGoal(200, 200, 75, 75)]
 
     EVAL_TIL = None
     world_config = RectangularWorldConfig(

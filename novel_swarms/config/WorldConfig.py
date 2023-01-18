@@ -54,4 +54,6 @@ class RectangularWorldConfig:
             n_agents=self.population_size,
             seed=self.seed,
             padding=self.padding,
+            goals=self.goals,
+            objects=self.objects
         )

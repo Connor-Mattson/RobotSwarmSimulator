@@ -14,7 +14,8 @@ class BehaviorDiscovery:
     """
 
     def __init__(self, generations=10, population_size=20, crossover_rate=0.3, mutation_rate=0.1, genome_builder=None,
-                 lifespan=200, world_config=None, behavior_config=None, k_neighbors=15, tournament_members=10, mutation_flip_chance = 0.2):
+                 lifespan=200, world_config=None, behavior_config=None, k_neighbors=15, tournament_members=10,
+                 mutation_flip_chance = 0.2, allow_external_archive=False):
         self.population = np.array([])
         self.behavior = np.array([])
         self.scores = np.array([])
@@ -38,6 +39,7 @@ class BehaviorDiscovery:
         self.max_theta = []
         self.min_theta = []
         self.tournament_members = tournament_members
+        self.allow_external_archive = allow_external_archive
 
         if genome_builder is None:
             raise Exception("BehaviorDiscovery must be initialized with a genotype ruleset.")

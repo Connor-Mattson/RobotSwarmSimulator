@@ -24,3 +24,6 @@ class Wall(WorldObject):
             [rect.bottomright, rect.bottomleft],
             [rect.bottomleft, rect.topleft]
         ]
+
+    def __repr__(self):
+        return f"Wall(None, {self.x}, {self.y}, {self.w}, {self.h})"
