@@ -4,6 +4,7 @@ import numpy as np
 from .NoveltyArchive import NoveltyArchive
 from ..results.Trends import Trends
 from ..world.WorldFactory import WorldFactory
+from ..cache.ExternalSimulationArchive import ExternalSimulationArchive
 from ..util.timer import Timer
 
 
@@ -46,6 +47,11 @@ class BehaviorDiscovery:
         self.gene_builder = genome_builder
 
         self.initializePopulation()
+        if self.allow_external_archive:
+            DEPTH = 4
+            BASE_DIRECTORY = "/home/connor/Desktop/Original_Capability_Archive"
+            assert DEPTH == len(self.gene_builder.rules)
+            self.external_archive = ExternalSimulationArchive(BASE_DIRECTORY, 4)
 
     def initializePopulation(self):
         self.population = np.array([
@@ -66,33 +72,51 @@ class BehaviorDiscovery:
         behavior = None
         output = None
 
+        # Check to see if the genome is already in our archive
         # There is a chance we will be asked to simulate the same genome twice,
         #   if a repeat genome is discovered do not re-simulate it just copy the appropriate phenome.
-
-        # TODO: Can we retrieve the output for the already simulated genome is the output was stored somewhere? So we don't have to recalculate.
         genome_index = -1
         for j in range(len(self.archive.genotypes)):
             if np.array_equal(self.archive.genotypes[j], genome):
                 genome_index = j
                 break
-
         if genome_index >= 0 and not output_config:
             behavior = self.archive.archive[genome_index]
             print("I've seen this genome before!")
             print(genome_index, behavior)
             print(f"Controller: {genome}")
+            if save:
+                self.behavior[i] = behavior
+                self.archive.addToArchive(behavior, genome)
+                return output
+
+        # If the behavior has already been simulated and its in the external archive, use that information
+        elif self.allow_external_archive:
+            rounded_genome = self.round_genome(genome)
+            r, _ = self.external_archive.retrieve_if_exists(rounded_genome, with_image=False)
+            if r is not None:
+                behavior = r
+                print(f"We just utilized the archive: {rounded_genome}")
+                if save:
+                    self.behavior[i] = behavior
+                    self.archive.addToArchive(behavior, genome)
+                    return output
 
         # If the genome is new, simulate
-        else:
-            world = WorldFactory.create(self.world_config)
-            output = world.evaluate(self.lifespan, output_capture=output_config)
-            if screen is not None:
-                world.draw(screen)
-            behavior = world.getBehaviorVector()
+        world = WorldFactory.create(self.world_config)
+        output = world.evaluate(self.lifespan, output_capture=output_config)
+        if screen is not None:
+            world.draw(screen)
+        behavior = world.getBehaviorVector()
 
         if save:
             self.behavior[i] = behavior
             self.archive.addToArchive(behavior, genome)
+            if self.allow_external_archive:
+                rounded_genome = self.round_genome(genome)
+                self.external_archive.save_if_empty(rounded_genome, behavior, image=output)
+                print(f"We just saved to the archive: {rounded_genome}")
+
             return output
 
         return output, behavior
@@ -187,20 +211,21 @@ class BehaviorDiscovery:
     def mutation(self, child):
         has_mutated = False
         for i in range(len(child)):
-            if random.random() < self.mutation_rate:
-                # There is a of flipping the bit vs shaking it
-                # Flip
-                if random.random() < self.mutation_flip_chance:
-                    gene_rule = self.gene_builder.rules[i]
-                    child[i] = gene_rule.clip(-child[i])
-                # Flip
-                else:
-                    gene_rule = self.gene_builder.rules[i]
-                    mutation_size = (gene_rule.mutation_step * 2 * np.random.rand()) - gene_rule.mutation_step
-                    child[i] = gene_rule.clip(child[i] + mutation_size)
+            if self.gene_builder.rules[i].allow_mutation:
+                if random.random() < self.mutation_rate:
+                    # There is a of flipping the bit vs shaking it
+                    # Flip
+                    if random.random() < self.mutation_flip_chance:
+                        gene_rule = self.gene_builder.rules[i]
+                        child[i] = gene_rule.clip(-child[i])
+                    # Flip
+                    else:
+                        gene_rule = self.gene_builder.rules[i]
+                        mutation_size = (gene_rule.mutation_step * 2 * np.random.rand()) - gene_rule.mutation_step
+                        child[i] = gene_rule.clip(child[i] + mutation_size)
 
-                self.mutations += 1
-                has_mutated = True
+                    self.mutations += 1
+                    has_mutated = True
 
         return child, has_mutated
 
@@ -221,3 +246,9 @@ class BehaviorDiscovery:
 
     def getBestGenome(self):
         return self.population[np.where(self.scores == self.getBestScore())[0][0]]
+
+    def round_genome(self, genome):
+        rounded = []
+        for i in genome:
+            rounded.append(round(i, 1) + 0.0)
+        return np.array(rounded)

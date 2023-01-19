@@ -128,8 +128,12 @@ class GeneBuilder:
     def magnitude(self, vec):
         return np.linalg.norm(np.array(vec))
 
+# class AbstractNucleotide:
+#     def mutate_with_chance(self, c=0.2, allow_negation=False):
+#         pass
+
 class GeneRule:
-    def __init__(self, _max=1.0, _min=-1.0, mutation_step=0.5, round_digits=None, exclude=None):
+    def __init__(self, _max=1.0, _min=-1.0, mutation_step=0.5, round_digits=None, exclude=None, allow_mutation=True):
 
         if exclude is None:
             self.exclude = []
@@ -140,7 +144,7 @@ class GeneRule:
         self.round_digits = round_digits
         self._range = self._max - self._min
         self.mutation_step = mutation_step
-
+        self.allow_mutation = allow_mutation
 
     def fetch(self):
         if self.round_digits is None:

@@ -83,12 +83,12 @@ if __name__ == "__main__":
     init_positions = [(start[0] + x, start[1] + y, t) for x, y, t in init_positions]
 
     # Original Example
-    objects = [
-        Wall(None, 104, 104, 2, 400),
-        Wall(None, 193, 104, 2, 400),
-        Wall(None, 282, 104, 2, 400),
-        Wall(None, 371, 104, 2, 400),
-    ]
+    # objects = [
+    #     Wall(None, 104, 104, 2, 400),
+    #     Wall(None, 193, 104, 2, 400),
+    #     Wall(None, 282, 104, 2, 400),
+    #     Wall(None, 371, 104, 2, 400),
+    # ]
 
     # Simple Maze
     objects = [
@@ -117,7 +117,7 @@ if __name__ == "__main__":
 
     # Add Goal
     goals = []
-    # goals = [AreaGoal(200, 200, 75, 75)]
+    goals = [AreaGoal(200, 200, 75, 75)]
 
     EVAL_TIL = None
     world_config = RectangularWorldConfig(

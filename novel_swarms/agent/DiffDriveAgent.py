@@ -59,7 +59,7 @@ class DifferentialDriveAgent(Agent):
 
         # timer = Timer("Calculations")
         super().step()
-        if world.goals[0].agent_achieved_goal(self):
+        if world.goals and world.goals[0].agent_achieved_goal(self):
             vl, vr = 0, 0
         else:
             vl, vr = self.interpretSensors()

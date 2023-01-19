@@ -9,7 +9,7 @@ FRAMERATE = 200
 GUI_WIDTH = 200
 
 
-def main(config: GeneticEvolutionConfig):
+def main(config: GeneticEvolutionConfig, output_config=None):
 
     # initialize the pygame module
     pygame.init()
@@ -47,7 +47,8 @@ def main(config: GeneticEvolutionConfig):
         k_neighbors=config.k,
         genome_builder=gene_builder,
         behavior_config=config.behavior_config,
-        mutation_flip_chance=config.mutation_flip_chance
+        mutation_flip_chance=config.mutation_flip_chance,
+        allow_external_archive=config.use_external_archive
     )
 
     if config.show_gui:
@@ -76,7 +77,7 @@ def main(config: GeneticEvolutionConfig):
             screen.fill((0, 0, 0))
 
             evolution.curr_genome = i
-            evolution.runSinglePopulation(screen=screen, i=i, seed=i, output_config=None)
+            evolution.runSinglePopulation(screen=screen, i=i, seed=i, output_config=output_config)
 
             if config.show_gui:
                 gui.draw(screen=screen)
@@ -101,6 +102,7 @@ def main(config: GeneticEvolutionConfig):
         current_time = time.time()
         if config.show_gui:
             gui.set_elapsed_time(current_time - last_gen_timestamp)
+        print(f"Generation {generation} completed in {current_time - last_gen_timestamp}")
         last_gen_timestamp = current_time
 
         if save_results and config.save_every is not None:

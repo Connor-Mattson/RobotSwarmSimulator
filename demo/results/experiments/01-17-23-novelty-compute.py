@@ -14,6 +14,8 @@ if __name__ == "__main__":
     archive = NoveltyArchive(
         # pheno_file="/home/connor/Desktop/Experiments/Daily-Trials/01-11-23-heuristic-evolution/b_1673482837_final_1673485568.csv",
         # geno_file="/home/connor/Desktop/Experiments/Daily-Trials/01-11-23-heuristic-evolution/g_1673482837_final_1673485568.csv",
+        pheno_file="/home/connor/Desktop/Experiments/Daily-Trials/01-18-23-evolution-w-archive/b_1674073010_final_1674076216.csv",
+        geno_file="/home/connor/Desktop/Experiments/Daily-Trials/01-18-23-evolution-w-archive/g_1674073010_final_1674076216.csv",
         absolute=True
     )
 
