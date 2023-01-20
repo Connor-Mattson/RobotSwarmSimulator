@@ -17,7 +17,12 @@ class DiffDriveAgentConfig:
                  agent_radius=5,
                  wheel_radius=2.0,
                  dt=1.0,
-                 sensors: SensorSet = None):
+                 sensors: SensorSet = None,
+                 trace_length=None,
+                 trace_color=None,
+                 body_color=(255, 255, 255),
+                 body_filled=False
+                ):
 
         self.x = x
         self.y = y
@@ -29,6 +34,10 @@ class DiffDriveAgentConfig:
         self.wheel_radius = wheel_radius
         self.controller = controller
         self.sensors = sensors
+        self.trace_length = trace_length
+        self.trace_color = trace_color
+        self.body_color = body_color
+        self.body_filled = body_filled
 
     def attach_world_config(self, world_config):
         self.world = world_config

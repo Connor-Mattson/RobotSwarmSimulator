@@ -57,7 +57,7 @@ def main(world_config, gui=None):
                     world.step()
                     steps_taken += 1
                     gui.set_time(steps_taken)
-                    screen.fill((0, 0, 0))
+                    screen.fill(world_config.background_color)
                     world.draw(screen)
                     gui.draw(screen)
                     pygame.display.flip()
@@ -100,7 +100,7 @@ def main(world_config, gui=None):
         gui.set_time(steps_taken)
 
         # Draw!
-        screen.fill((0, 0, 0))
+        screen.fill(world_config.background_color)
         world.draw(screen)
         gui.draw(screen)
         pygame.display.flip()
