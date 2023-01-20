@@ -41,6 +41,7 @@ class BehaviorDiscovery:
         self.min_theta = []
         self.tournament_members = tournament_members
         self.allow_external_archive = allow_external_archive
+        self.force_repeats = False
 
         if genome_builder is None:
             raise Exception("BehaviorDiscovery must be initialized with a genotype ruleset.")
@@ -75,23 +76,24 @@ class BehaviorDiscovery:
         # Check to see if the genome is already in our archive
         # There is a chance we will be asked to simulate the same genome twice,
         #   if a repeat genome is discovered do not re-simulate it just copy the appropriate phenome.
-        genome_index = -1
-        for j in range(len(self.archive.genotypes)):
-            if np.array_equal(self.archive.genotypes[j], genome):
-                genome_index = j
-                break
-        if genome_index >= 0 and not output_config:
-            behavior = self.archive.archive[genome_index]
-            print("I've seen this genome before!")
-            print(genome_index, behavior)
-            print(f"Controller: {genome}")
-            if save:
-                self.behavior[i] = behavior
-                self.archive.addToArchive(behavior, genome)
-                return output
+        if not self.force_repeats:
+            genome_index = -1
+            for j in range(len(self.archive.genotypes)):
+                if np.array_equal(self.archive.genotypes[j], genome):
+                    genome_index = j
+                    break
+            if genome_index >= 0 and not output_config:
+                behavior = self.archive.archive[genome_index]
+                print("I've seen this genome before!")
+                print(genome_index, behavior)
+                print(f"Controller: {genome}")
+                if save:
+                    self.behavior[i] = behavior
+                    self.archive.addToArchive(behavior, genome)
+                    return output
 
         # If the behavior has already been simulated and its in the external archive, use that information
-        elif self.allow_external_archive:
+        if self.allow_external_archive:
             rounded_genome = self.round_genome(genome)
             r, _ = self.external_archive.retrieve_if_exists(rounded_genome, with_image=False)
             if r is not None:
@@ -108,6 +110,8 @@ class BehaviorDiscovery:
         if screen is not None:
             world.draw(screen)
         behavior = world.getBehaviorVector()
+        print("End:")
+        print([(a.x_pos, a.y_pos) for a in world.population])
 
         if save:
             self.behavior[i] = behavior

@@ -2,6 +2,7 @@ from typing import Tuple
 import pygame
 import random
 import math
+import numpy as np
 from copy import deepcopy
 from .Agent import Agent
 from ..config.AgentConfig import DiffDriveAgentConfig
@@ -65,7 +66,8 @@ class DifferentialDriveAgent(Agent):
         self.attach_agent_to_sensors()
 
     def seed(self, seed):
-        random.seed(DifferentialDriveAgent.SEED)
+        # random.seed(DifferentialDriveAgent.SEED)
+        pass
 
     def step(self, check_for_world_boundaries=None, world=None, check_for_agent_collisions=None) -> None:
 
@@ -151,7 +153,7 @@ class DifferentialDriveAgent(Agent):
     def get_random_color(self):
         rand_color = [255, 255, 255]
         while sum(rand_color) > 245*3:
-            rand_color = random.choices(range(256), k=3)
+            rand_color = np.random.choice(256, 3)
         return rand_color
 
     def __str__(self) -> str:

@@ -29,8 +29,9 @@ class RectangularWorld(World):
         self.goals = config.goals
 
         if config.seed is not None:
+            # print(f"World Instantiated with Seed: {config.seed}")
+            # print(f"TESTING RAND: {random.random()}")
             random.seed(config.seed)
-            np.random.seed(config.seed)
 
         self.population = [
             AgentFactory.create(config.agentConfig, name=f"{i}") for i in range(self.population_size)
@@ -52,6 +53,9 @@ class RectangularWorld(World):
             for agent in self.population:
                 agent.x_pos = random.randint(0 + ac.agent_radius, ac.world.w - ac.agent_radius)
                 agent.y_pos = random.randint(0 + ac.agent_radius, ac.world.h - ac.agent_radius)
+                agent.angle = random.random() * 2 * math.pi
+
+        # print([(a.x_pos, a.y_pos, a.angle) for a in self.population])
 
         for i in range(len(self.objects)):
             self.objects[i].world = self

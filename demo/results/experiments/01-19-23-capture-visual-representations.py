@@ -6,6 +6,7 @@ January 2023
 import pygame
 import time
 import numpy as np
+import random
 from novel_swarms.world.simulate import main as simulate
 from novel_swarms.novelty.GeneRule import GeneRule, GeneBuilder
 from novel_swarms.config.OutputTensorConfig import OutputTensorConfig
@@ -25,6 +26,7 @@ import matplotlib.pyplot as plt
 if __name__ == "__main__":
 
     SEED = 1
+    random.seed(SEED)
 
     sensors = SensorSet([
         BinaryLOSSensor(angle=0, draw=False),
@@ -83,7 +85,7 @@ if __name__ == "__main__":
         mutation_rate=0.15,
         world_config=world_config,
         k_nn=15,
-        simulation_lifespan=1200,
+        simulation_lifespan=2200,
         display_novelty=False,
         save_archive=True,
         show_gui=False,
@@ -129,7 +131,7 @@ if __name__ == "__main__":
         [-0.7, 0.3, 1.0, 1.0],
         [-0.7, -1.0, 1.0, -1.0],
         [0.2, 0.7, -0.5, -0.1],
-        [-0.69, -0.77, 0.05, -0.4],
+        # [0.3, 0.5, 0.9, 1.0],
         [1.0, 0.98, 1.0, 1.0]
     ]
     for i, controller in enumerate(CONTROLLERS):
@@ -140,4 +142,4 @@ if __name__ == "__main__":
         plt.axis('off')
         plt.tight_layout()
         plt.imshow(output, cmap='Greys')
-        plt.savefig("C:\\Users\\conno\\Downloads\\" + f'{TRIAL}_{elem}.png', bbox_inches='tight', transparent="True", pad_inches=0)
+        plt.savefig("out/" + f'{TRIAL}_{elem}.png', bbox_inches='tight', transparent="True", pad_inches=0)
