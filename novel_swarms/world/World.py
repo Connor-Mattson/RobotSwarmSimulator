@@ -52,11 +52,11 @@ class World():
             if output_capture and output_capture.screen:
                 # If start of recording, clear screen
                 if frame_markers and step == frame_markers[0]:
-                    screen.fill((0, 0, 0))
+                    screen.fill(output_capture.background_color)
                     pygame.display.flip()
 
                 if not output_capture or not output_capture.timeless:
-                    screen.fill((0, 0, 0))
+                    screen.fill(output_capture.background_color)
 
                 if frame_markers and step > frame_markers[0]:
                     self.draw(screen)
@@ -64,14 +64,20 @@ class World():
 
             if output_capture:
                 if not output_capture.timeless and step in frame_markers:
-                    screen_capture = pygame.surfarray.array2d(screen)
+                    if output_capture.colored:
+                        screen_capture = pygame.surfarray.array3d(screen)
+                    else:
+                        screen_capture = pygame.surfarray.array2d(screen)
                     if output is None:
                         output = np.array([screen_capture])
                     else:
                         output = np.concatenate((output, [screen_capture]))
 
         if output_capture and output_capture.timeless:
-            output = pygame.surfarray.array2d(screen)
+            if output_capture.colored:
+                output = pygame.surfarray.array3d(screen)
+            else:
+                output = pygame.surfarray.array2d(screen)
 
         return output
 

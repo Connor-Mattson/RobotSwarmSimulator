@@ -14,7 +14,8 @@ class RectangularWorldConfig:
                  agent_initialization=None,
                  stop_at=None,
                  objects=[],
-                 goals=[]
+                 goals=[],
+                 background_color=(0, 0, 0)
                  ):
 
         if behavior is None:
@@ -39,6 +40,7 @@ class RectangularWorldConfig:
         self.stop_at = stop_at
         self.objects = objects
         self.goals = goals
+        self.background_color = background_color
 
         if self.agentConfig:
             self.agentConfig.attach_world_config(self.getShallowCopy())
