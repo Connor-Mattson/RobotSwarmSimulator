@@ -48,7 +48,7 @@ class RectangularWorld(World):
                 self.population[i].y_pos = init[1] + noise_y
                 if len(init) > 2:
                     self.population[i].angle = init[2] + noise_theta
-            
+
         elif ac.x is None and config.seed is not None:
             for agent in self.population:
                 agent.x_pos = random.randint(0 + ac.agent_radius, ac.world.w - ac.agent_radius)
@@ -85,7 +85,6 @@ class RectangularWorld(World):
             behavior.calculate()
         # behavior_timer.check_watch()
 
-
     def draw(self, screen):
         """
         Cycle through the entire population and draw the agents. Draw Environment Walls if needed.
@@ -94,7 +93,7 @@ class RectangularWorld(World):
             p = self.config.padding
             w = self.config.w
             h = self.config.h
-            pygame.draw.rect(screen, (200, 200, 200), pygame.Rect((p, p), (w - (2*p), h - (2*p))), 1)
+            pygame.draw.rect(screen, (200, 200, 200), pygame.Rect((p, p), (w - (2 * p), h - (2 * p))), 1)
 
         for world_obj in self.objects:
             world_obj.draw(screen)
@@ -154,6 +153,40 @@ class RectangularWorld(World):
         agent.y_pos = min((self.bounded_height - agent.radius - padding), agent.y_pos)
 
         # agent.angle += (math.pi / 720)
+        self.handleWallCollisions(agent)
+
+    def handleWallCollisions(self, agent: DifferentialDriveAgent):
+        # Check for distances between the agent and the line segments
+        for obj in self.objects:
+            segs = obj.get_sensing_segments()
+            c = (agent.x_pos, agent.y_pos)
+            for p1, p2 in segs:
+                # From https://stackoverflow.com/questions/24727773/detecting-rectangle-collision-with-a-circle
+                x1, y1 = p1
+                x2, y2 = p2
+                x3, y3 = c
+                px = x2 - x1
+                py = y2 - y1
+
+                something = px * px + py * py
+
+                u = ((x3 - x1) * px + (y3 - y1) * py) / float(something)
+
+                if u > 1:
+                    u = 1
+                elif u < 0:
+                    u = 0
+
+                x = x1 + u * px
+                y = y1 + u * py
+
+                dx = x - x3
+                dy = y - y3
+
+                dist = math.sqrt(dx * dx + dy * dy)
+                if dist < agent.radius:
+                    agent.y_pos -= dy
+                    agent.x_pos -= dx
 
     def preventAgentCollisions(self, agent: DifferentialDriveAgent) -> None:
         agent_center = agent.getPosition()
@@ -182,6 +215,8 @@ class RectangularWorld(World):
 
                 agent.collision_flag = True
                 colliding_agent.collision_flag = True
+                if colliding_agent.detection_id == 2:
+                    agent.detection_id = 2
 
                 # print(f"Overlap. A: {agent_center}, B: {colliding_agent.getPosition()}")
                 distance_needed = target_distance - center_distance

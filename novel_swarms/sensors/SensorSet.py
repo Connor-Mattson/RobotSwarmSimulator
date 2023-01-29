@@ -25,6 +25,9 @@ class SensorSet:
         state = int(''.join(binary_states), 2)
         return state
 
+    def getDetectionId(self):
+        return max([sensor.detection_id for sensor in self.sensors])
+
     def getStatePermutationSize(self):
         return sum([s.n_possible_states for s in self.sensors])
 

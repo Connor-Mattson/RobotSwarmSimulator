@@ -36,6 +36,7 @@ if __name__ == "__main__":
     # CUSTOM_GENOME = [0.65, 1.0, 0.4, 0.5]  # Milling
     # CUSTOM_GENOME = [1.0, 0.98, 1.0, 1.0]  # Wall Following
     # CUSTOM_GENOME = [-0.83, -0.75, 0.27, -0.57]  # Random
+    CUSTOM_GENOME = [1.0, 0.8, 0.9, -0.5]
 
     SEED = None
 

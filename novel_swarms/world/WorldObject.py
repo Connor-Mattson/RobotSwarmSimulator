@@ -11,3 +11,6 @@ class WorldObject:
 
     def get_sensing_segments(self):
         return []
+
+    def get_collision_segments(self):
+        return []

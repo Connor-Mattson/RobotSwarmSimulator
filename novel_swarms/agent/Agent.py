@@ -16,6 +16,7 @@ class Agent:
         self.collision_flag = False
         self.stop_on_collision = False
         self.stopped_duration = 0
+        self.detection_id = 0
         pass
 
     def step(self, check_for_world_boundaries=None) -> None:

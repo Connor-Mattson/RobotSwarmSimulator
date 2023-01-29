@@ -49,6 +49,7 @@ class DifferentialDriveAgent(Agent):
         if self.trace:
             self.trace_path = []
             self.trace_length = config.trace_length
+
         if config.body_color == "Random":
             self.body_color = self.get_random_color()
         else:

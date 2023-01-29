@@ -72,11 +72,13 @@ class GeneBuilder:
 
         # Mirror Property
         mirrored_controller = np.array([v0_l, v0_r, -v0_l, -v0_r])
-        mirror_score = np.linalg.norm(mirrored_controller - controller)
+        mirror_score = np.linalg.norm(mirrored_controller - np.array([v0_l, v0_r, v1_l, v1_r]))
+        k_m = 0.3
+        mirror_score = -5 if mirror_score < k_m else mirror_score
 
         # Independence Property
         independent_controller = np.array([v0_l, v0_r, v0_l, v0_r])
-        indep = np.linalg.norm(independent_controller - controller)
+        indep = np.linalg.norm(independent_controller - np.array([v0_l, v0_r, v1_l, v1_r]))
 
         attributes = [
             indep,
@@ -90,9 +92,11 @@ class GeneBuilder:
             average_score,
         ]
 
-        weights = [5.3943, 4.5802, 3.3803, 1.7969, -4.1899, -3.9899, -7.3916, 2.5855, 10.1178]
+        # weights = [5.3943, 4.5802, 3.3803, 1.7969, -4.1899, -3.9899, -7.3916, 2.5855, 10.1178]
+        weights = [0.8993,  0.7878, 1.7404,  0.7404,  0.4437,  0.3982, -0.1233,  0.0905, 1.1693]
         mx = np.dot(np.array(attributes), np.array(weights))
-        return mx > 10.5
+        # return mx > 10.5
+        return mx > 3.8
 
     def round_to(self, vec):
         ret = vec

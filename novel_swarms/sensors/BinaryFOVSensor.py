@@ -62,6 +62,7 @@ class BinaryFOVSensor(AbstractSensor):
         # Detect Outer Walls
         # TODO: Rewrite all this to use WorldObjects
         # see https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
+        consideration_set = []
         if self.walls is not None:
             # Get e_left, e_right line_segments
             l = [sensor_origin, sensor_origin + (e_left[:2] * self.wall_sensing_range)]
@@ -75,8 +76,24 @@ class BinaryFOVSensor(AbstractSensor):
             for wall in [wall_top, wall_right, wall_bottom, wall_left]:
                 for line in [l, r]:
                     if self.lines_segments_intersect(line, wall):
-                        self.determineState(True, None)
-                        return
+                        d_to_inter = np.linalg.norm(np.array(self.line_seg_int_point(line, wall)) - np.array(sensor_origin))
+                        consideration_set.append((d_to_inter, None))
+
+        # Detect for World Objects
+        for world_obj in world.objects:
+            if not world_obj.detectable:
+                continue
+            l = [sensor_origin, sensor_origin + (e_left[:2] * self.wall_sensing_range)]
+            r = [sensor_origin, sensor_origin + (e_right[:2] * self.wall_sensing_range)]
+            for segment in world_obj.get_sensing_segments():
+                if self.lines_segments_intersect(segment, l):
+                    d_to_inter = np.linalg.norm(np.array(self.line_seg_int_point(segment, l)) - np.array(sensor_origin))
+                    consideration_set.append((d_to_inter, None))
+
+                if self.lines_segments_intersect(segment, r):
+                    d_to_inter = np.linalg.norm(np.array(self.line_seg_int_point(segment, r)) - np.array(sensor_origin))
+                    consideration_set.append((d_to_inter, None))
+
 
         # Detect Other Agents
         for agent in bag:
@@ -91,8 +108,8 @@ class BinaryFOVSensor(AbstractSensor):
                 added_signs = sign_l - sign_r
                 sector_boundaries = np.all(added_signs == 0)
                 if sector_boundaries:
-                    self.determineState(True, agent)
-                    return
+                    d_to_inter = np.linalg.norm(u)
+                    consideration_set.append((d_to_inter, agent))
 
                 # It may also be the case that the center of the agent is not within the FOV, but that some part of the
                 # circle is visible and on the edges of the left and right viewing vectors.
@@ -108,24 +125,21 @@ class BinaryFOVSensor(AbstractSensor):
                 dist_r = np.linalg.norm(u - u_r)
 
                 radius = self.parent.radius    # Note: Assumes homogenous radius
-                # radius = 2.5
-                if dist_l < radius or dist_r < radius:
-                    self.determineState(True, agent)
-                    return
+                if dist_l < radius:
+                    d_to_inter = np.linalg.norm(u)
+                    consideration_set.append((d_to_inter, agent))
+                if dist_r < radius:
+                    d_to_inter = np.linalg.norm(u)
+                    consideration_set.append((d_to_inter, agent))
 
-        # Detect for World Objects
-        for world_obj in world.objects:
-            if not world_obj.detectable:
-                continue
-            l = [sensor_origin, sensor_origin + (e_left[:2] * self.wall_sensing_range)]
-            r = [sensor_origin, sensor_origin + (e_right[:2] * self.wall_sensing_range)]
-            for segment in world_obj.get_sensing_segments():
-                if self.lines_segments_intersect(segment, l) or self.lines_segments_intersect(segment, r):
-                    self.determineState(True, None)
-                    return
+        if not consideration_set:
+            self.determineState(False, None)
+            return
 
-        self.determineState(False, None)
-        return
+        consideration_set.sort()
+        # print(consideration_set)
+        score, val = consideration_set.pop(0)
+        self.determineState(True, val)
 
     def lines_segments_intersect(self, l1, l2):
         p1, q1 = l1
@@ -139,6 +153,22 @@ class BinaryFOVSensor(AbstractSensor):
         if checkA and checkB:
             return True
         return False
+
+    def line_seg_int_point(self, line1, line2):
+        xdiff = (line1[0][0] - line1[1][0], line2[0][0] - line2[1][0])
+        ydiff = (line1[0][1] - line1[1][1], line2[0][1] - line2[1][1])
+
+        def det(a, b):
+            return a[0] * b[1] - a[1] * b[0]
+
+        div = det(xdiff, ydiff)
+        if div == 0:
+            raise Exception('lines do not intersect')
+
+        d = (det(*line1), det(*line2))
+        x = det(d, xdiff) / div
+        y = det(d, ydiff) / div
+        return x, y
 
     def point_orientation(self, p1, p2, p3):
         """
@@ -160,17 +190,23 @@ class BinaryFOVSensor(AbstractSensor):
             if np.random.random_sample() < self.fn:
                 self.parent.agent_in_sight = None
                 self.current_state = 0
+                self.detection_id = 0
             else:
                 self.parent.agent_in_sight = agent
                 self.current_state = 1
+                if agent:
+                    self.detection_id = agent.detection_id
+
         else:
             # Consider Reporting False Positive
             if np.random.random_sample() < self.fp:
                 self.parent.agent_in_sight = None
+                self.detection_id = 0
                 self.current_state = 1
             else:
                 self.parent.agent_in_sight = None
                 self.current_state = 0
+                self.detection_id = 0
 
     def step(self, world):
         super(BinaryFOVSensor, self).step(world=world)

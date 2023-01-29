@@ -7,15 +7,11 @@ from novel_swarms.sensors.AbstractSensor import AbstractSensor
 from novel_swarms.sensors.GenomeDependentSensor import GenomeBinarySensor
 from novel_swarms.sensors.StaticSensor import StaticSensor
 from novel_swarms.world.simulate import main as simulate
-from novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
-from novel_swarms.behavior.AverageSpeed import AverageSpeedBehavior
-from novel_swarms.behavior.GroupRotationBehavior import GroupRotationBehavior
-from novel_swarms.behavior.RadialVariance import RadialVarianceBehavior
-from novel_swarms.behavior.ScatterBehavior import ScatterBehavior
+from novel_swarms.behavior.DistanceToGoal import DistanceToGoal
 from novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
 from novel_swarms.sensors.BinaryFOVSensor import BinaryFOVSensor
 from novel_swarms.sensors.SensorSet import SensorSet
-from novel_swarms.config.AgentConfig import UnicycleAgentConfig
+from novel_swarms.config.AgentConfig import MazeAgentConfig
 from novel_swarms.config.WorldConfig import RectangularWorldConfig
 from novel_swarms.world.generation.Maze import Maze
 from novel_swarms.world.goals.Goal import AreaGoal
@@ -40,26 +36,27 @@ if __name__ == "__main__":
 
     SEED = None
     GUI_PADDING = 15
-    N_AGENTS = 9
+    N_AGENTS = 20
+    # N_AGENTS = 1
     WIDTH, HEIGHT = int(BL * 29.8), int(BL * 29.8)
 
     sensors = SensorSet([
         BinaryFOVSensor(
             theta=14,
-            distance=(BL * 2),
+            distance=(BL * 8),
             bias=0,
             degrees=True,
-            false_positive=0.0,
-            false_negative=0.0,
+            false_positive=0.02,
+            false_negative=0.02,
             # Rectangle Representing Environment Boundaries
             walls=[[GUI_PADDING, GUI_PADDING], [GUI_PADDING + WIDTH, GUI_PADDING + HEIGHT]],
-            wall_sensing_range=(BL * 2),
+            wall_sensing_range=(BL * 3),
             time_step_between_sensing=1,
             store_history=False
         )
     ])
 
-    agent_config = UnicycleAgentConfig(
+    agent_config = MazeAgentConfig(
         controller=CUSTOM_CONTROLLER,
         agent_radius=BL / 3,
         dt=0.13,  # 130ms sampling period
@@ -69,11 +66,7 @@ if __name__ == "__main__":
     )
 
     behavior = [
-        AverageSpeedBehavior(),
-        AngularMomentumBehavior(),
-        RadialVarianceBehavior(),
-        ScatterBehavior(),
-        GroupRotationBehavior(),
+        DistanceToGoal()
     ]
 
     r = 10
@@ -90,20 +83,12 @@ if __name__ == "__main__":
     #     Wall(None, 371, 104, 2, 400),
     # ]
 
-    # Simple Maze
+    # Tricky Maze
     objects = [
-        Wall(None, 193, 15, 2, 91),
-        Wall(None, 371, 15, 2, 91),
-        Wall(None, 15, 104, 91, 2),
-        Wall(None, 193, 104, 2, 91),
-        Wall(None, 193, 104, 91, 2),
-        Wall(None, 371, 104, 2, 91),
-        Wall(None, 104, 193, 2, 91),
-        Wall(None, 193, 193, 2, 91),
-        Wall(None, 282, 193, 2, 91),
-        Wall(None, 282, 282, 2, 91),
-        Wall(None, 371, 282, 2, 91),
-        Wall(None, 104, 371, 91, 2),
+        Wall(None, 180, 193, 120, 2),
+        Wall(None, 180, 193, 2, 91),
+        Wall(None, 300, 193, 2, 91),
+        Wall(None, 238, 350, 2, 100),
     ]
 
     # Use the maze object to generate a maze and return the wall objects associated with it
@@ -116,8 +101,8 @@ if __name__ == "__main__":
     #     print(repr(o))
 
     # Add Goal
-    goals = []
-    goals = [AreaGoal(200, 200, 75, 75)]
+    # goals = []
+    goals = [AreaGoal(200, 200, 75, 20)]
 
     EVAL_TIL = None
     world_config = RectangularWorldConfig(
@@ -128,7 +113,7 @@ if __name__ == "__main__":
         agentConfig=agent_config,
         padding=GUI_PADDING,
         show_walls=True,
-        agent_initialization=init_positions,
+        agent_initialization=None,
         stop_at=EVAL_TIL,
         objects=objects,
         goals=goals

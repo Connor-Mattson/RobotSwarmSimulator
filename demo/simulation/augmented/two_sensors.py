@@ -20,36 +20,25 @@ from novel_swarms.sensors.BinaryFOVSensor import BinaryFOVSensor
 from novel_swarms.sensors.SensorSet import SensorSet
 from novel_swarms.config.AgentConfig import DiffDriveAgentConfig
 from novel_swarms.config.WorldConfig import RectangularWorldConfig
+from novel_swarms.config.defaults import ConfigurationDefaults
 import numpy as np
 
 if __name__ == "__main__":
     a = 0.8
     b = 0.4
 
-    # CUSTOM_GENOME = [-0.7, -1.0, 1.0, -1.0]  # Aggregation
-    CUSTOM_GENOME = [-0.7, 0.3, 1.0, 1.0]  # Cyclic Pursuit
-    # CUSTOM_GENOME = [0.2, 0.7, -0.5, -0.1]  # Dispersal
-    # CUSTOM_GENOME = [-0.69, -0.77, 0.05, -0.4]  # Milling
-    #CUSTOM_GENOME = [1.0, 0.98, 1.0, 1.0]  # Wall Following
-    # CUSTOM_GENOME = [-0.83, -0.75, 0.27, -0.57]  # Random
-    # CUSTOM_GENOME = [0.8346  ,   0.5136 ,    0.87086294, 0.7218    ]
-
-    CUSTOM_GENOME = [0.5375002,      0.940188,      -0.75132048,     -0.48969879,      0.90855447,  1.,     0.59844588,     0.07282897,   -0.96174765,  1.42534261]
-
+    CUSTOM_GENOME = [-0.8, 0.5, -0.3, 1.0, 0.4, 0.6, 0.3, -0.1, -1.1]
     SEED = None
 
     sensors = SensorSet([
-        # BinaryLOSSensor(angle=-(np.pi/4)),
-        GenomeBinarySensor(genome_id=8),
-        GenomeBinarySensor(genome_id=9)
-        # BinaryFOVSensor(theta=14 / 2, distance=125, degrees=True)
+        BinaryLOSSensor(angle=0),
+        GenomeBinarySensor(genome_id=8)
     ])
 
-    agent_config = DiffDriveAgentConfig(
-        controller=CUSTOM_GENOME,
-        sensors=sensors,
-        seed=SEED,
-    )
+    agent_config = ConfigurationDefaults.DIFF_DRIVE_AGENT
+    agent_config.sensors = sensors
+    agent_config.seed = SEED
+    agent_config.controller = CUSTOM_GENOME
 
     behavior = [
         AverageSpeedBehavior(),
@@ -61,7 +50,7 @@ if __name__ == "__main__":
 
     world_config = RectangularWorldConfig(
         size=(500, 500),
-        n_agents=30,
+        n_agents=24,
         seed=SEED,
         behavior=behavior,
         agentConfig=agent_config,

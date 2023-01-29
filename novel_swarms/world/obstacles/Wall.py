@@ -25,5 +25,14 @@ class Wall(WorldObject):
             [rect.bottomleft, rect.topleft]
         ]
 
+    def get_collision_segments(self):
+        rect = pygame.Rect(self.x, self.y, self.w, self.h)
+        return [
+            [rect.topleft, rect.topright],
+            [rect.topright, rect.bottomright],
+            [rect.bottomright, rect.bottomleft],
+            [rect.bottomleft, rect.topleft]
+        ]
+
     def __repr__(self):
         return f"Wall(None, {self.x}, {self.y}, {self.w}, {self.h})"
