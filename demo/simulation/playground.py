@@ -3,10 +3,6 @@ Feel free to copy this file and explore configurations that lead to interesting 
 
 If you do not plan to make commits to the GitHub repository or if you can ensure that changes to this file
 are not included in your commits, you may directly edit and run this file.
-
-Connor Mattson
-University of Utah
-September 2022
 """
 from novel_swarms.sensors.AbstractSensor import AbstractSensor
 from novel_swarms.sensors.GenomeDependentSensor import GenomeBinarySensor
@@ -31,12 +27,12 @@ if __name__ == "__main__":
 
     # [vl_0, vr_0, vl_1, vr_1]
     # CUSTOM_GENOME = [-0.7, -1.0, 1.0, -1.0]  # Aggregation
-    CUSTOM_GENOME = [-0.7, 0.3, 1.0, 1.0]  # Cyclic Pursuit
+    # CUSTOM_GENOME = [-0.7, 0.3, 1.0, 1.0]  # Cyclic Pursuit
     # CUSTOM_GENOME = [0.2, 0.7, -0.5, -0.1]  # Dispersal
-    # CUSTOM_GENOME = [0.65, 1.0, 0.4, 0.5]  # Milling
-    # CUSTOM_GENOME = [1.0, 0.98, 1.0, 1.0]  # Wall Following
-    # CUSTOM_GENOME = [-0.83, -0.75, 0.27, -0.57]  # Random
-    CUSTOM_GENOME = [1.0, 0.8, 0.9, -0.5]
+    # CUSTOM_GENOME = [0.8, 1.0, 0.5, 0.6]  # Milling
+    # CUSTOM_GENOME = [1.0, 0.95, 1.0, 1.0]  # Wall Following
+    CUSTOM_GENOME = [-0.8, -0.7, 0.2, -0.5]  # Random
+    # CUSTOM_GENOME = [-0.8, -0.7, -0.7,  1. ]
 
     SEED = None
 
@@ -44,13 +40,23 @@ if __name__ == "__main__":
         BinaryLOSSensor(angle=0, draw=True),
     ])
 
+    # agent_config = DiffDriveAgentConfig(
+    #     controller=CUSTOM_GENOME,
+    #     agent_radius=5,
+    #     dt=1.0,
+    #     wheel_radius=2,
+    #     sensors=sensors,
+    #     seed=None,
+    # )
+
     agent_config = DiffDriveAgentConfig(
         controller=CUSTOM_GENOME,
-        agent_radius=5,
-        dt=0.13,
-        wheel_radius=4.4,
         sensors=sensors,
-        seed=None,
+        trace_length=0,
+        agent_radius=12,
+        wheel_radius=1,
+        # body_color="Random",
+        body_filled=True,
     )
 
     behavior = [
@@ -63,7 +69,7 @@ if __name__ == "__main__":
 
     world_config = RectangularWorldConfig(
         size=(500, 500),
-        n_agents=24,
+        n_agents=18,
         seed=SEED,
         behavior=behavior,
         agentConfig=agent_config,

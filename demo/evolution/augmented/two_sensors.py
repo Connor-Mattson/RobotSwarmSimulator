@@ -3,13 +3,9 @@ Feel free to copy this file and explore configurations that lead to interesting 
 
 If you do not plan to make commits to the GitHub repository or if you can ensure that changes to this file
 are not included in your commits, you may directly edit and run this file.
-
-Connor Mattson
-University of Utah
-September 2022
 """
 from novel_swarms.config.defaults import ConfigurationDefaults
-from novel_swarms.novelty.GeneRule import GeneRule
+from novel_swarms.novelty.GeneRule import GeneRule, GeneBuilder
 from novel_swarms.novelty.evolve import main as evolve
 from novel_swarms.results.results import main as report
 from novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
@@ -32,8 +28,9 @@ if __name__ == "__main__":
     SEED = None
 
     sensors = SensorSet([
-        GenomeBinarySensor(genome_id=8),
-        GenomeBinarySensor(genome_id=9)
+        BinaryLOSSensor(angle=0),
+        GenomeBinarySensor(genome_id=8)
+        # BinaryFOVSensor(theta=14 / 2, distance=125, degrees=True)
     ])
 
     agent_config = DiffDriveAgentConfig(
@@ -41,18 +38,21 @@ if __name__ == "__main__":
         seed=SEED,
     )
 
-    genotype = [
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.15, round_digits=4),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.15, round_digits=4),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.15, round_digits=4),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.15, round_digits=4),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.15, round_digits=4),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.15, round_digits=4),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.15, round_digits=4),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.15, round_digits=4),
-        GeneRule(_max=((1/3) * np.pi), _min=-((2/3) * np.pi), mutation_step=(np.pi/8), round_digits=4),
-        GeneRule(_max=((2/3) * np.pi), _min=-((1/3) * np.pi), mutation_step=(np.pi/8), round_digits=4),
-    ]
+    gene_specifications = GeneBuilder(
+        heuristic_validation=True,
+        round_to_digits=1,
+        rules=[
+            GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
+            GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
+            GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
+            GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
+            GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
+            GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
+            GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
+            GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
+            GeneRule(_max=((2 / 3) * np.pi), _min=-((2 / 3) * np.pi), mutation_step=(np.pi / 8), round_digits=4),
+        ]
+    )
 
     phenotype = [
         AverageSpeedBehavior(),
@@ -73,7 +73,7 @@ if __name__ == "__main__":
     )
 
     novelty_config = GeneticEvolutionConfig(
-        gene_rules=genotype,
+        gene_builder=gene_specifications,
         phenotype_config=phenotype,
         n_generations=15,
         n_population=100,

@@ -2,10 +2,6 @@
 DO NOT ALTER THIS FILE.
 This file should remain a constant reference to the experiments conducted in Brown et al.
 Please create your own file for experiments or alter 'demo/evolution/playground.py' instead.
-
-Connor Mattson
-University of Utah
-September 2022
 """
 from novel_swarms.novelty.GeneRule import GeneRule
 from novel_swarms.novelty.evolve import main as evolve

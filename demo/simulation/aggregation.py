@@ -2,10 +2,6 @@
 DO NOT ALTER THIS FILE.
 This file should remain a constant reference to a specific behavior.
 Please create your own file for simulating or alter 'demo/simulation/playground.py' instead.
-
-Connor Mattson
-University of Utah
-September 2022
 """
 
 from novel_swarms.world.simulate import main as simulate

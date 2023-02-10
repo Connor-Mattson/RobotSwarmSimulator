@@ -1,8 +1,3 @@
-"""
-Connor Mattson
-University of Utah
-January 2023
-"""
 from novel_swarms.world.simulate import main as simulate
 from novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
 from novel_swarms.behavior.AverageSpeed import AverageSpeedBehavior

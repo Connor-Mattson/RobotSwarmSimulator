@@ -142,7 +142,7 @@ class DifferentialDriveAgent(Agent):
         if not self.trace:
             return
         for x, y in self.trace_path:
-            pygame.draw.circle(screen, self.trace_color, (x, y), 1)
+            pygame.draw.circle(screen, self.trace_color, (x, y), 2)
 
     def add_to_trace(self, x, y):
         if not self.trace:

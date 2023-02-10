@@ -1,8 +1,3 @@
-"""
-Connor Mattson
-University of Utah
-January 2023
-"""
 import pygame
 import time
 import numpy as np
@@ -16,6 +11,7 @@ from novel_swarms.behavior.GroupRotationBehavior import GroupRotationBehavior
 from novel_swarms.behavior.RadialVariance import RadialVarianceBehavior
 from novel_swarms.behavior.ScatterBehavior import ScatterBehavior
 from novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
+from novel_swarms.sensors.GenomeDependentSensor import GenomeBinarySensor
 from novel_swarms.sensors.SensorSet import SensorSet
 from novel_swarms.config.AgentConfig import DiffDriveAgentConfig
 from novel_swarms.config.WorldConfig import RectangularWorldConfig
@@ -25,21 +21,25 @@ import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
 
-    SEED = 1
+    SEED = 3
     random.seed(SEED)
 
     sensors = SensorSet([
         BinaryLOSSensor(angle=0),
+        # GenomeBinarySensor(genome_id=8)
+        # BinaryFOVSensor(theta=14 / 2, distance=125, degrees=True)
     ])
 
     agent_config = DiffDriveAgentConfig(
         sensors=sensors,
-        trace_length=160,
+        trace_length=180,
+        agent_radius=12,
+        wheel_radius=1,
         body_color="Random",
         body_filled=True,
     )
 
-    genotype = GeneBuilder(
+    gene_specifications = GeneBuilder(
         heuristic_validation=True,
         round_to_digits=1,
         rules=[
@@ -47,6 +47,11 @@ if __name__ == "__main__":
             GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
             GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
             GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
+            # GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
+            # GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
+            # GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
+            # GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
+            # GeneRule(_max=((2 / 3) * np.pi), _min=-((2 / 3) * np.pi), mutation_step=(np.pi / 8), round_digits=4),
         ]
     )
 
@@ -60,7 +65,7 @@ if __name__ == "__main__":
 
     world_config = RectangularWorldConfig(
         size=(500, 500),
-        n_agents=24,
+        n_agents=18,
         seed=SEED,
         behavior=phenotype,
         agentConfig=agent_config,
@@ -82,7 +87,7 @@ if __name__ == "__main__":
 
     # Original Experiment was 50 gens, 50 pop
     novelty_config = GeneticEvolutionConfig(
-        gene_builder=genotype,
+        gene_builder=gene_specifications,
         phenotype_config=phenotype,
         n_generations=50,
         n_population=50,
@@ -90,7 +95,7 @@ if __name__ == "__main__":
         mutation_rate=0.15,
         world_config=world_config,
         k_nn=15,
-        simulation_lifespan=2200,
+        simulation_lifespan=8000,
         display_novelty=False,
         save_archive=True,
         show_gui=False,
@@ -131,13 +136,15 @@ if __name__ == "__main__":
         allow_external_archive=config.use_external_archive
     )
 
-    TRIAL = "2_traces"
+    TRIAL = "1-sensor"
     CONTROLLERS = [
-        [-0.7, 0.3, 1.0, 1.0],
-        [-0.7, -1.0, 1.0, -1.0],
-        [0.2, 0.7, -0.5, -0.1],
-        # [0.3, 0.5, 0.9, 1.0],
-        [1.0, 0.98, 1.0, 1.0]
+        # [-0.7, -1.0, 1.0, -1.0],  # Aggregation
+        # [-0.7, 0.3, 1.0, 1.0],  # Cyclic Pursuit
+        # [0.2, 0.7, -0.5, -0.1],  # Dispersal
+        [0.8, 1.0, 0.5, 0.6] , # Milling
+        # [1.0, 0.93, 1.0, 1.0],
+        # [0.8, 0.5, 0.6, -0.5, -0.5, -0.0, -0.2, 0.5, -(np.pi / 3)],
+        # [-0.4, 0.8, 0.9, -0.2, 0.6, 1.0, 0.6, -0.0, np.pi/6]
     ]
     for i, controller in enumerate(CONTROLLERS):
         elem = str(i)

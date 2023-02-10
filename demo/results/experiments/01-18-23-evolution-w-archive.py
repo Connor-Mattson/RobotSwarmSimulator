@@ -1,8 +1,3 @@
-"""
-Connor Mattson
-University of Utah
-January 2022
-"""
 import pygame
 from novel_swarms.config.OutputTensorConfig import OutputTensorConfig
 from novel_swarms.config.defaults import ConfigurationDefaults

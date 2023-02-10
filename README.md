@@ -1,5 +1,5 @@
 # Novel Behavior Discovery in Computation Free Swarms
-Contributors: Daniel S. Brown, Connor Mattson <br>
+Contributors: Anon. <br>
 Experiments replicated from *Discovery and Exploration of Novel Swarm Behaviors given Limited Robot Capabilities* by Daniel S. Brown, Ryan Turner, Oliver Hennigh, and Steven Loscalzo
 
 ## Required Software

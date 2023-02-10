@@ -1,8 +1,3 @@
-"""
-Connor Mattson
-University of Utah
-January 2023
-"""
 from novel_swarms.sensors.AbstractSensor import AbstractSensor
 from novel_swarms.sensors.GenomeDependentSensor import GenomeBinarySensor
 from novel_swarms.sensors.StaticSensor import StaticSensor
@@ -37,7 +32,7 @@ if __name__ == "__main__":
     SEED = None
     GUI_PADDING = 15
     N_AGENTS = 20
-    N_AGENTS = 1
+    # N_AGENTS = 1
     WIDTH, HEIGHT = int(BL * 29.8), int(BL * 29.8)
 
     sensors = SensorSet([

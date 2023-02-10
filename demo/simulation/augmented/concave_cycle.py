@@ -24,16 +24,9 @@ if __name__ == "__main__":
     a = 0.8
     b = 0.4
 
-    # CUSTOM_GENOME = [-0.7, 0.3, -0.7, 0.3, 1.0, 0.9, 1.0, 0.9, np.pi / 6]  # Cyclic Pursuit - Two Sensor
-    # CUSTOM_GENOME = [-0.7, -1.0, 1.0, -1.0, -0.7, -1.0, 1.0, -1.0, np.pi / 6]  # Aggregation - Two Sensor
-    # CUSTOM_GENOME = [0.2, 0.7, -0.5, -0.1, 0.2, 0.7, -0.5, -0.1, np.pi / 6]  # Dispersal - Two Sensor
-    # CUSTOM_GENOME = [0.8, 1.0, 0.5, 0.6, 0.8, 1.0, 0.5, 0.6, np.pi / 6]  # Milling - Two Sensor
-    # CUSTOM_GENOME = [1.0, 0.95, 1.0, 0.95, 1.0, 1.0, 1.0, 1.0, np.pi / 6]  # Wall Following - Two Sensor
-    CUSTOM_GENOME = [-0.8, -0.7, 0.2, -0.5, -0.7, -0.9, 0.2, -0.5, np.pi / 6]  # Random
-    # # CUSTOM_GENOME = [0.8,  0.9, -0.2,  0.5,  0.2, -0.8,  0.7,  0.9, -0.5, np.pi / 6]
-    # CUSTOM_GENOME = [0.8, 0.5, 0.6, -0.5, -0.5, -0.0, -0.2, 0.5, -(np.pi / 3)]  # Nested Cycle
-    # CUSTOM_GENOME = [-0.4, 0.8, 0.9, -0.2, 0.6, 1.0, 0.6, -0.0, np.pi / 6]  # Concave Cycle
-    SEED = None
+    # CUSTOM_GENOME = [-0.4, 0.8, 0.9, -0.1, 0.6, 1.0, 0.4, -0.0, np.pi/6]
+    CUSTOM_GENOME = [-0.4, 0.8, 0.9, -0.2, 0.6, 1.0, 0.6, -0.0, np.pi/6]
+    SEED = 8
 
     sensors = SensorSet([
         BinaryLOSSensor(angle=0),
@@ -42,11 +35,10 @@ if __name__ == "__main__":
 
     agent_config = ConfigurationDefaults.DIFF_DRIVE_AGENT
     agent_config.sensors = sensors
-    agent_config.agent_radius = 12
-    agent_config.wheel_radius = 1
     agent_config.seed = SEED
     agent_config.controller = CUSTOM_GENOME
-    agent_config.body_filled = True
+    agent_config.agent_radius = 10
+    agent_config.wheel_radius = 2
 
     behavior = [
         AverageSpeedBehavior(),
@@ -58,7 +50,7 @@ if __name__ == "__main__":
 
     world_config = RectangularWorldConfig(
         size=(500, 500),
-        n_agents=18,
+        n_agents=24,
         seed=SEED,
         behavior=behavior,
         agentConfig=agent_config,

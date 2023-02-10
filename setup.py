@@ -3,13 +3,13 @@ import setuptools
 setuptools.setup(
     name='novel_swarms',
     version='0.0.1',
-    author='Connor Mattson',
-    author_email='c.mattson@utah.edu',
+    author='',
+    author_email='',
     description='Simulation and Evolution on Computation Free Swarms',
     long_description='Simulation and Evolution on Computation Free Swarms',
-    url='https://github.com/Connor-Mattson/NovelSwarmBehavior',
+    url='',
     project_urls={
-        "Bug Tracker": "https://github.com/Connor-Mattson/NovelSwarmBehavior/issues"
+        "Bug Tracker": ""
     },
     license='MIT',
     packages=[

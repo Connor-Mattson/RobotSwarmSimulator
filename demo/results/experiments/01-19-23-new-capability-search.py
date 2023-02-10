@@ -3,10 +3,6 @@ Feel free to copy this file and explore configurations that lead to interesting 
 
 If you do not plan to make commits to the GitHub repository or if you can ensure that changes to this file
 are not included in your commits, you may directly edit and run this file.
-
-Connor Mattson
-University of Utah
-January 2023
 """
 from novel_swarms.world.simulate import main as simulate
 from novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
