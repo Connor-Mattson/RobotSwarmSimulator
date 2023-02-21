@@ -95,7 +95,7 @@ if __name__ == "__main__":
         mutation_rate=0.15,
         world_config=world_config,
         k_nn=15,
-        simulation_lifespan=8000,
+        simulation_lifespan=1200,
         display_novelty=False,
         save_archive=True,
         show_gui=False,
@@ -141,8 +141,9 @@ if __name__ == "__main__":
         # [-0.7, -1.0, 1.0, -1.0],  # Aggregation
         # [-0.7, 0.3, 1.0, 1.0],  # Cyclic Pursuit
         # [0.2, 0.7, -0.5, -0.1],  # Dispersal
-        [0.8, 1.0, 0.5, 0.6] , # Milling
+        # [0.8, 1.0, 0.5, 0.6] , # Milling
         # [1.0, 0.93, 1.0, 1.0],
+        [-0.83, -0.75, 0.27, -0.57]
         # [0.8, 0.5, 0.6, -0.5, -0.5, -0.0, -0.2, 0.5, -(np.pi / 3)],
         # [-0.4, 0.8, 0.9, -0.2, 0.6, 1.0, 0.6, -0.0, np.pi/6]
     ]

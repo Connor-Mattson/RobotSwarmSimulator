@@ -19,6 +19,7 @@ from novel_swarms.sensors.BinaryFOVSensor import BinaryFOVSensor
 from novel_swarms.sensors.SensorSet import SensorSet
 from novel_swarms.config.AgentConfig import UnicycleAgentConfig
 from novel_swarms.config.WorldConfig import RectangularWorldConfig
+from novel_swarms.behavior.AlgebraicConnectivity import AlgebraicConn
 import numpy as np
 
 if __name__ == "__main__":
@@ -33,13 +34,18 @@ if __name__ == "__main__":
     # CUSTOM_CONTROLLER = [17.5, 0.25, 17.5, -0.25]  # Dispersion
     CUSTOM_CONTROLLER = [12.5, 0.5, 12.5, -0.5]  # Stable Milling
     # CUSTOM_CONTROLLER = [17.5, 1.25, 17.5, -1.25]  # Semi-Stable Milling
-    CUSTOM_CONTROLLER = [2.5, 2.0, 2.5, -2.0]  # Colliding Unstable
-
+    # CUSTOM_CONTROLLER = [2.5, 2.0, 2.5, -2.0]  # Colliding Unstable
     # CUSTOM_CONTROLLER = [4.5, 0.3, -3, 0.4]  # Our Dispersal Gene
+
+    # Behavior Discovery Genomes
+    CUSTOM_CONTROLLER = [18.0, -0.1, 14.0, 0.5]  # Wall Following
+    # CUSTOM_CONTROLLER = [16.6, -0.4, 14.0, 0.5]  # Wall Following - Sweeping Version
+    # CUSTOM_CONTROLLER = [-12.0, -0.6, -14.0, -0.5]  # Dispersal
+    # CUSTOM_CONTROLLER = [8.0, -0.9, 15.0, 0.1]  # Milling/Cyclic
 
     SEED = None
     GUI_PADDING = 15
-    N_AGENTS = 9
+    N_AGENTS = 10
     WIDTH, HEIGHT = int(BL * 29.8), int(BL * 29.8)
 
     sensors = SensorSet([
@@ -73,6 +79,7 @@ if __name__ == "__main__":
         RadialVarianceBehavior(),
         ScatterBehavior(),
         GroupRotationBehavior(),
+        AlgebraicConn(),
     ]
 
     r = 50
@@ -91,7 +98,7 @@ if __name__ == "__main__":
         padding=GUI_PADDING,
         show_walls=True,
         agent_initialization=init_positions,
-        stop_at=EVAL_TIL
+        stop_at=EVAL_TIL,
     )
 
     # import matplotlib.pyplot as plot

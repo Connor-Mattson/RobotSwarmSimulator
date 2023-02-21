@@ -80,6 +80,7 @@ class UnicycleAgent(Agent):
 
         old_x_pos = self.x_pos
         old_y_pos = self.y_pos
+        old_heading = self.angle
 
         if self.stopped_duration > 0:
             self.stopped_duration -= 1
@@ -87,14 +88,18 @@ class UnicycleAgent(Agent):
         else:
             self.x_pos += self.dx * self.dt
             self.y_pos += self.dy * self.dt
-
-        self.angle += dw * self.dt
+            self.angle += dw * self.dt
 
         if check_for_world_boundaries is not None:
             check_for_world_boundaries(self)
 
         if check_for_agent_collisions is not None:
-            check_for_agent_collisions(self)
+            check_for_agent_collisions(self, forward_freeze=True)
+
+        if self.stopped_duration > 0:
+            self.x_pos = old_x_pos
+            self.y_pos = old_y_pos
+            self.angle = old_heading
 
         # Calculate the 'real' dx, dy after collisions have been calculated.
         # This is what we use for velocity in our equations

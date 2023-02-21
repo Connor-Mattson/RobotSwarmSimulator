@@ -188,7 +188,7 @@ class RectangularWorld(World):
                     agent.y_pos -= dy
                     agent.x_pos -= dx
 
-    def preventAgentCollisions(self, agent: DifferentialDriveAgent) -> None:
+    def preventAgentCollisions(self, agent: DifferentialDriveAgent, forward_freeze=False) -> None:
         agent_center = agent.getPosition()
         minimum_distance = agent.radius * 2
         target_distance = minimum_distance + 0.001
@@ -202,7 +202,6 @@ class RectangularWorld(World):
 
             # Check ALL Bagged agents for collisions
             for i in range(len(neighborhood)):
-
                 colliding_agent = neighborhood[i]
                 center_distance = distance(agent_center, colliding_agent.getPosition())
 
@@ -220,11 +219,37 @@ class RectangularWorld(World):
 
                 # print(f"Overlap. A: {agent_center}, B: {colliding_agent.getPosition()}")
                 distance_needed = target_distance - center_distance
-                a_to_b = agent_center - colliding_agent.getPosition()
+                a_to_b = colliding_agent.getPosition() - agent_center
+                b_to_a = agent_center - colliding_agent.getPosition()
+
+                # Check to see if the collision takes place in the forward facing direction
+                if forward_freeze:
+                    heading = agent.getFrontalPoint()
+                    dot = np.dot(a_to_b, heading)
+                    mag_a = np.linalg.norm(a_to_b)
+                    mag_b = np.linalg.norm(heading)
+                    angle = np.arccos(dot / (mag_a * mag_b))
+                    degs = np.degrees(abs(angle))
+                    if degs < 30:
+                        # print(f"Collision at angle {degs}.")
+                        agent.stopped_duration = 2
+                        continue
+
+                    # Now Calculate B_to_A
+                    heading = colliding_agent.getFrontalPoint()
+                    dot = np.dot(b_to_a, heading)
+                    mag_a = np.linalg.norm(b_to_a)
+                    mag_b = np.linalg.norm(heading)
+                    angle = np.arccos(dot / (mag_a * mag_b))
+                    degs = np.degrees(abs(angle))
+                    if degs < 30:
+                        # print(f"Collision at angle {degs}.")
+                        colliding_agent.stopped_duration = 2
+                        continue
 
                 # If distance super close to 0, we have a problem. Add noise.
                 SIGNIFICANCE = 0.0001
-                if a_to_b[0] < SIGNIFICANCE and a_to_b[1] < SIGNIFICANCE:
+                if b_to_a[0] < SIGNIFICANCE and b_to_a[1] < SIGNIFICANCE:
                     MAGNITUDE = 0.001
                     direction = 1
                     if random.random() > 0.5:
@@ -239,12 +264,11 @@ class RectangularWorld(World):
                     agent_center = agent.getPosition()
                     center_distance = distance(agent_center, colliding_agent.getPosition())
                     distance_needed = target_distance - center_distance
-                    a_to_b = agent_center - colliding_agent.getPosition()
+                    b_to_a = agent_center - colliding_agent.getPosition()
 
-                pushback = (a_to_b / np.linalg.norm(a_to_b)) * distance_needed
+                pushback = (b_to_a / np.linalg.norm(b_to_a)) * distance_needed
 
                 # print(base, a_to_b, theta)
-
                 delta_x = pushback[0]
                 delta_y = pushback[1]
 

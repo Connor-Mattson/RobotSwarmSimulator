@@ -136,7 +136,7 @@ class BinaryFOVSensor(AbstractSensor):
             self.determineState(False, None)
             return
 
-        consideration_set.sort()
+        # consideration_set.sort()
         # print(consideration_set)
         score, val = consideration_set.pop(0)
         self.determineState(True, val)
