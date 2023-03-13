@@ -8,17 +8,16 @@ from novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
 from novel_swarms.behavior.AverageSpeed import AverageSpeedBehavior
 from novel_swarms.behavior.GroupRotationBehavior import GroupRotationBehavior
 from novel_swarms.behavior.RadialVariance import RadialVarianceBehavior
-from novel_swarms.behavior.ScatterBehavior import ScatterBehavior
 from novel_swarms.behavior.Squareness import SquarenessBehavior
-from novel_swarms.behavior.KNN import KNNBehavior
-from novel_swarms.behavior.MeanNeighbors import MeanNeighborDistance
 from novel_swarms.behavior.LargestSeparation import LargestSeparationBehavior
 
-from novel_swarms.world.simulate import main as simulate
+from novel_swarms.world.WorldFactory import WorldFactory
 from novel_swarms.sensors.SensorSet import SensorSet
 from novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
 from novel_swarms.config.AgentConfig import DiffDriveAgentConfig
 from novel_swarms.config.WorldConfig import RectangularWorldConfig
+from novel_swarms.gui.agentGUI import DifferentialDriveGUI
+
 
 import os
 import shutil
@@ -27,7 +26,8 @@ import csv
 import matplotlib.pyplot as plt
 
 Genome = namedtuple("Genome", "name controller")
-Behavior = namedtuple("Behavior", "name content dirPath")
+Metric = namedtuple("Metric", "name content")
+ROOT_PATH = os.path.abspath("../..")
 
 GENOME_LIST = [
     Genome('aggregation', [-0.7, -1.0, 1.0, -1.0]),
@@ -35,23 +35,60 @@ GENOME_LIST = [
     Genome('wall-following', [1.0, 0.98, 1.0, 1.0]),
     Genome('cyclic-pursuit', [-0.7, 0.3, 1.0, 1.0]),
     Genome('dispersal', [0.2, 0.7, -0.5, -0.1]),
-    Genome('milling', [-0.69, -0.77, 0.05, -0.4])
+    Genome('milling', [-0.942, -0.592, -1.0, -0.132])
     ]
 
-BEHAVIOR_LIST = [
-    Behavior('angular-momentum', AngularMomentumBehavior, os.path.join("data/behavior_data/" + 'angular-momentum')),
-    Behavior('average-speed', AverageSpeedBehavior, os.path.join("data/behavior_data/" + 'average-speed')),
-    Behavior('group-rotation', GroupRotationBehavior, os.path.join("data/behavior_data/" + 'group-rotation')),
-    Behavior('radial-variance', RadialVarianceBehavior, os.path.join("data/behavior_data/" + 'radial-variance')),
-    Behavior('scatter', ScatterBehavior, os.path.join("data/behavior_data/" + 'scatter')),
-    Behavior('squareness', SquarenessBehavior, os.path.join("data/behavior_data/" + 'squareness')),
-    Behavior('knn', KNNBehavior, os.path.join("data/behavior_data/" + 'knn')),
-    Behavior('neighbor-dist', MeanNeighborDistance, os.path.join("data/behavior_data/" + 'neighbor-dist')),
-    Behavior('largest-separation', LargestSeparationBehavior, os.path.join("data/behavior_data/" + 'largest-separation'))
+METRIC_LIST = [
+    Metric('angular-momentum', AngularMomentumBehavior),
+    Metric('average-speed', AverageSpeedBehavior),
+    Metric('group-rotation', GroupRotationBehavior),
+    Metric('radial-variance', RadialVarianceBehavior),
+    Metric('squareness', SquarenessBehavior),
+    Metric('largest-separation', LargestSeparationBehavior)
 ]
 
-def get_behavior_dir_path(behavior):
-    return os.path.join("data/behavior_data/" + behavior.name)
+convergence_dict = {
+    'aggregation': 450,
+    'entropic': None,
+    'wall-following': 260,
+    'cyclic-pursuit': 650,
+    'dispersal': 320,
+    'milling': None
+}
+
+line_color_dict = {
+    'angular-momentum': 'red',
+    'average-speed': 'blue',
+    'group-rotation': 'brown',
+    'radial-variance': 'purple',
+    'squareness': 'green',
+    'largest-separation': 'pink'
+}
+
+def get_genome_file_path(genome):
+    return os.path.join(ROOT_PATH, "data/behavior_data/" + genome.name + ".csv")
+
+def get_genome_chart_path(genome):
+    return os.path.join(ROOT_PATH, "data/behavior_data/" + genome.name)
+
+def convert_data_to_weighted_average(data, window_size):
+    new_data = list()
+    for i in range(len(data)):
+        window = None
+        if i < window_size:
+            window = data[:i+1]
+        else:
+            window = data[i-window_size:i+1]
+        window_average = sum(window) / len(window)
+        new_data.append(window_average)
+    return new_data
+
+def purge_data_dir():
+    data_path = os.path.join(ROOT_PATH, "data/behavior_data")
+    if os.path.exists(data_path):
+        shutil.rmtree(data_path)
+    os.mkdir(data_path)
+
 
 if __name__ == '__main__':
     print("(O/N): Do you want to use pre-existing old data (O) or collect new data (N)?")
@@ -59,29 +96,26 @@ if __name__ == '__main__':
 
     # If we are collecting new data
     if user_answer == 'N':
-        # Clear all previous data
-        shutil.rmtree("data/behavior_data/", ignore_errors=False)
-        os.mkdir("data/behavior_data/")
-
-        # In the behavior_data directory, make a sub-directory to record data on each behavior
-        for behavior in BEHAVIOR_LIST:
-            os.mkdir(behavior.dirPath)
+        purge_data_dir()
 
         # Record data for each of the six genomes
         for genome in GENOME_LIST:
+            file_path = get_genome_file_path(genome)
+            
             # Create a world with the genome
-            SEED = None
             sensors = SensorSet([BinaryLOSSensor(angle=0)])
             agent_config = DiffDriveAgentConfig(
                 controller=genome.controller,
                 sensors=sensors,
-                seed=SEED
+                seed=None
             )
-            behavior = [behavior.content(archiveMode=True) for behavior in BEHAVIOR_LIST]
+
+            behavior = [metric.content(archiveMode=True) for metric in METRIC_LIST]
+
             world_config = RectangularWorldConfig(
                 size=(500, 500),
                 n_agents=30,
-                seed=SEED,
+                seed=None,
                 behavior=behavior,
                 agentConfig=agent_config,
                 padding=15
@@ -89,50 +123,66 @@ if __name__ == '__main__':
 
             # Simulate the world with the genome
             # All metrics are tracked until the world is exited
+            world = WorldFactory.create(world_config)
+            for i in range(2000):
+                world.step()
 
-            simulate(world_config=world_config)
-            
             # Metric data is stored in each behavior object
             # Write data to csv files to create a data archive
-            for i in range(len(BEHAVIOR_LIST)):
-                csvPath = os.path.join(BEHAVIOR_LIST[i].dirPath, "data.csv")
-                with open(csvPath, "a") as file:
+            with open(file_path, "a") as file:
+                for i in range(len(METRIC_LIST)):
+                    current_behavior = behavior[i]
                     filewriter = csv.writer(file, delimiter=',')
-                    print(f"Writing the {BEHAVIOR_LIST[i].name} data for the {genome.name} controller at {csvPath}.")
-                    filewriter.writerow([genome.name] + BEHAVIOR_LIST[i].content.get_archive(behavior[i]))
-            
+                    print(f"Writing data for the {current_behavior.name} behavior in the {genome.name} genome.")
+                    filewriter.writerow([METRIC_LIST[i].name] + METRIC_LIST[i].content.get_archive(current_behavior))
             print("\n")
-    
-    convergence_dict = {
-        'aggregation': 450,
-        'entropic': None,
-        'wall-following': 260,
-        'cyclic-pursuit': 650,
-        'dispersal': 320,
-        'milling': None
-    }
+
+
     # Processing the data, done regardless of user input
-    for behavior in BEHAVIOR_LIST:
-        csvPath = os.path.join(behavior.dirPath, "data.csv")
-        with open(csvPath, 'r') as file:
+    for genome in GENOME_LIST:
+        genome_name = genome.name
+        file_path = get_genome_file_path(genome)
+        with open(file_path, 'r') as file:
             reader = csv.reader(file)
+            fig, ax = plt.subplots()
+            ax.set_xlabel("Timesteps")
+            ax.set_title(f"Behavior metrics over time for the \"{genome_name}\" genome")
+            convergence_point = convergence_dict[genome_name]
+            if convergence_point is not None:
+                ax.axvline(convergence_point, color='red', linestyle='--')
+
+            largest_y = None
+            smallest_y = None
+            data_length = None
+            metric_name = None
+            data = None
+
             for row in reader:
-                genome_name = row[0]
+                metric_name = row[0]
                 data = row[1:]
                 data = [float(p) for p in data]
-                fig, ax = plt.subplots()
-                ax.plot(data, color='orange', linewidth=2, linestyle='', marker='o', markersize=1)
+                data = convert_data_to_weighted_average(data, 25)
 
-                ax.set_xlabel("Timesteps")
-                ax.set_ylabel(behavior.name)
-                ax.set_title(f"{behavior.name} over time for the \"{genome_name}\" genome")
-                ax.axis([0, len(data), min(data), max(data)])
-                ax.set_ylim(-1, 1)
-                fig.tight_layout()
-                convergence_point = convergence_dict[genome_name]
-                if convergence_point is not None:
-                    ax.axvline(convergence_point, color='red', linestyle='--')
-                chartPath = os.path.join(behavior.dirPath, genome_name)
-                fig.savefig(chartPath)
+                # Update the upper and lower bounds of the graph
+                smallest_y_in_series = min(data)
+                largest_y_in_series = max(data)
+                if largest_y is None and smallest_y is None:
+                    largest_y = largest_y_in_series
+                    smallest_y = smallest_y_in_series
+                    data_length = len(data)
+                if largest_y_in_series > largest_y:
+                    largest_y = largest_y_in_series
+                if smallest_y_in_series < smallest_y:
+                    smallest_y = smallest_y_in_series
+
+                line_color = line_color_dict[metric_name]
+                ax.plot(data, label=metric_name, color=line_color, linewidth=2, linestyle='', marker='o', markersize=1)
+
+            ax.legend(loc='upper right', bbox_to_anchor=(1.04, 1))
+            ax.axis([0, data_length, smallest_y, largest_y])
+            ax.set_ylim(smallest_y, largest_y)
+            chartPath = get_genome_chart_path(genome)
+            fig.tight_layout()
+            fig.savefig(chartPath)
 
             

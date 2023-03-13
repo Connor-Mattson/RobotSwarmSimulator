@@ -1,5 +1,4 @@
 import numpy as np
-from typing import List
 from .AbstractBehavior import AbstractBehavior
 
 class AngularMomentumBehavior(AbstractBehavior):

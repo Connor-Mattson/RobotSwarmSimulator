@@ -4,7 +4,7 @@ from .WorldFactory import WorldFactory
 from ..util.timer import Timer
 
 screen = None
-FRAMERATE = 500
+FRAMERATE = 5000
 GUI_WIDTH = 200
 
 
@@ -32,7 +32,7 @@ def main(world_config):
     gui.set_world(world)
     world.attach_gui(gui)
 
-    total_allowed_steps = 1000
+    total_allowed_steps = None
     steps_taken = 0
     steps_per_frame = 1
 

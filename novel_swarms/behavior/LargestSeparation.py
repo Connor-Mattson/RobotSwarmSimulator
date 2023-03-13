@@ -12,7 +12,7 @@ class LargestSeparationBehavior(AbstractBehavior):
     def euclideanDistance(self, agent1, agent2):
         return math.sqrt((agent2.x_pos - agent1.x_pos) ** 2 + (agent2.y_pos - agent1.y_pos) ** 2)
 
-    # Calculates the distance between the two points that are farthest away from each other
+    # Calculates the distance between the two points that are furthest away from each other
     def calculate(self):
         largestSeparation = 0
         for a in self.population:

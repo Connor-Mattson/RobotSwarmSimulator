@@ -15,6 +15,19 @@ class World():
         self.bounded_height = h
         self.bounded_width = w
         pass
+
+    def get_all_positions(self):
+        positions = list()
+        for agent in self.population:
+            positions.append(agent.getPosition())
+        return positions
+
+    def get_all_velocities(self):
+        velocities = list()
+        for agent in self.population:
+            velocities.append(agent.getVelocity())
+        return velocities
+
     
     def setup(self):
         pass
