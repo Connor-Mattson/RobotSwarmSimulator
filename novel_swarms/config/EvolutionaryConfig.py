@@ -18,7 +18,8 @@ class GeneticEvolutionConfig:
                  save_archive=False,
                  show_gui=True,
                  save_every=None,
-                 use_external_archive=False
+                 use_external_archive=False,
+                 world_metadata = None
                  ):
 
         if gene_rules and not gene_builder:
@@ -42,4 +43,5 @@ class GeneticEvolutionConfig:
         self.save_every = save_every
         self.mutation_flip_chance = mutation_flip_chance
         self.use_external_archive = use_external_archive
+        self.world_metadata = world_metadata
 

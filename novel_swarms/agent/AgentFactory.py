@@ -1,6 +1,7 @@
-from ..config.AgentConfig import DiffDriveAgentConfig, UnicycleAgentConfig, MazeAgentConfig
+from ..config.AgentConfig import DiffDriveAgentConfig, UnicycleAgentConfig, MazeAgentConfig, StaticAgentConfig
 from .DiffDriveAgent import DifferentialDriveAgent
 from .UnicycleAgent import UnicycleAgent
+from .StaticAgent import StaticAgent
 from .MazeAgent import MazeAgent
 
 
@@ -13,4 +14,6 @@ class AgentFactory:
             return UnicycleAgent(config=agent_config, name=name)
         if isinstance(agent_config, MazeAgentConfig):
             return MazeAgent(config=agent_config, name=name)
+        if isinstance(agent_config, StaticAgentConfig):
+            return StaticAgent(config=agent_config, name=name)
         raise Exception("Could not Create Agent: Unknown Config Input")

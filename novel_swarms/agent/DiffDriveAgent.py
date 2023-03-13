@@ -7,11 +7,14 @@ from copy import deepcopy
 from .Agent import Agent
 from ..config.AgentConfig import DiffDriveAgentConfig
 from ..sensors.GenomeDependentSensor import GenomeBinarySensor
+from ..util.collider.AABB import AABB
+from ..util.collider.CircularCollider import CircularCollider
 from ..util.timer import Timer
 
 class DifferentialDriveAgent(Agent):
 
     SEED = -1
+    DEBUG = True
 
     def __init__(self, config: DiffDriveAgentConfig = None) -> None:
 
@@ -59,6 +62,7 @@ class DifferentialDriveAgent(Agent):
         else:
             self.trace_color = config.trace_color
 
+        self.aabb = None
         self.sensors = deepcopy(config.sensors)
         for sensor in self.sensors:
             if isinstance(sensor, GenomeBinarySensor):
@@ -77,6 +81,8 @@ class DifferentialDriveAgent(Agent):
 
         # timer = Timer("Calculations")
         super().step()
+        self.aabb = None
+
         if world.goals and world.goals[0].agent_achieved_goal(self):
             vl, vr = 0, 0
         else:
@@ -96,8 +102,7 @@ class DifferentialDriveAgent(Agent):
         if check_for_world_boundaries is not None:
             check_for_world_boundaries(self)
 
-        if check_for_agent_collisions is not None:
-            check_for_agent_collisions(self)
+        self.handle_collisions(world)
 
         # Calculate the 'real' dx, dy after collisions have been calculated.
         # This is what we use for velocity in our equations
@@ -132,6 +137,9 @@ class DifferentialDriveAgent(Agent):
         vec_with_magnitude = ((vec[0] * mag) + tail[0], (vec[1] * mag) + tail[1])
         pygame.draw.line(screen, self.body_color, tail, vec_with_magnitude)
 
+        if self.DEBUG:
+            self.debug_draw(screen)
+
     def interpretSensors(self) -> Tuple:
         sensor_state = self.sensors.getState()
         vl = self.controller[sensor_state * 2]
@@ -156,6 +164,42 @@ class DifferentialDriveAgent(Agent):
         while sum(rand_color) > 245*3:
             rand_color = np.random.choice(256, 3)
         return rand_color
+
+    def debug_draw(self, screen):
+        self.get_aabb().draw(screen)
+
+    def handle_collisions(self, world):
+        collisions = True
+        attempts = 0
+        while collisions and attempts < 10:
+            collisions = False
+            attempts += 1
+            collider = self.build_collider()
+            agent_set = world.getAgentsMatchingYRange(self.get_aabb())
+            for agent in agent_set:
+                if agent.name == self.name:
+                    continue
+                if self.aabb.intersects(agent.get_aabb()):
+                    self.get_aabb().toggle_intersection()
+                    correction = collider.collision_then_correction(agent.build_collider())
+                    if correction is not None:
+                        self.x_pos += correction[0]
+                        self.y_pos += correction[1]
+                        collisions = True
+                        break
+
+    def build_collider(self):
+        return CircularCollider(self.x_pos, self.y_pos, self.radius)
+
+    def get_aabb(self):
+        """
+        Return the Bounding Box of the agent
+        """
+        if not self.aabb:
+            top_left = (self.x_pos - self.radius, self.y_pos - self.radius)
+            bottom_right = (self.x_pos + self.radius, self.y_pos + self.radius)
+            self.aabb = AABB(top_left, bottom_right)
+        return self.aabb
 
     def __str__(self) -> str:
         return "(x: {}, y: {}, r: {}, θ: {})".format(self.x_pos, self.y_pos, self.radius, self.angle)

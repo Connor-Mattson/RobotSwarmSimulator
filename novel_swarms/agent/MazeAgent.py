@@ -7,6 +7,7 @@ from copy import deepcopy
 from .Agent import Agent
 from ..config.AgentConfig import MazeAgentConfig
 from ..sensors.GenomeDependentSensor import GenomeBinarySensor
+from ..util.collider.AABB import AABB
 from ..util.timer import Timer
 
 
@@ -160,6 +161,17 @@ class MazeAgent(Agent):
         while sum(rand_color) > 245*3:
             rand_color = np.random.choice(256, 3)
         return rand_color
+
+    def debug_draw(self, screen):
+        self.get_aabb().draw(screen)
+
+    def get_aabb(self):
+        """
+        Return the Bounding Box of the agent
+        """
+        top_left = (self.x_pos - self.radius, self.y_pos - self.radius)
+        bottom_right = (self.x_pos + self.radius, self.y_pos + self.radius)
+        return AABB(top_left, bottom_right)
 
     def __str__(self) -> str:
         return "(x: {}, y: {}, r: {}, θ: {})".format(self.x_pos, self.y_pos, self.radius, self.angle)

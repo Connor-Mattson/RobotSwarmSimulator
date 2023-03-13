@@ -53,8 +53,9 @@ class DifferentialDriveGUI(AbstractGUI):
                     self.appendTextToGUI(screen, f"Idio_1: {a.i_1}")
                     self.appendTextToGUI(screen, f"Idio_2: {a.i_2}")
                 self.appendTextToGUI(screen, f"")
-                self.appendTextToGUI(screen, f"controller: {a.controller}")
-                self.appendTextToGUI(screen, f"")
+                if hasattr(a, "controller"):
+                    self.appendTextToGUI(screen, f"controller: {a.controller}")
+                    self.appendTextToGUI(screen, f"")
                 self.appendTextToGUI(screen, f"θ: {a.angle % (2 * np.pi)}")
                 if a.agent_in_sight is not None:
                     self.appendTextToGUI(screen, f"sees: {a.agent_in_sight.name}")

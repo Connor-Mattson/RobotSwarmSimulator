@@ -110,3 +110,30 @@ class MazeAgentConfig:
 
     def attach_world_config(self, world_config):
         self.world = world_config
+
+
+class StaticAgentConfig:
+    def __init__(self,
+                 x=None,
+                 y=None,
+                 angle=None,
+                 world_config: RectangularWorldConfig = None,
+                 seed=None,
+                 agent_radius=5,
+                 dt=1.0,
+                 body_color=(255, 255, 255),
+                 body_filled=False
+                 ):
+
+        self.x = x
+        self.y = y
+        self.angle = angle
+        self.world = world_config
+        self.seed = seed
+        self.dt = dt
+        self.agent_radius = agent_radius
+        self.body_color = body_color
+        self.body_filled = body_filled
+
+    def attach_world_config(self, world_config):
+        self.world = world_config

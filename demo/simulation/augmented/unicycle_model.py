@@ -30,7 +30,8 @@ if __name__ == "__main__":
     # Controllers of the Form: [v_0, w_0, v_1, w_1]
     # v_0, v_1 is forward speed for sensor off/on, respectively
     # w_0, w_1 is turning rate for sensor off/on, respectively
-    # Note that in Vega et al. v_0 = v_1
+    # Note that in Vega et al. v_0 = v_1, w_0 = -w_1
+
     # CUSTOM_CONTROLLER = [17.5, 0.25, 17.5, -0.25]  # Dispersion
     CUSTOM_CONTROLLER = [12.5, 0.5, 12.5, -0.5]  # Stable Milling
     # CUSTOM_CONTROLLER = [17.5, 1.25, 17.5, -1.25]  # Semi-Stable Milling
@@ -38,26 +39,27 @@ if __name__ == "__main__":
     # CUSTOM_CONTROLLER = [4.5, 0.3, -3, 0.4]  # Our Dispersal Gene
 
     # Behavior Discovery Genomes
-    CUSTOM_CONTROLLER = [18.0, -0.1, 14.0, 0.5]  # Wall Following
+    # CUSTOM_CONTROLLER = [18.0, -0.1, 14.0, 0.5]  # Wall Following
     # CUSTOM_CONTROLLER = [16.6, -0.4, 14.0, 0.5]  # Wall Following - Sweeping Version
     # CUSTOM_CONTROLLER = [-12.0, -0.6, -14.0, -0.5]  # Dispersal
     # CUSTOM_CONTROLLER = [8.0, -0.9, 15.0, 0.1]  # Milling/Cyclic
 
     SEED = None
     GUI_PADDING = 15
-    N_AGENTS = 10
+    N_AGENTS = 20
     WIDTH, HEIGHT = int(BL * 29.8), int(BL * 29.8)
 
     sensors = SensorSet([
         BinaryFOVSensor(
-            theta=14 / 2,
+            theta=60 / 2,
             distance=(BL * 12.5),
             bias=-4,
             degrees=True,
             false_positive=0.1,
             false_negative=0.05,
             # Rectangle Representing Environment Boundaries
-            walls=[[GUI_PADDING, GUI_PADDING], [GUI_PADDING + WIDTH, GUI_PADDING + HEIGHT]],
+            # walls=[[GUI_PADDING, GUI_PADDING], [GUI_PADDING + WIDTH, GUI_PADDING + HEIGHT]],
+            walls=None,
             wall_sensing_range=(BL * 6),
             time_step_between_sensing=2,
             store_history=True
@@ -96,6 +98,7 @@ if __name__ == "__main__":
         behavior=behavior,
         agentConfig=agent_config,
         padding=GUI_PADDING,
+        collide_walls=False,
         show_walls=True,
         agent_initialization=init_positions,
         stop_at=EVAL_TIL,

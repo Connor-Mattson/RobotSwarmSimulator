@@ -17,6 +17,7 @@ class Agent:
         self.stop_on_collision = False
         self.stopped_duration = 0
         self.detection_id = 0
+        self.aabb = None
         pass
 
     def step(self, check_for_world_boundaries=None) -> None:
@@ -40,3 +41,6 @@ class Agent:
     def attach_agent_to_sensors(self):
         for sensor in self.sensors:
             sensor.parent = self
+
+    def get_aabb(self):
+        pass

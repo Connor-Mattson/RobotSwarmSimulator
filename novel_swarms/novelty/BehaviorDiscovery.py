@@ -16,7 +16,7 @@ class BehaviorDiscovery:
 
     def __init__(self, generations=10, population_size=20, crossover_rate=0.3, mutation_rate=0.1, genome_builder=None,
                  lifespan=200, world_config=None, behavior_config=None, k_neighbors=15, tournament_members=10,
-                 mutation_flip_chance = 0.2, allow_external_archive=False):
+                 mutation_flip_chance = 0.2, allow_external_archive=False, genome_dependent_world=None):
         self.population = np.array([])
         self.behavior = np.array([])
         self.scores = np.array([])
@@ -42,6 +42,9 @@ class BehaviorDiscovery:
         self.tournament_members = tournament_members
         self.allow_external_archive = allow_external_archive
         self.force_repeats = False
+        self.genome_dependent_world = genome_dependent_world
+        if self.genome_dependent_world is None:
+            self.genome_dependent_world = {}
 
         if genome_builder is None:
             raise Exception("BehaviorDiscovery must be initialized with a genotype ruleset.")
@@ -70,6 +73,10 @@ class BehaviorDiscovery:
 
         self.status = "Simulation"
         self.world_config.agentConfig.controller = genome
+        for key in self.genome_dependent_world:
+            print("Setting Key!", key, " with Value: ", genome[self.genome_dependent_world[key]])
+            setattr(self.world_config, key, genome[self.genome_dependent_world[key]])
+
         behavior = None
         output = None
 
@@ -110,8 +117,6 @@ class BehaviorDiscovery:
         if screen is not None:
             world.draw(screen)
         behavior = world.getBehaviorVector()
-        print("End:")
-        print([(a.x_pos, a.y_pos) for a in world.population])
 
         if save:
             self.behavior[i] = behavior
@@ -217,17 +222,7 @@ class BehaviorDiscovery:
         for i in range(len(child)):
             if self.gene_builder.rules[i].allow_mutation:
                 if random.random() < self.mutation_rate:
-                    # There is a of flipping the bit vs shaking it
-                    # Flip
-                    if random.random() < self.mutation_flip_chance:
-                        gene_rule = self.gene_builder.rules[i]
-                        child[i] = gene_rule.clip(-child[i])
-                    # Flip
-                    else:
-                        gene_rule = self.gene_builder.rules[i]
-                        mutation_size = (gene_rule.mutation_step * 2 * np.random.rand()) - gene_rule.mutation_step
-                        child[i] = gene_rule.clip(child[i] + mutation_size)
-
+                    child[i] = self.gene_builder.rules[i].step_in_domain(child[i])
                     self.mutations += 1
                     has_mutated = True
 

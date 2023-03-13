@@ -6,12 +6,15 @@ import numpy as np
 from copy import deepcopy
 from .Agent import Agent
 from ..config.AgentConfig import UnicycleAgentConfig
-from ..sensors.GenomeDependentSensor import GenomeBinarySensor
+from ..sensors.GenomeDependentSensor import GenomeBinarySensor, GenomeFOVSensor
 from ..util.timer import Timer
+from ..util.collider.AABB import AABB
+from ..util.collider.AngleSensitiveCC import AngleSensitiveCC
 
 
 class UnicycleAgent(Agent):
     SEED = -1
+    DEBUG = False
 
     def __init__(self, config: UnicycleAgentConfig = None, name=None) -> None:
 
@@ -50,8 +53,13 @@ class UnicycleAgent(Agent):
 
         self.sensors = deepcopy(config.sensors)
         for sensor in self.sensors:
-            if isinstance(sensor, GenomeBinarySensor):
+            if isinstance(sensor, GenomeBinarySensor) or isinstance(sensor, GenomeFOVSensor):
                 sensor.augment_from_genome(config.controller)
+
+        self.aabb = None
+        self.collider = None
+        self.body_filled = config.body_filled
+        self.body_color = config.body_color
 
         self.attach_agent_to_sensors()
 
@@ -65,6 +73,9 @@ class UnicycleAgent(Agent):
 
         # timer = Timer("Calculations")
         super().step()
+        self.aabb = None
+        self.collider = None
+
         if world.goals and world.goals[0].agent_achieved_goal(self):
             v, omega = 0, 0
         else:
@@ -93,8 +104,10 @@ class UnicycleAgent(Agent):
         if check_for_world_boundaries is not None:
             check_for_world_boundaries(self)
 
-        if check_for_agent_collisions is not None:
-            check_for_agent_collisions(self, forward_freeze=True)
+        # if check_for_agent_collisions is not None:
+        #     check_for_agent_collisions(self, forward_freeze=True)
+
+        self.handle_collisions(world)
 
         if self.stopped_duration > 0:
             self.x_pos = old_x_pos
@@ -112,14 +125,42 @@ class UnicycleAgent(Agent):
             sensor.step(world=world)
         # timer = timer.check_watch()
 
+    def handle_collisions(self, world):
+        collisions = True
+        limit = 10
+        while collisions and limit > 0:
+            limit -= 1
+            collisions = False
+            self.build_collider()
+            agent_set = world.getAgentsMatchingYRange(self.get_aabb())
+            for agent in agent_set:
+                if agent.name == self.name:
+                    continue
+                if self.aabb.intersects(agent.get_aabb()):
+                    self.get_aabb().toggle_intersection()
+                    correction = self.collider.collision_then_correction(agent.build_collider())
+                    if correction is not None:
+                        collisions = True
+                        if np.linalg.norm(correction) == 0:
+                            self.stopped_duration = 2
+                        else:
+                            self.x_pos += correction[0]
+                            self.y_pos += correction[1]
+                        break
+            if collisions:
+                self.collider.flag_collision()
+    def build_collider(self):
+        self.collider = AngleSensitiveCC(self.x_pos, self.y_pos, self.radius, self.angle, self.get_action(), sensitivity=45)
+        return self.collider
+
     def draw(self, screen) -> None:
         super().draw(screen)
         for sensor in self.sensors:
             sensor.draw(screen)
 
         # Draw Cell Membrane
-        filled = 0 if self.is_highlighted or self.stopped_duration else 1
-        color = (255, 255, 255) if not self.stopped_duration else (255,255,51)
+        filled = 0 if self.is_highlighted or self.body_filled else 1
+        color = self.body_color if not self.stopped_duration else (255, 255, 51)
         pygame.draw.circle(screen, color, (self.x_pos, self.y_pos), self.radius, width=filled)
 
         # "Front" direction vector
@@ -130,11 +171,31 @@ class UnicycleAgent(Agent):
         vec_with_magnitude = ((vec[0] * mag) + tail[0], (vec[1] * mag) + tail[1])
         pygame.draw.line(screen, (255, 255, 255), tail, vec_with_magnitude)
 
+        if self.DEBUG:
+            self.debug_draw(screen)
+
     def interpretSensors(self) -> Tuple:
         sensor_state = self.sensors.getState()
         v = self.controller[sensor_state * 2]
         omega = self.controller[(sensor_state * 2) + 1]
         return v, omega
+
+    def debug_draw(self, screen):
+        # self.aabb.draw(screen)
+        self.collider.draw(screen)
+
+    def get_action(self):
+        return np.array([self.dx * self.dt, self.dy, self.dt])
+
+    def get_aabb(self):
+        """
+        Return the Bounding Box of the agent
+        """
+        if not self.aabb:
+            top_left = (self.x_pos - self.radius, self.y_pos - self.radius)
+            bottom_right = (self.x_pos + self.radius, self.y_pos + self.radius)
+            self.aabb = AABB(top_left, bottom_right)
+        return self.aabb
 
     def __str__(self) -> str:
         return "(x: {}, y: {}, r: {}, θ: {})".format(self.x_pos, self.y_pos, self.radius, self.angle)

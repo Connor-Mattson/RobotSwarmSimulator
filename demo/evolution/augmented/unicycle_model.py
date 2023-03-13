@@ -6,7 +6,7 @@ are not included in your commits, you may directly edit and run this file.
 """
 from novel_swarms.behavior.AlgebraicConnectivity import AlgebraicConn
 from novel_swarms.config.defaults import ConfigurationDefaults
-from novel_swarms.novelty.GeneRule import GeneRule, GeneBuilder
+from novel_swarms.novelty.GeneRule import GeneRule, GeneBuilder, GeneRuleContinuous
 from novel_swarms.novelty.evolve import main as evolve
 from novel_swarms.results.results import main as report
 from novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
@@ -97,10 +97,10 @@ if __name__ == "__main__":
         heuristic_validation=False,
         round_to_digits=1,
         rules=[
-            GeneRule(_max=20.0, _min=-20.0, mutation_step=3.0, round_digits=0),
-            GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
-            GeneRule(_max=20.0, _min=-20.0, mutation_step=3.0, round_digits=0),
-            GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
+            GeneRuleContinuous(_max=20.0, _min=-20.0, mutation_step=3.0, round_digits=0),
+            GeneRuleContinuous(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
+            GeneRuleContinuous(_max=20.0, _min=-20.0, mutation_step=3.0, round_digits=0),
+            GeneRuleContinuous(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
         ]
     )
 

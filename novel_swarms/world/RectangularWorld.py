@@ -7,8 +7,10 @@ from ..agent.Agent import Agent
 from ..agent.DiffDriveAgent import DifferentialDriveAgent
 from ..config.WorldConfig import RectangularWorldConfig
 from ..agent.AgentFactory import AgentFactory
+from ..config.HeterogenSwarmConfig import HeterogeneousSwarmConfig
 from .World import World
 from ..util.timer import Timer
+from ..util.collider.AABB import AABB
 
 
 def distance(pointA, pointB) -> float:
@@ -33,9 +35,15 @@ class RectangularWorld(World):
             # print(f"TESTING RAND: {random.random()}")
             random.seed(config.seed)
 
-        self.population = [
-            AgentFactory.create(config.agentConfig, name=f"{i}") for i in range(self.population_size)
-        ]
+        self.heterogeneous = False
+        if isinstance(config.agentConfig, HeterogeneousSwarmConfig):
+            self.population = config.agentConfig.build_agent_population()
+            self.heterogeneous = True
+
+        else:
+            self.population = [
+                AgentFactory.create(config.agentConfig, name=f"{i}") for i in range(int(self.population_size))
+            ]
 
         ac = config.agentConfig
         if config.defined_start:
@@ -49,6 +57,12 @@ class RectangularWorld(World):
                 if len(init) > 2:
                     self.population[i].angle = init[2] + noise_theta
 
+        elif self.heterogeneous:
+            for agent in self.population:
+                agent.x_pos = random.randint(math.floor(0 + agent.radius), math.floor(self.bounded_width - agent.radius))
+                agent.y_pos = random.randint(math.ceil(0 + agent.radius), math.floor(self.bounded_height - agent.radius))
+                agent.angle = random.random() * 2 * math.pi
+
         elif ac.x is None and config.seed is not None:
             for agent in self.population:
                 agent.x_pos = random.randint(0 + ac.agent_radius, ac.world.w - ac.agent_radius)
@@ -59,6 +73,10 @@ class RectangularWorld(World):
 
         for i in range(len(self.objects)):
             self.objects[i].world = self
+
+        # Assign Agents Identifiers
+        for i, agent in enumerate(self.population):
+            agent.name = str(i)
 
         self.behavior = config.behavior
         for b in self.behavior:
@@ -74,7 +92,7 @@ class RectangularWorld(World):
                 raise Exception("Agents must be subtype of Agent, not {}".format(type(agent)))
 
             agent.step(
-                check_for_world_boundaries=self.withinWorldBoundaries,
+                check_for_world_boundaries=self.withinWorldBoundaries if self.config.collide_walls else None,
                 check_for_agent_collisions=self.preventAgentCollisions,
                 world=self
             )
@@ -203,8 +221,11 @@ class RectangularWorld(World):
             # Check ALL Bagged agents for collisions
             for i in range(len(neighborhood)):
                 colliding_agent = neighborhood[i]
-                center_distance = distance(agent_center, colliding_agent.getPosition())
 
+                if not agent.get_aabb().intersects(colliding_agent.get_aabb()):
+                    continue
+
+                center_distance = distance(agent_center, colliding_agent.getPosition())
                 if center_distance > minimum_distance:
                     # colliding_agent.collision_flag = False
                     continue
@@ -286,6 +307,15 @@ class RectangularWorld(World):
             neighborhood = self.getNeighborsWithinDistance(agent_center, minimum_distance, excluded=agent)
             remaining_attempts -= 1
 
+    def getAgentsMatchingYRange(self, bb: AABB):
+        ret = []
+        for agent in self.population:
+            if bb.in_y_range(agent.get_aabb()):
+                ret.append(agent)
+        return ret
+
     def getBehaviorVector(self):
         behavior = np.array([s.out_average()[1] for s in self.behavior])
         return behavior
+
+

@@ -1,13 +1,15 @@
+import random
 import numpy as np
+
 
 class GeneBuilder:
     def __init__(self,
                  rules=None,
                  require_single_elem_gt=None,
                  require_magnitude_gt=None,
-                 round_to_digits=2,
-                 heuristic_validation=False
-              ):
+                 round_to_digits=None,
+                 heuristic_validation=False,
+                 ):
 
         if rules is None or not isinstance(rules, list) or len(rules) == 0:
             print(rules)
@@ -27,8 +29,9 @@ class GeneBuilder:
         ret = [rule.fetch() for rule in self.rules]
         while not self.is_valid(ret):
             ret = [rule.fetch() for rule in self.rules]
-        for i, elem in enumerate(ret):
-            ret[i] = round(elem, self.round_to_digits)
+        if self.round_to_digits is not None:
+            for i, elem in enumerate(ret):
+                ret[i] = round(elem, self.round_to_digits)
         return ret
 
     def is_valid(self, controller):
@@ -93,7 +96,7 @@ class GeneBuilder:
         ]
 
         # weights = [5.3943, 4.5802, 3.3803, 1.7969, -4.1899, -3.9899, -7.3916, 2.5855, 10.1178]
-        weights = [0.8993,  0.7878, 1.7404,  0.7404,  0.4437,  0.3982, -0.1233,  0.0905, 1.1693]
+        weights = [0.8993, 0.7878, 1.7404, 0.7404, 0.4437, 0.3982, -0.1233, 0.0905, 1.1693]
         mx = np.dot(np.array(attributes), np.array(weights))
         # return mx > 10.5
         return mx > 3.8
@@ -132,13 +135,36 @@ class GeneBuilder:
     def magnitude(self, vec):
         return np.linalg.norm(np.array(vec))
 
+
 # class AbstractNucleotide:
 #     def mutate_with_chance(self, c=0.2, allow_negation=False):
 #         pass
 
 class GeneRule:
-    def __init__(self, _max=1.0, _min=-1.0, mutation_step=0.5, round_digits=None, exclude=None, allow_mutation=True):
+    def __init__(self, discrete_domain, step_size=1, allow_mutation=True):
+        self.domain = discrete_domain
+        self.step = step_size
+        self.allow_mutation = allow_mutation
 
+    def fetch(self):
+        return random.choice(self.domain)
+
+    def step_in_domain(self, value):
+        """
+        Find value in the list and then select a neighbor within `self.step` indices away. Assume a circular list.
+        """
+        EPSILON = 1e-4
+        for i in range(len(self.domain)):
+            if abs(self.domain[i] - value) < EPSILON:
+                new_i = i
+                while new_i == i:
+                    new_i = i + random.randint(-self.step, self.step)
+                return self.domain[new_i % len(self.domain)]
+
+
+class GeneRuleContinuous(GeneRule):
+    def __init__(self, _max=1.0, _min=-1.0, mutation_step=0.5, round_digits=None, exclude=None, allow_mutation=True):
+        super().__init__([], step_size=0, allow_mutation=True)
         if exclude is None:
             self.exclude = []
         else:
@@ -154,6 +180,13 @@ class GeneRule:
         if self.round_digits is None:
             return self.getRandomFloat()
         return self.getRandomRoundedFloat()
+
+    def step_in_domain(self, value):
+        """
+        Shift the value of the genome element within the step_size and w.r.t. the _min and _max bounds
+        """
+        augment = (random.random() * self.mutation_step * 2) - self.mutation_step
+        return round(self.clip(value + augment), self.round_digits)
 
     def clip(self, value):
         """
@@ -173,7 +206,6 @@ class GeneRule:
                     value = ex_bot
                 else:
                     value = ex_top
-
         return value
 
     def getRandomFloat(self):

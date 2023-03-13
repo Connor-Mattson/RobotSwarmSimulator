@@ -15,7 +15,7 @@ class BinaryFOVSensor(AbstractSensor):
                  false_positive=0.0,
                  false_negative=0.0,
                  walls=None,
-                 wall_sensing_range = 10,
+                 wall_sensing_range=10,
                  time_step_between_sensing=1,
                  store_history=False
                  ):

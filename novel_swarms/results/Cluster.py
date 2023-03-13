@@ -28,7 +28,7 @@ class Cluster:
         (133, 146, 158),  # GREY
     ]
 
-    def __init__(self, config: ResultsConfig):
+    def __init__(self, config: ResultsConfig, world_metadata=None):
 
         archive = config.archive
         if archive is None or not issubclass(type(archive), NoveltyArchive):
@@ -41,6 +41,7 @@ class Cluster:
         self.cluster_medoids = []
         self.medoid_genomes = []
         self.world_config = config.world
+        self.world_metadata = world_metadata
         self.results_config = config
 
         self.initTSNE()
@@ -110,8 +111,12 @@ class Cluster:
             if dist < self.MEDOID_RADIUS:
                 controller = self.medoid_genomes[i]
                 from ..world.simulate import main
-                self.world_config.agentConfig.controller = controller
                 print(f"Display Controller (Medoid): {controller}")
+
+                metadata = self.sync_metadata_with_controller(controller)
+                self.world_config.agentConfig.controller = controller
+                self.world_config.set_attributes(metadata)
+
                 main(world_config=self.world_config)
                 return
 
@@ -121,8 +126,12 @@ class Cluster:
             if dist < self.MEDOID_RADIUS:
                 controller = self.archive.genotypes[i]
                 from ..world.simulate import main
-                self.world_config.agentConfig.controller = controller
                 print(f"Display Controller: {controller}")
+
+                metadata = self.sync_metadata_with_controller(controller)
+                self.world_config.agentConfig.controller = controller
+                self.world_config.set_attributes(metadata)
+
                 main(world_config=self.world_config)
                 return
 
@@ -150,3 +159,11 @@ class Cluster:
         x = np.interp(point[0], (min_x, max_x), (self.WORLD_PADDING, self.GUI_WIDTH - self.WORLD_PADDING))
         y = np.interp(point[1], (min_y, max_y), (self.WORLD_PADDING, self.GUI_HEIGHT - self.WORLD_PADDING))
         return ClusterPoint(x=x, y=y, color=color, genome=genome)
+
+    def sync_metadata_with_controller(self, controller):
+        new_dict = {}
+        if not self.world_metadata:
+            return {}
+        for key in self.world_metadata:
+            new_dict[key] = controller[self.world_metadata[key]]
+        return new_dict

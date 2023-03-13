@@ -6,13 +6,11 @@ import numpy as np
 
 class World():
 
-    def __init__(self, w, h):
+    def __init__(self, w=100, h=100):
         self.population = []
         self.behavior = []
         self.objects = []  # A list of obstacles or other objects that belong to the world
         self.goals = []  # A set of goal markers in a world
-        self.bounded_width = 100
-        self.bounded_height = 100
         self.gui = None
         self.bounded_height = h
         self.bounded_width = w

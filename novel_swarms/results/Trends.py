@@ -57,10 +57,10 @@ class Trends():
         ax.hist(archive.archive[:, 4], bins=20)
         plt.show()
 
-        # fig, ax = plt.subplots()
-        # ax.set_title("Sensor Angle Distribution")
-        # ax.hist(archive.archive[:, 5], bins=20)
-        # plt.show()
+        fig, ax = plt.subplots()
+        ax.set_title("Algebraic Connectivity")
+        ax.hist(archive.archive[:, 5], bins=20)
+        plt.show()
 
         fig, ax = plt.subplots()
         ax.set_title("Angular Momentum Distribution")
@@ -81,3 +81,4 @@ class Trends():
         ax.set_title("Scatter Distribution")
         ax.hist(archive.archive[:, 3], bins=20)
         plt.show()
+

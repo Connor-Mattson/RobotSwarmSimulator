@@ -10,6 +10,7 @@ class RectangularWorldConfig:
                  behavior=None,
                  agentConfig=None,
                  padding=0,
+                 collide_walls=False,
                  show_walls=False,
                  agent_initialization=None,
                  stop_at=None,
@@ -37,6 +38,7 @@ class RectangularWorldConfig:
         self.agentConfig = agentConfig
         self.radius = np.linalg.norm([self.w / 2, self.h / 2])
         self.show_walls = show_walls
+        self.collide_walls = collide_walls
         self.stop_at = stop_at
         self.objects = objects
         self.goals = goals
@@ -59,3 +61,7 @@ class RectangularWorldConfig:
             goals=self.goals,
             objects=self.objects
         )
+
+    def set_attributes(self, dictionary):
+        for key in dictionary:
+            setattr(self, key, dictionary[key])

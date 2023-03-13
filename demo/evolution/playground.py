@@ -5,7 +5,7 @@ If you do not plan to make commits to the GitHub repository or if you can ensure
 are not included in your commits, you may directly edit and run this file.
 """
 from novel_swarms.config.defaults import ConfigurationDefaults
-from novel_swarms.novelty.GeneRule import GeneRule
+from novel_swarms.novelty.GeneRule import GeneRule, GeneRuleContinuous
 from novel_swarms.novelty.evolve import main as evolve
 from novel_swarms.results.results import main as report
 from novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
@@ -34,10 +34,10 @@ if __name__ == "__main__":
     agent_config = ConfigurationDefaults.DIFF_DRIVE_AGENT
 
     genotype = [
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=2),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=2),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=2),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=2),
+        GeneRuleContinuous(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=2),
+        GeneRuleContinuous(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=2),
+        GeneRuleContinuous(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=2),
+        GeneRuleContinuous(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=2),
     ]
 
     phenotype = [

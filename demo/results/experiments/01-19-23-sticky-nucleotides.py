@@ -2,7 +2,7 @@ import pygame
 import math
 from novel_swarms.config.OutputTensorConfig import OutputTensorConfig
 from novel_swarms.config.defaults import ConfigurationDefaults
-from novel_swarms.novelty.GeneRule import GeneRule, GeneBuilder
+from novel_swarms.novelty.GeneRule import GeneRule, GeneBuilder, GeneRuleContinuous
 from novel_swarms.novelty.evolve import main as evolve
 from novel_swarms.results.results import main as report
 from novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
@@ -36,14 +36,14 @@ if __name__ == "__main__":
         heuristic_validation=False,
         round_to_digits=1,
         rules=[
-            GeneRule(_max=0.5, _min=0.5, mutation_step=0.4, round_digits=1, allow_mutation=False),
-            GeneRule(_max=0.9, _min=0.9, mutation_step=0.4, round_digits=1, allow_mutation=False),
-            GeneRule(_max=1.0, _min=1.0, mutation_step=0.4, round_digits=1, allow_mutation=False),
-            GeneRule(_max=1.0, _min=1.0, mutation_step=0.4, round_digits=1, allow_mutation=False),
-            GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
-            GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
-            GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
-            GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
+            GeneRuleContinuous(_max=0.5, _min=0.5, mutation_step=0.4, round_digits=1, allow_mutation=False),
+            GeneRuleContinuous(_max=0.9, _min=0.9, mutation_step=0.4, round_digits=1, allow_mutation=False),
+            GeneRuleContinuous(_max=1.0, _min=1.0, mutation_step=0.4, round_digits=1, allow_mutation=False),
+            GeneRuleContinuous(_max=1.0, _min=1.0, mutation_step=0.4, round_digits=1, allow_mutation=False),
+            GeneRuleContinuous(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
+            GeneRuleContinuous(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
+            GeneRuleContinuous(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
+            GeneRuleContinuous(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
         ]
     )
 
