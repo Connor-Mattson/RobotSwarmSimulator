@@ -149,7 +149,7 @@ class BehaviorDiscovery:
         self.population = np.array([])
 
         # Crossover in pairs
-        for i in range(0, len(selection), 2):
+        for i in range(0, len(selection) - 1, 2):
             parent_A = selection[i]
             parent_B = selection[i + 1]
 

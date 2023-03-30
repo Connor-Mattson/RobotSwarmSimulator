@@ -51,8 +51,8 @@ if __name__ == "__main__":
     agent_config_b = StaticAgentConfig(agent_radius=BL)
 
     heterogeneous_swarm_config = HeterogeneousSwarmConfig()
-    heterogeneous_swarm_config.add_sub_populuation(agent_config_a, 8)
-    heterogeneous_swarm_config.add_sub_populuation(agent_config_b, 0)
+    heterogeneous_swarm_config.add_sub_populuation(agent_config_a, 2)
+    heterogeneous_swarm_config.add_sub_populuation(agent_config_b, 5)
 
     behavior = [
         AverageSpeedBehavior(),
@@ -67,6 +67,7 @@ if __name__ == "__main__":
         n_agents=30,
         seed=SEED,
         behavior=behavior,
+        collide_walls=True,
         show_walls=True,
         agentConfig=heterogeneous_swarm_config,
         padding=15

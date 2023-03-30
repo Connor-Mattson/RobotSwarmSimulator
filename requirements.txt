@@ -7,14 +7,17 @@ matplotlib==3.5.3
 numpy==1.23.1
 opencv-python==4.7.0.68
 packaging==21.3
+pandas==1.5.3
 pep517==0.13.0
 Pillow==9.2.0
 pygame==2.1.2
 pyparsing==3.0.9
 python-dateutil==2.8.2
+pytz==2022.7.1
 scikit-learn==1.1.2
 scikit-learn-extra==0.2.0
 scipy==1.9.0
+seaborn==0.12.2
 six==1.16.0
 threadpoolctl==3.1.0
 tomli==2.0.1

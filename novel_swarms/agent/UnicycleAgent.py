@@ -2,6 +2,7 @@ from typing import Tuple
 import pygame
 import random
 import math
+import time
 import numpy as np
 from copy import deepcopy
 from .Agent import Agent
@@ -41,6 +42,7 @@ class UnicycleAgent(Agent):
             self.angle = config.angle
 
         self.radius = config.agent_radius
+        self.wheel_radius = config.wheel_radius
         self.dt = config.dt
         self.is_highlighted = False
         self.agent_in_sight = None
@@ -62,6 +64,13 @@ class UnicycleAgent(Agent):
         self.body_color = config.body_color
 
         self.attach_agent_to_sensors()
+
+        # Set Trace Settings if a trace was assigned to this object.
+        self.trace_color = config.trace_color
+        self.trace = config.trace_length is not None
+        if self.trace:
+            self.trace_path = []
+            self.trace_length = config.trace_length
 
     def seed(self, seed):
         random.seed(UnicycleAgent.SEED)
@@ -125,6 +134,8 @@ class UnicycleAgent(Agent):
             sensor.step(world=world)
         # timer = timer.check_watch()
 
+        self.add_to_trace(self.x_pos, self.y_pos)
+
     def handle_collisions(self, world):
         collisions = True
         limit = 10
@@ -142,13 +153,14 @@ class UnicycleAgent(Agent):
                     if correction is not None:
                         collisions = True
                         if np.linalg.norm(correction) == 0:
-                            self.stopped_duration = 2
+                            self.stopped_duration = 15
                         else:
                             self.x_pos += correction[0]
                             self.y_pos += correction[1]
                         break
             if collisions:
                 self.collider.flag_collision()
+
     def build_collider(self):
         self.collider = AngleSensitiveCC(self.x_pos, self.y_pos, self.radius, self.angle, self.get_action(), sensitivity=45)
         return self.collider
@@ -162,6 +174,9 @@ class UnicycleAgent(Agent):
         filled = 0 if self.is_highlighted or self.body_filled else 1
         color = self.body_color if not self.stopped_duration else (255, 255, 51)
         pygame.draw.circle(screen, color, (self.x_pos, self.y_pos), self.radius, width=filled)
+
+        # Draw Trace (if parameterized to do so)
+        self.draw_trace(screen)
 
         # "Front" direction vector
         head = self.getFrontalPoint()
@@ -196,6 +211,19 @@ class UnicycleAgent(Agent):
             bottom_right = (self.x_pos + self.radius, self.y_pos + self.radius)
             self.aabb = AABB(top_left, bottom_right)
         return self.aabb
+
+    def draw_trace(self, screen):
+        if not self.trace:
+            return
+        for x, y in self.trace_path:
+            pygame.draw.circle(screen, self.trace_color, (x, y), 2)
+
+    def add_to_trace(self, x, y):
+        if not self.trace:
+            return
+        self.trace_path.append((x, y))
+        if len(self.trace_path) > self.trace_length:
+            self.trace_path.pop(0)
 
     def __str__(self) -> str:
         return "(x: {}, y: {}, r: {}, θ: {})".format(self.x_pos, self.y_pos, self.radius, self.angle)

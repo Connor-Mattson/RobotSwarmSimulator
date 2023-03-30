@@ -43,7 +43,7 @@ if __name__ == "__main__":
 
     gene_specifications = GeneBuilder(
         heuristic_validation=False,
-        round_to_digits=1,
+        round_to_digits=None,
         rules=[
             GeneRule(discrete_domain=[-20, -16, -12, -8, -4, 4, 8, 12, 16, 20], allow_mutation=True, step_size=2),
             GeneRule(discrete_domain=[-2.0, -1.6, -1.2, -0.8, -0.4, 0.4, 0.8, 1.2, 1.6, 2.0], allow_mutation=True, step_size=2),
@@ -118,8 +118,8 @@ if __name__ == "__main__":
     novelty_config = GeneticEvolutionConfig(
         gene_builder=gene_specifications,
         phenotype_config=behavior,
-        n_generations=10,
-        n_population=20,
+        n_generations=20,
+        n_population=25,
         crossover_rate=0.7,
         mutation_rate=0.15,
         world_config=world_config,

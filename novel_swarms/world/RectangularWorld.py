@@ -52,6 +52,9 @@ class RectangularWorld(World):
                 noise_x = ((np.random.random() * 2) - 1) * 20
                 noise_y = ((np.random.random() * 2) - 1) * 20
                 noise_theta = ((np.random.random() * 2) - 1) * (np.pi / 8)
+                # noise_x = 0
+                # noise_y = 0
+                # noise_theta = 0
                 self.population[i].x_pos = init[0] + noise_x
                 self.population[i].y_pos = init[1] + noise_y
                 if len(init) > 2:
@@ -86,6 +89,7 @@ class RectangularWorld(World):
         """
         Cycle through the entire population and take one step. Calculate Behavior if needed.
         """
+        super().step()
         agent_step_timer = Timer("Population Step")
         for agent in self.population:
             if not issubclass(type(agent), Agent):
@@ -158,6 +162,8 @@ class RectangularWorld(World):
         """
         padding = self.padding
 
+        old_x, old_y = agent.x_pos, agent.y_pos
+
         # Prevent Left Collisions
         agent.x_pos = max(agent.radius + padding, agent.x_pos)
 
@@ -171,10 +177,15 @@ class RectangularWorld(World):
         agent.y_pos = min((self.bounded_height - agent.radius - padding), agent.y_pos)
 
         # agent.angle += (math.pi / 720)
-        self.handleWallCollisions(agent)
+        in_coll = self.handleWallCollisions(agent)
+
+        if agent.x_pos != old_x or agent.y_pos != old_y:
+            return True
+        return False
 
     def handleWallCollisions(self, agent: DifferentialDriveAgent):
         # Check for distances between the agent and the line segments
+        in_collision = False
         for obj in self.objects:
             segs = obj.get_sensing_segments()
             c = (agent.x_pos, agent.y_pos)
@@ -203,8 +214,10 @@ class RectangularWorld(World):
 
                 dist = math.sqrt(dx * dx + dy * dy)
                 if dist < agent.radius:
+                    in_collision = True
                     agent.y_pos -= dy
                     agent.x_pos -= dx
+        return in_collision
 
     def preventAgentCollisions(self, agent: DifferentialDriveAgent, forward_freeze=False) -> None:
         agent_center = agent.getPosition()

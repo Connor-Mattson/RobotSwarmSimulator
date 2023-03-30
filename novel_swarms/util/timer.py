@@ -10,7 +10,7 @@ class Timer:
 
     def stop_the_clock(self):
         self.stop = time.time()
-        return self.check_watch(self, True)
+        return self.check_watch()
 
     def check_watch(self, p=True):
         if self.stop is not None:

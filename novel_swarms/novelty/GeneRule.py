@@ -102,6 +102,8 @@ class GeneBuilder:
         return mx > 3.8
 
     def round_to(self, vec):
+        if not self.round_to_digits:
+            return vec
         ret = vec
         for i, elem in enumerate(ret):
             ret[i] = round(elem, self.round_to_digits)

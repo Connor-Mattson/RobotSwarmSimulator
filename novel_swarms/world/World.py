@@ -14,13 +14,14 @@ class World():
         self.gui = None
         self.bounded_height = h
         self.bounded_width = w
+        self.total_steps = 0
         pass
     
     def setup(self):
         pass
 
     def step(self):
-        pass
+        self.total_steps += 1
 
     def draw(self, screen):
         pass

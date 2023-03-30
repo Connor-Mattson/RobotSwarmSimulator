@@ -33,27 +33,39 @@ if __name__ == "__main__":
     # Note that in Vega et al. v_0 = v_1, w_0 = -w_1
 
     # CUSTOM_CONTROLLER = [17.5, 0.25, 17.5, -0.25]  # Dispersion
-    CUSTOM_CONTROLLER = [12.5, 0.5, 12.5, -0.5]  # Stable Milling
+    # CUSTOM_CONTROLLER = [12.5, 0.5, 12.5, -0.5]  # Stable Milling
     # CUSTOM_CONTROLLER = [17.5, 1.25, 17.5, -1.25]  # Semi-Stable Milling
     # CUSTOM_CONTROLLER = [2.5, 2.0, 2.5, -2.0]  # Colliding Unstable
     # CUSTOM_CONTROLLER = [4.5, 0.3, -3, 0.4]  # Our Dispersal Gene
+
+    # forwards = [2.5 * i for i in range(1, 8)]
+    # rotation = [0.25 * i for i in range(1, 9)]
+    # i, j = 1, 2
+    # F_S = forwards[j]
+    # T_R = rotation[i]
+    # print("x:", T_R, "y:", F_S)
+    # CUSTOM_CONTROLLER = [F_S, T_R, F_S, -T_R]
 
     # Behavior Discovery Genomes
     # CUSTOM_CONTROLLER = [18.0, -0.1, 14.0, 0.5]  # Wall Following
     # CUSTOM_CONTROLLER = [16.6, -0.4, 14.0, 0.5]  # Wall Following - Sweeping Version
     # CUSTOM_CONTROLLER = [-12.0, -0.6, -14.0, -0.5]  # Dispersal
     # CUSTOM_CONTROLLER = [8.0, -0.9, 15.0, 0.1]  # Milling/Cyclic
+    CUSTOM_CONTROLLER = [-1.7, 0.2, 0.0, 0.2]
 
-    SEED = None
+    # CUSTOM_CONTROLLER = [20.0, -1.6, 20.0, 1.2]
+
+    SEED = 1
     GUI_PADDING = 15
-    N_AGENTS = 20
+    N_AGENTS = 9
     WIDTH, HEIGHT = int(BL * 29.8), int(BL * 29.8)
 
     sensors = SensorSet([
         BinaryFOVSensor(
-            theta=60 / 2,
+            theta=50 / 2,
             distance=(BL * 12.5),
-            bias=-4,
+            # distance=(BL * 3),
+            bias=-7,
             degrees=True,
             false_positive=0.1,
             false_negative=0.05,
@@ -61,7 +73,7 @@ if __name__ == "__main__":
             # walls=[[GUI_PADDING, GUI_PADDING], [GUI_PADDING + WIDTH, GUI_PADDING + HEIGHT]],
             walls=None,
             wall_sensing_range=(BL * 6),
-            time_step_between_sensing=2,
+            time_step_between_sensing=3,
             store_history=True
         )
     ])
@@ -69,6 +81,7 @@ if __name__ == "__main__":
     agent_config = UnicycleAgentConfig(
         controller=CUSTOM_CONTROLLER,
         agent_radius=BL / 2,
+        wheel_radius=BL * 0.44,
         dt=0.13,  # 130ms sampling period
         sensors=sensors,
         seed=None,
@@ -84,7 +97,7 @@ if __name__ == "__main__":
         AlgebraicConn(),
     ]
 
-    r = 50
+    r = 80
     pi_slice = (2 * np.pi) / N_AGENTS
     center = (int(BL * 29.8) / 2, int(BL * 29.8) / 2)
     init_positions = [(r*np.cos(t * pi_slice), r*np.sin(t * pi_slice), t * pi_slice) for t in range(0, N_AGENTS)]
