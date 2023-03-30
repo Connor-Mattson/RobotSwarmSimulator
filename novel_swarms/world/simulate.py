@@ -8,7 +8,6 @@ FRAMERATE = 200
 
 def main(world_config, show_gui=True, gui=None, stop_detection=None, step_size=1):
     # initialize the pygame module
-    print("Showing Gui?", show_gui)
     if show_gui:
         pygame.init()
         pygame.display.set_caption("Swarm Simulation")

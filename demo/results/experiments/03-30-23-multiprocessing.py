@@ -10,6 +10,7 @@ from novel_swarms.sensors.SensorSet import SensorSet
 from novel_swarms.config.AgentConfig import DiffDriveAgentConfig
 from novel_swarms.config.WorldConfig import RectangularWorldConfig
 from novel_swarms.util.timer import Timer
+from novel_swarms.util.processing.multicoreprocessing import MultiWorldSimulation
 import matplotlib.pyplot as plt
 
 def f(x):
@@ -87,7 +88,45 @@ def plot_findings():
     plt.title("Time to Simulate 25 controllers for 30 agents for 1000 timesteps")
     plt.show()
 
+def object_oriented_approach():
+    def stop_when(world):
+        if world.total_steps > 1000:
+            return True
+        return False
+
+    controllers = [[i * 0.1, j * 0.1, 1.0, 1.0] for i in range(-10, 10, 5) for j in range(-10, 10, 5)]
+    agent_config = [
+        DiffDriveAgentConfig(
+            controller=controller,
+            sensors=SensorSet([
+                BinaryLOSSensor(angle=0),
+            ]),
+            seed=1,
+        ) for controller in controllers
+    ]
+    sim_config = [
+        RectangularWorldConfig(
+            size=(500, 500),
+            n_agents=30,
+            seed=1,
+            behavior=[
+                AverageSpeedBehavior(),
+                AngularMomentumBehavior(),
+                RadialVarianceBehavior(),
+                ScatterBehavior(),
+                GroupRotationBehavior(),
+            ],
+            agentConfig=a_c,
+            padding=15,
+            stop_at=1000,
+        ) for a_c in agent_config
+    ]
+
+    processor = MultiWorldSimulation(pool_size=12)
+    ret = processor.execute(sim_config, world_stop_condition=stop_when)
+    print([r.total_steps for r in ret])
+
 if __name__ == "__main__":
-    plot_findings()
+    object_oriented_approach()
 
 

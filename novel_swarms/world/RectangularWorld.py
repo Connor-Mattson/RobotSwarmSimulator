@@ -83,6 +83,7 @@ class RectangularWorld(World):
 
         self.behavior = config.behavior
         for b in self.behavior:
+            b.reset()
             b.attach_world(self)
 
     def step(self):

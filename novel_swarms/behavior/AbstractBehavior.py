@@ -19,7 +19,11 @@ class AbstractBehavior():
         self.current_value = value
 
     def out_current(self) -> Tuple:
-        return (self.name, self.value)
+        return (self.name, self.value_history[-1])
 
     def out_average(self) -> Tuple:
         return (self.name, average(self.value_history))
+
+    def reset(self):
+        self.current_value = 0
+        self.value_history = []
