@@ -17,7 +17,7 @@ class RadialVarianceBehavior(AbstractBehavior):
         r = self.world_radius
         mew = self.center_of_mass()
 
-        # Calculate the Average disance from C.O.M. for all agents first, save to variable 'avg_dist'
+        # Calculate the Average distance from C.O.M. for all agents first, save to variable 'avg_dist'
         distance_list = []
         for agent in self.population:
             x_i = agent.getPosition()

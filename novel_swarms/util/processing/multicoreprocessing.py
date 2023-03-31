@@ -2,8 +2,8 @@ from multiprocessing import Pool
 from novel_swarms.world.simulate import main as sim
 
 
-def simulate(world_config):
-    world = sim(world_config, show_gui=False)
+def simulate(world_config, terminate_function):
+    world = sim(world_config, show_gui=False, stop_detection=terminate_function)
     return world
 
 class MultiWorldSimulation:
@@ -21,5 +21,5 @@ class MultiWorldSimulation:
 
         ret = []
         with Pool(self.pool_size) as pool:
-            ret = pool.map(simulate, world_setup)
+            ret = pool.starmap(simulate, zip(world_setup, [world_stop_condition for _ in world_setup]))
         return ret

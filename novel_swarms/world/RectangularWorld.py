@@ -332,4 +332,5 @@ class RectangularWorld(World):
         behavior = np.array([s.out_average()[1] for s in self.behavior])
         return behavior
 
-
+    def removeAgent(self, agent):
+        self.population.remove(agent)

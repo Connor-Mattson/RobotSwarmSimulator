@@ -10,6 +10,7 @@ from novel_swarms.behavior.RadialVariance import RadialVarianceBehavior
 from novel_swarms.behavior.ScatterBehavior import ScatterBehavior
 from novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
 from novel_swarms.behavior.DistanceToGoal import DistanceToGoal
+from novel_swarms.behavior.AgentsAtGoal import AgentsAtGoal
 from novel_swarms.world.goals.Goal import AreaGoal
 from novel_swarms.world.simulate import main as simulate
 from novel_swarms.sensors.BinaryFOVSensor import BinaryFOVSensor
@@ -77,11 +78,12 @@ if __name__ == "__main__":
     )
 
     heterogeneous_swarm_config = HeterogeneousSwarmConfig()
-    heterogeneous_swarm_config.add_sub_populuation(agent_levy, 1)
+    heterogeneous_swarm_config.add_sub_populuation(agent_levy, 10)
     heterogeneous_swarm_config.add_sub_populuation(agent_config_b, 0)
 
     behavior = [
-        # DistanceToGoal()
+        DistanceToGoal(),
+        AgentsAtGoal(),
     ]
 
     goals = [AreaGoal(200, 200, 75, 20)]

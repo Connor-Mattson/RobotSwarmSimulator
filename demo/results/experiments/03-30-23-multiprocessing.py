@@ -13,9 +13,12 @@ from novel_swarms.util.timer import Timer
 from novel_swarms.util.processing.multicoreprocessing import MultiWorldSimulation
 import matplotlib.pyplot as plt
 
-def f(x):
-    print(x)
-    return x*x
+
+def stop_detection_method(world):
+    EPSILON = 0.001
+    if world.total_steps > 100 and world.behavior[2].out_average()[1] < EPSILON:
+        return True
+    return False
 
 def simulate(agent_config, show_gui=False):
     behavior = [
@@ -89,12 +92,7 @@ def plot_findings():
     plt.show()
 
 def object_oriented_approach():
-    def stop_when(world):
-        if world.total_steps > 1000:
-            return True
-        return False
-
-    controllers = [[i * 0.1, j * 0.1, 1.0, 1.0] for i in range(-10, 10, 5) for j in range(-10, 10, 5)]
+    controllers = [[i * 0.1, j * 0.1, 1.0, 1.0] for i in range(-10, 10, 1) for j in range(-10, 10, 1)]
     agent_config = [
         DiffDriveAgentConfig(
             controller=controller,
@@ -118,13 +116,15 @@ def object_oriented_approach():
             ],
             agentConfig=a_c,
             padding=15,
-            stop_at=1000,
+            stop_at=2500,
         ) for a_c in agent_config
     ]
 
     processor = MultiWorldSimulation(pool_size=12)
-    ret = processor.execute(sim_config, world_stop_condition=stop_when)
+    time_it = Timer("Full 21x21 search for cyclic")
+    ret = processor.execute(sim_config, world_stop_condition=stop_detection_method)
     print([r.total_steps for r in ret])
+    time_it.check_watch()
 
 if __name__ == "__main__":
     object_oriented_approach()

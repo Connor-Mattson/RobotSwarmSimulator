@@ -52,8 +52,11 @@ class LevyAgent(UnicycleAgent):
 
         v, omega = self.v, self.omega
         if world.goals and world.goals[0].agent_achieved_goal(self):
-            v, omega = 0, 0
             self.steps_left = 1000
+            if world.goals[0].remove_at:
+                world.goals[0].add_achieved_agent(self.name)
+                world.removeAgent(self)
+                return
 
         self.dx = v * math.cos(self.angle)
         self.dy = v * math.sin(self.angle)
