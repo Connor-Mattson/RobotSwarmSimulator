@@ -92,7 +92,7 @@ def plot_findings():
     plt.show()
 
 def object_oriented_approach():
-    controllers = [[i * 0.1, j * 0.1, 1.0, 1.0] for i in range(-10, 10, 1) for j in range(-10, 10, 1)]
+    controllers = [[i * 0.1, j * 0.1, 1.0, 1.0] for i in range(-10, 11, 10) for j in range(-10, 11, 10)]
     agent_config = [
         DiffDriveAgentConfig(
             controller=controller,
@@ -120,7 +120,7 @@ def object_oriented_approach():
         ) for a_c in agent_config
     ]
 
-    processor = MultiWorldSimulation(pool_size=12)
+    processor = MultiWorldSimulation(pool_size=12, single_step=True, with_gui=True)
     time_it = Timer("Full 21x21 search for cyclic")
     ret = processor.execute(sim_config, world_stop_condition=stop_detection_method)
     print([r.total_steps for r in ret])

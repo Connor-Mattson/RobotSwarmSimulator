@@ -23,6 +23,7 @@ def main(world_config, show_gui=True, gui=None, stop_detection=None, step_size=1
     # define a variable to control the main loop
     running = True
     paused = False
+    draw_world = True
 
     # Create the simulation world
     world = WorldFactory.create(world_config)
@@ -75,6 +76,8 @@ def main(world_config, show_gui=True, gui=None, stop_detection=None, step_size=1
                     if event.key == pygame.K_LSHIFT and steps_per_frame > 1:
                         steps_per_frame /= 2
                         steps_per_frame = round(steps_per_frame)
+                    if event.key == pygame.K_w:
+                        draw_world = not draw_world
                     if event.key in labels:
                         return event.key, steps_taken
 
@@ -107,7 +110,8 @@ def main(world_config, show_gui=True, gui=None, stop_detection=None, step_size=1
         if gui and screen:
             gui.set_time(steps_taken)
             screen.fill(world_config.background_color)
-            world.draw(screen)
+            if draw_world:
+                world.draw(screen)
             gui.draw(screen)
 
         # Limit the FPS of the simulation to FRAMERATE

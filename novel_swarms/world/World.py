@@ -6,7 +6,7 @@ import numpy as np
 
 class World():
 
-    def __init__(self, w=100, h=100):
+    def __init__(self, w=100, h=100, metadata=None):
         self.population = []
         self.behavior = []
         self.objects = []  # A list of obstacles or other objects that belong to the world
@@ -15,7 +15,10 @@ class World():
         self.bounded_height = h
         self.bounded_width = w
         self.total_steps = 0
-        pass
+        if metadata is None:
+            self.meta = {}
+        else:
+            self.meta = metadata
     
     def setup(self):
         pass

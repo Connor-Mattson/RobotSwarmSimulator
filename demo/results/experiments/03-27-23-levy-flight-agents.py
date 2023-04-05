@@ -10,7 +10,7 @@ from novel_swarms.behavior.RadialVariance import RadialVarianceBehavior
 from novel_swarms.behavior.ScatterBehavior import ScatterBehavior
 from novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
 from novel_swarms.behavior.DistanceToGoal import DistanceToGoal
-from novel_swarms.behavior.AgentsAtGoal import AgentsAtGoal
+from novel_swarms.behavior.AgentsAtGoal import AgentsAtGoal, PercentageAtGoal
 from novel_swarms.world.goals.Goal import AreaGoal
 from novel_swarms.world.simulate import main as simulate
 from novel_swarms.sensors.BinaryFOVSensor import BinaryFOVSensor
@@ -54,16 +54,17 @@ if __name__ == "__main__":
         idiosyncrasies=True,
         body_filled=True,
         body_color=(255, 0, 0),
-        trace_length=10000,
+        trace_length=500,
         trace_color=(255, 255, 255)
     )
 
     agent_levy = LevyAgentConfig(
         base_config,
-        levy_constant=1.1,
+        levy_constant="Random",
         turning_rate=2.0,
         forward_rate=12.5,
-        step_scale=30.0
+        step_scale=30.0,
+        seed=None,
     )
 
     agent_config_b = UnicycleAgentConfig(
@@ -78,23 +79,29 @@ if __name__ == "__main__":
     )
 
     heterogeneous_swarm_config = HeterogeneousSwarmConfig()
-    heterogeneous_swarm_config.add_sub_populuation(agent_levy, 10)
+    heterogeneous_swarm_config.add_sub_populuation(agent_levy, 1)
     heterogeneous_swarm_config.add_sub_populuation(agent_config_b, 0)
 
     behavior = [
         DistanceToGoal(),
-        AgentsAtGoal(),
+        AgentsAtGoal(history=1),
+        PercentageAtGoal(0.01, history=1),
+        PercentageAtGoal(0.10, history=1),
+        PercentageAtGoal(0.25, history=1),
+        PercentageAtGoal(0.50, history=1),
+        PercentageAtGoal(0.80, history=1),
+        PercentageAtGoal(1.0, history=1),
     ]
 
-    goals = [AreaGoal(200, 200, 75, 20)]
+    goals = [AreaGoal(200, 200, 75, 20, remove_agents_at_goal=True)]
     objects = [
         Wall(None, 180, 193, 120, 2),
         Wall(None, 180, 193, 2, 91),
         Wall(None, 300, 193, 2, 91),
-        Wall(None, 238, 350, 2, 135),
+        Wall(None, 240, 350, 2, 135),
     ]
 
-    initial_conditions = [(238, 50, 0)]
+    initial_conditions = [(255, 255, 0)]
 
     world_config = RectangularWorldConfig(
         size=(500, 500),
@@ -121,4 +128,4 @@ if __name__ == "__main__":
     #     time_to_goal.append(world.total_steps)
     #     print(time_to_goal)
 
-    world = simulate(world_config=world_config, step_size=5)
+    world = simulate(world_config=world_config, step_size=1)

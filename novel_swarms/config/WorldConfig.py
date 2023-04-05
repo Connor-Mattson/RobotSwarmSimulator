@@ -16,7 +16,8 @@ class RectangularWorldConfig:
                  stop_at=None,
                  objects=[],
                  goals=[],
-                 background_color=(0, 0, 0)
+                 background_color=(0, 0, 0),
+                 metadata=None,
                  ):
 
         if behavior is None:
@@ -43,6 +44,7 @@ class RectangularWorldConfig:
         self.objects = objects
         self.goals = goals
         self.background_color = background_color
+        self.metadata = metadata
 
         if self.agentConfig:
             self.agentConfig.attach_world_config(self.getShallowCopy())

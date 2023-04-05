@@ -8,6 +8,7 @@ from copy import deepcopy
 from .Agent import Agent
 from ..config.AgentConfig import UnicycleAgentConfig
 from ..sensors.GenomeDependentSensor import GenomeBinarySensor, GenomeFOVSensor
+from ..util.collider.CircularCollider import CircularCollider
 from ..util.timer import Timer
 from ..util.collider.AABB import AABB
 from ..util.collider.AngleSensitiveCC import AngleSensitiveCC
@@ -162,7 +163,10 @@ class UnicycleAgent(Agent):
                 self.collider.flag_collision()
 
     def build_collider(self):
-        self.collider = AngleSensitiveCC(self.x_pos, self.y_pos, self.radius, self.angle, self.get_action(), sensitivity=45)
+        if self.stop_on_collision:
+            self.collider = AngleSensitiveCC(self.x_pos, self.y_pos, self.radius, self.angle, self.get_action(), sensitivity=45)
+        else:
+            self.collider = CircularCollider(self.x_pos, self.y_pos, self.radius)
         return self.collider
 
     def draw(self, screen) -> None:

@@ -21,7 +21,15 @@ class LevyAgent(UnicycleAgent):
     def __init__(self, config: LevyAgentConfig = None, name=None) -> None:
         super().__init__(config.unicycle_config)
 
-        self.levy_dist_index = config.levy_constant
+        if config.seed is not None:
+            random.seed(config.seed)
+            np.random.seed(config.seed)
+
+        if config.levy_constant == "Random":
+            self.levy_dist_index = random.random() + 1
+        else:
+            self.levy_dist_index = config.levy_constant
+
         self.sigma_u = self._sigma(self.levy_dist_index)
         self.sigma_v = 1
 
@@ -39,6 +47,8 @@ class LevyAgent(UnicycleAgent):
 
         if world is None:
             raise Exception("Expected a Valid value for 'World' in step method call - Unicycle Agent")
+
+        world.meta["levy_value"] = self.levy_dist_index
 
         self.aabb = None
         self.collider = None

@@ -18,8 +18,9 @@ class MazeAgent(Agent):
 
         self.controller = config.controller
 
+        self.seed = config.seed
         if config.seed is not None:
-            self.seed(config.seed)
+            self.set_seed(config.seed)
 
         if config.x is None:
             self.x_pos = random.randint(round(0 + config.agent_radius), round(config.world.w - config.agent_radius))
@@ -62,8 +63,8 @@ class MazeAgent(Agent):
         else:
             self.body_color = config.body_color
 
-    def seed(self, seed):
-        random.seed(MazeAgent.SEED)
+    def set_seed(self, seed):
+        random.seed(seed)
 
     def step(self, check_for_world_boundaries=None, world=None, check_for_agent_collisions=None) -> None:
 
@@ -72,6 +73,7 @@ class MazeAgent(Agent):
 
         # timer = Timer("Calculations")
         super().step()
+
         if world.goals and world.goals[0].agent_achieved_goal(self) or self.detection_id == 2:
             v, omega = 0, 0
             self.detection_id = 2

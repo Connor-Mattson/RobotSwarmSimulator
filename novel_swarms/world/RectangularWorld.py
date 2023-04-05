@@ -22,14 +22,14 @@ class RectangularWorld(World):
         if config is None:
             raise Exception("RectangularWorld must be instantiated with a WorldConfig class")
 
-        super().__init__(config.w, config.h)
+        super().__init__(config.w, config.h, config.metadata)
         self.config = config
         self.population_size = config.population_size
         self.behavior = config.behavior
         self.padding = config.padding
         self.objects = config.objects
         self.goals = config.goals
-
+        self.seed = config.seed
         if config.seed is not None:
             # print(f"World Instantiated with Seed: {config.seed}")
             # print(f"TESTING RAND: {random.random()}")
@@ -62,14 +62,14 @@ class RectangularWorld(World):
 
         elif self.heterogeneous:
             for agent in self.population:
-                agent.x_pos = random.randint(math.floor(0 + agent.radius), math.floor(self.bounded_width - agent.radius))
-                agent.y_pos = random.randint(math.ceil(0 + agent.radius), math.floor(self.bounded_height - agent.radius))
+                agent.x_pos = random.uniform(math.floor(0 + agent.radius), math.floor(self.bounded_width - agent.radius))
+                agent.y_pos = random.uniform(math.ceil(0 + agent.radius), math.floor(self.bounded_height - agent.radius))
                 agent.angle = random.random() * 2 * math.pi
 
         elif ac.x is None and config.seed is not None:
             for agent in self.population:
-                agent.x_pos = random.randint(0 + ac.agent_radius, ac.world.w - ac.agent_radius)
-                agent.y_pos = random.randint(0 + ac.agent_radius, ac.world.h - ac.agent_radius)
+                agent.x_pos = random.uniform(0 + ac.agent_radius, ac.world.w - ac.agent_radius)
+                agent.y_pos = random.uniform(0 + ac.agent_radius, ac.world.h - ac.agent_radius)
                 agent.angle = random.random() * 2 * math.pi
 
         # print([(a.x_pos, a.y_pos, a.angle) for a in self.population])
@@ -214,10 +214,21 @@ class RectangularWorld(World):
                 dy = y - y3
 
                 dist = math.sqrt(dx * dx + dy * dy)
+
                 if dist < agent.radius:
                     in_collision = True
-                    agent.y_pos -= dy
-                    agent.x_pos -= dx
+                    agent.y_pos -= np.sign(dy) * (agent.radius - abs(dy) + 1)
+                    agent.x_pos -= np.sign(dx) * (agent.radius - abs(dx) + 1)
+
+                # dx = x - x3 - agent.radius
+                # if dx < 0:
+                #     in_collision = True
+                #     agent.x_pos -= dx
+                # dy = y - y3 - agent.radius
+                # if dy < 0:
+                #     in_collision = True
+                #     agent.y_pos -= dy
+
         return in_collision
 
     def preventAgentCollisions(self, agent: DifferentialDriveAgent, forward_freeze=False) -> None:

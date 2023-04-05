@@ -27,3 +27,6 @@ class AbstractBehavior():
     def reset(self):
         self.current_value = 0
         self.value_history = []
+
+    def draw(self, screen):
+        pass

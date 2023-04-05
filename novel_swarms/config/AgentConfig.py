@@ -86,17 +86,22 @@ class LevyAgentConfig:
     def __init__(self,
                  config=None,
                  world_config: RectangularWorldConfig = None,
-                 levy_constant=1,
+                 levy_constant='Random',
                  forward_rate=1.0,
                  turning_rate=1.0,
-                 step_scale=1.0
+                 step_scale=1.0,
+                 seed=None,
                  ):
+        self.x = config.x
+        self.y = config.y
+        self.agent_radius = config.agent_radius
         self.unicycle_config = config
         self.world = world_config
         self.levy_constant = levy_constant
         self.forward_rate = forward_rate
         self.turning_rate = turning_rate
         self.step_scale = step_scale
+        self.seed = seed
 
     def attach_world_config(self, world_config):
         self.world = world_config

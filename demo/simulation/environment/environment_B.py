@@ -1,3 +1,4 @@
+from novel_swarms.behavior.AgentsAtGoal import AgentsAtGoal, PercentageAtGoal
 from novel_swarms.sensors.AbstractSensor import AbstractSensor
 from novel_swarms.sensors.GenomeDependentSensor import GenomeBinarySensor
 from novel_swarms.sensors.StaticSensor import StaticSensor
@@ -38,11 +39,10 @@ if __name__ == "__main__":
         BinaryFOVSensor(
             theta=14,
             distance=(BL * 8),
-
             bias=0,
             degrees=True,
-            false_positive=0.02,
-            false_negative=0.02,
+            false_positive=0.10,
+            false_negative=0.05,
             # Rectangle Representing Environment Boundaries
             walls=[[GUI_PADDING, GUI_PADDING], [GUI_PADDING + WIDTH, GUI_PADDING + HEIGHT]],
             wall_sensing_range=(BL * 3),
@@ -61,7 +61,14 @@ if __name__ == "__main__":
     )
 
     behavior = [
-        DistanceToGoal()
+        DistanceToGoal(),
+        AgentsAtGoal(),
+        PercentageAtGoal(0.01),
+        PercentageAtGoal(0.10),
+        PercentageAtGoal(0.25),
+        PercentageAtGoal(0.50),
+        PercentageAtGoal(0.80),
+        PercentageAtGoal(1.0),
     ]
 
     r = 10
@@ -108,6 +115,7 @@ if __name__ == "__main__":
         agentConfig=agent_config,
         padding=GUI_PADDING,
         show_walls=True,
+        collide_walls=True,
         agent_initialization=None,
         stop_at=EVAL_TIL,
         objects=objects,

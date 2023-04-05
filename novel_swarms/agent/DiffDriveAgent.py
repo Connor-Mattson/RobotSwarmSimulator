@@ -14,7 +14,7 @@ from ..util.timer import Timer
 class DifferentialDriveAgent(Agent):
 
     SEED = -1
-    DEBUG = True
+    DEBUG = False
 
     def __init__(self, config: DiffDriveAgentConfig = None) -> None:
 

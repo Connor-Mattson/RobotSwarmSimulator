@@ -26,7 +26,10 @@ class DistanceToGoal(AbstractBehavior):
                 d = self.calc_dist_to_goal(agent, goal)
                 dist_to_goals.append(d)
             distances.append(min(dist_to_goals))
-        self.set_value(np.average(distances))
+        if distances:
+            self.set_value(np.average(distances))
+        else:
+            self.set_value(0.0)
 
     def calc_dist_to_goal(self, agent, goal):
         if goal.agent_achieved_goal(agent):
