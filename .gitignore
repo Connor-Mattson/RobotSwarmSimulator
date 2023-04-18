@@ -1,3 +1,6 @@
+# Ignore Experiment Files
+git.sh
+
 # Distribution / packaging
 __pycache__
 *__pycache__

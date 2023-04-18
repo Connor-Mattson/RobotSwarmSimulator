@@ -3,7 +3,7 @@ from novel_swarms.world.simulate import main as sim
 
 
 def simulate(world_config, terminate_function, show_gui=False):
-    world = sim(world_config, show_gui=show_gui, stop_detection=terminate_function, step_size=10)
+    world = sim(world_config, show_gui=show_gui, stop_detection=terminate_function, step_size=5)
     return world
 
 class MultiWorldSimulation:
@@ -13,7 +13,7 @@ class MultiWorldSimulation:
 
     def __init__(self, pool_size=4, single_step=False, with_gui=False):
         self.single_step = single_step
-        self.with_gui=with_gui
+        self.with_gui = with_gui
         self.pool_size = pool_size
 
     def execute(self, world_setup: list, world_stop_condition=None):
@@ -27,6 +27,7 @@ class MultiWorldSimulation:
                 ret = pool.starmap(simulate, zip(world_setup, [world_stop_condition for _ in world_setup]))
         else:
             for w in world_setup:
+                print(w.agentConfig.controller)
                 ret.append(simulate(w, world_stop_condition, show_gui=self.with_gui))
 
         return ret

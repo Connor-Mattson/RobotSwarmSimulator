@@ -1,6 +1,9 @@
 build==0.8.0
 cycler==0.11.0
+Cython==0.29.34
+Deprecated==1.2.13
 fonttools==4.35.0
+hopcroftkarp==1.2.5
 joblib==1.1.0
 kiwisolver==1.4.4
 matplotlib==3.5.3
@@ -9,11 +12,13 @@ opencv-python==4.7.0.68
 packaging==21.3
 pandas==1.5.3
 pep517==0.13.0
+persim==0.3.1
 Pillow==9.2.0
 pygame==2.1.2
 pyparsing==3.0.9
 python-dateutil==2.8.2
 pytz==2022.7.1
+ripser==0.6.4
 scikit-learn==1.1.2
 scikit-learn-extra==0.2.0
 scipy==1.9.0
@@ -21,3 +26,4 @@ seaborn==0.12.2
 six==1.16.0
 threadpoolctl==3.1.0
 tomli==2.0.1
+wrapt==1.15.0

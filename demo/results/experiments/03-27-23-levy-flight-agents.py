@@ -24,7 +24,7 @@ import numpy as np
 if __name__ == "__main__":
 
     AGGREGATION_CONTROLLER = [12.5, 0.5, 12.5, -0.5]
-    SEED = None
+    SEED = 1
     GUI_PADDING = 15
     BL = 15.1
     N_AGENTS = 10
@@ -79,7 +79,7 @@ if __name__ == "__main__":
     )
 
     heterogeneous_swarm_config = HeterogeneousSwarmConfig()
-    heterogeneous_swarm_config.add_sub_populuation(agent_levy, 1)
+    heterogeneous_swarm_config.add_sub_populuation(agent_levy, 10)
     heterogeneous_swarm_config.add_sub_populuation(agent_config_b, 0)
 
     behavior = [
@@ -95,10 +95,11 @@ if __name__ == "__main__":
 
     goals = [AreaGoal(200, 200, 75, 20, remove_agents_at_goal=True)]
     objects = [
-        Wall(None, 180, 193, 120, 2),
-        Wall(None, 180, 193, 2, 91),
-        Wall(None, 300, 193, 2, 91),
-        Wall(None, 240, 350, 2, 135),
+        Wall(None, 180, 193, 120, 5),
+        Wall(None, 180, 193, 5, 91),
+        Wall(None, 300, 193, 5, 91),
+        Wall(None, 238, 350, 5, 135),
+        Wall(None, 236, 348, 10, 5),
     ]
 
     initial_conditions = [(255, 255, 0)]
@@ -128,4 +129,4 @@ if __name__ == "__main__":
     #     time_to_goal.append(world.total_steps)
     #     print(time_to_goal)
 
-    world = simulate(world_config=world_config, step_size=1)
+    world = simulate(world_config=world_config, step_size=2)

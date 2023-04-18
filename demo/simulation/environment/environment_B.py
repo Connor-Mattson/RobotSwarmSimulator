@@ -25,14 +25,14 @@ if __name__ == "__main__":
     # Note that in Vega et al. v_0 = v_1
 
     # CUSTOM_CONTROLLER = [17.5, 0.25, 17.5, -0.25]  # Dispersion
-    CUSTOM_CONTROLLER = [12.5, 0.75, 12.5, -0.75]  # Stable Milling
+    CUSTOM_CONTROLLER = [12.5, 0.5, 12.5, -0.5]  # Stable Milling
     # CUSTOM_CONTROLLER = [17.5, 1.25, 17.5, -1.25]  # Semi-Stable Milling
     # CUSTOM_CONTROLLER = [2.5, 2.0, 2.5, -2.0]  # Colliding Unstable
     # CUSTOM_CONTROLLER = [4.5, 0.3, -3, 0.4]  # Our Dispersal Gene
 
-    SEED = None
+    SEED = 1
     GUI_PADDING = 15
-    N_AGENTS = 20
+    N_AGENTS = 10
     WIDTH, HEIGHT = int(BL * 29.8), int(BL * 29.8)
 
     sensors = SensorSet([
@@ -87,10 +87,11 @@ if __name__ == "__main__":
 
     # Tricky Maze
     objects = [
-        Wall(None, 180, 193, 120, 2),
-        Wall(None, 180, 193, 2, 91),
-        Wall(None, 300, 193, 2, 91),
-        Wall(None, 238, 350, 2, 100),
+        Wall(None, 180, 193, 120, 5),
+        Wall(None, 180, 193, 5, 91),
+        Wall(None, 300, 193, 5, 91),
+        Wall(None, 238, 350, 5, 100),
+        Wall(None, 236, 348, 10, 5),
     ]
 
     # Use the maze object to generate a maze and return the wall objects associated with it

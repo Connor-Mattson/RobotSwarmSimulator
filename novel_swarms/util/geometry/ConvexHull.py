@@ -21,6 +21,8 @@ class ConvexHull:
 
         if self.method == "Graham":
             return self._graham_scan(points)
+        if self.method == "Wrapping":
+            return self._gift_wrapping(points)
 
 
     def _graham_scan(self, points):
@@ -66,6 +68,55 @@ class ConvexHull:
             poly.addPoint(p)
         return poly
 
+    def _gift_wrapping(self, points):
+        poly = Polygon()
+        if len(points) < 3:
+            return poly
+
+        max_Y = self._find_max_y_value(points)
+        min_Y = self._find_min_y_value(points)
+        i = 1000
+
+        # Wrap Right Side
+        consideration_p = min_Y
+        while consideration_p != max_Y and i > 0:
+            i -= 1
+            poly.addPoint(consideration_p)
+            min_angle = 10000
+            min_point = None
+            for p in points:
+                if p == consideration_p:
+                    continue
+                angle = self._get_relative_angle(consideration_p, p, np.array([1, 0]))
+                if angle < 0:
+                    continue
+                if angle < min_angle:
+                    min_angle = angle
+                    min_point = p
+            consideration_p = min_point
+
+        # Wrap Left Side
+        consideration_p = max_Y
+        while consideration_p != min_Y and i > 0:
+            i -= 1
+            poly.addPoint(consideration_p)
+            min_angle = 10000
+            min_point = None
+            for p in points:
+                if p == consideration_p:
+                    continue
+                angle = self._get_relative_angle(consideration_p, p, np.array([-1, 0]))
+                if angle < 0:
+                    continue
+                if angle < min_angle:
+                    min_angle = angle
+                    min_point = p
+            consideration_p = min_point
+
+        if i < 1:
+            return Polygon()
+        return poly
+
     def _unit_vector(self, v):
         return v / np.linalg.norm(v)
 
@@ -92,3 +143,20 @@ class ConvexHull:
                 min_X_Point = point
         return min_X_Point
 
+    def _find_min_y_value(self, points):
+        min_Y_Val = 100000
+        min_Y_Point = None
+        for point in points:
+            if point.y < min_Y_Val:
+                min_Y_Val = point.y
+                min_Y_Point = point
+        return min_Y_Point
+
+    def _find_max_y_value(self, points):
+        max_Y_Val = -100000
+        max_Y_Point = None
+        for point in points:
+            if point.y > max_Y_Val:
+                max_Y_Val = point.y
+                max_Y_Point = point
+        return max_Y_Point

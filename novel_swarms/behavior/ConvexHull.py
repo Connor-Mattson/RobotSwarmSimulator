@@ -26,14 +26,21 @@ class ConvexHull(AbstractBehavior):
         if not self.world:
             self.set_value(math.nan)
         points = [Point.from_agent(a) for a in self.world.population]
-        self.polygon = CH().find_hull(points)
-        self.set_value(1.0)
+        try:
+            self.polygon = CH(method="Graham").find_hull(points)
+        except:
+            try:
+                self.polygon = CH(method="Wrapping").find_hull(points)
+            except Exception as e1:
+                print(f"ConvexHull Calculation Error! {e1}")
+                self.polygon = Polygon()
+
+        self.set_value(self.polygon.area())
 
     def draw(self, screen):
         if not self.polygon:
             return
-        self.polygon.draw(screen, color=(0, 255, 0))
-
+        self.polygon.draw(screen, color=(0, 255, 0), width=4)
 
 
 class InverseConvexHull(AbstractBehavior):
@@ -69,11 +76,22 @@ class InverseConvexHull(AbstractBehavior):
             for i in range(point_length)
         }
         inv_points = list(inverse_dict.keys())
-        inv_hull = CH().find_hull(inv_points)
+
+        try:
+            inv_hull = CH(method="Graham").find_hull(inv_points)
+        except Exception as e:
+            try:
+                inv_hull = CH(method="Wrapping").find_hull(inv_points)
+            except Exception as e1:
+                print(f"InverseConvexHull Calculation Error! {e1}")
+                self.set_value(-1.0)
+                return
+
         self.polygon = Polygon()
         for p in inv_hull.boundary:
             self.polygon.addPoint(inverse_dict[p])
-        self.set_value(1.0)
+
+        self.set_value(self.polygon.area())
 
     def draw(self, screen):
         if not self.polygon:

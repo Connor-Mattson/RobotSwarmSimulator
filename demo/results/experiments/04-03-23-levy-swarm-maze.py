@@ -151,7 +151,7 @@ def stop_early(world):
 
 if __name__ == "__main__":
     seeds = range(0, 50, 1)
-    n_agents = range(1, 30, 1)
+    n_agents = range(1, 31, 1)
     processor = MultiWorldSimulation(pool_size=12, single_step=False, with_gui=False)
 
     milling_data = []

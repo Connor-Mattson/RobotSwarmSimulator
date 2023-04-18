@@ -64,7 +64,8 @@ def main(world_config, show_gui=True, gui=None, stop_detection=None, step_size=1
                         gui.set_time(steps_taken)
                         screen.fill(world_config.background_color)
                         if gui and screen:
-                            world.draw(screen)
+                            if draw_world:
+                                world.draw(screen)
                             gui.draw(screen)
                         pygame.display.flip()
                     if event.key == pygame.K_r:
