@@ -36,42 +36,54 @@ if __name__ == "__main__":
     random_ds.columns = COLUMNS
 
     def convex_hull_ratio():
+        plt.figure(figsize=(8, 4))
+        total = 0
         x, y = cyclic_ds["CONVEX_HULL"], cyclic_ds["INVERSE_HULL"]
         y = np.divide(cyclic_ds["INVERSE_HULL"], cyclic_ds["CONVEX_HULL"])
         plt.scatter(x, y, c='orange', label="Cyclic Pursuit")
+        total += len(x)
 
         x, y = aggregation_ds["CONVEX_HULL"], aggregation_ds["INVERSE_HULL"]
         y = np.divide(aggregation_ds["INVERSE_HULL"], aggregation_ds["CONVEX_HULL"])
         plt.scatter(x, y, c='blue', label="Aggregation")
+        total += len(x)
 
         x, y = dispersal_ds["CONVEX_HULL"], dispersal_ds["INVERSE_HULL"]
         y = np.divide(dispersal_ds["INVERSE_HULL"], dispersal_ds["CONVEX_HULL"])
         plt.scatter(x, y, c='green', label="Dispersal")
+        total += len(x)
 
         x, y = milling_ds["CONVEX_HULL"], milling_ds["INVERSE_HULL"]
         y = np.divide(milling_ds["INVERSE_HULL"], milling_ds["CONVEX_HULL"])
         plt.scatter(x, y, c='red', label="Milling")
+        total += len(x)
 
         x, y = wall_f_ds["CONVEX_HULL"], wall_f_ds["INVERSE_HULL"]
         y = np.divide(wall_f_ds["INVERSE_HULL"], wall_f_ds["CONVEX_HULL"])
         plt.scatter(x, y, c='purple', label="Wall Following")
+        total += len(x)
 
         plt.xlabel("Convex Hull Area")
-        plt.ylabel("Hull Ratio")
-        plt.title("Convex Hull -- Area")
-        plt.legend()
+        plt.ylabel("Hull:Frame Ratio")
+        plt.title("Swarm Behavior Space")
+        plt.legend(bbox_to_anchor=(1.05, 1.0), loc='upper left')
+        plt.tight_layout()
         plt.show()
+        print(f"TOTAL: {total}")
 
     def persistence_3d():
         fig = plt.figure()
         ax = fig.add_subplot(projection='3d')
 
-        DIVIDE_X_BY_Y = True
-        X_FIELD, Y_FIELD, Z_FIELD = "CONVEX_HULL", "INVERSE_HULL", "ELEMS_1D"
+        total = 0
+
+        DIVIDE_X_BY_Y = False
+        X_FIELD, Y_FIELD, Z_FIELD = "CONVEX_HULL", "INVERSE_HULL", "MAX_1D"
 
         x, y, z = cyclic_ds[X_FIELD], cyclic_ds[Y_FIELD], cyclic_ds[Z_FIELD]
         y = np.divide(cyclic_ds[Y_FIELD], cyclic_ds[X_FIELD]) if DIVIDE_X_BY_Y else y
         ax.scatter(x, y, z, c='orange', label="Cyclic Pursuit")
+
 
         x, y, z = aggregation_ds[X_FIELD], aggregation_ds[Y_FIELD], aggregation_ds[Z_FIELD]
         y = np.divide(aggregation_ds[Y_FIELD], aggregation_ds[X_FIELD]) if DIVIDE_X_BY_Y else y
@@ -89,12 +101,14 @@ if __name__ == "__main__":
         y = np.divide(wall_f_ds[Y_FIELD], wall_f_ds[X_FIELD]) if DIVIDE_X_BY_Y else y
         ax.scatter(x, y, z, c='purple', label="Wall Following")
 
-        plt.xlabel(X_FIELD)
-        plt.ylabel(Y_FIELD)
-        ax.set_zlabel(Z_FIELD)
-        plt.title("Convex Hull -- Area")
+
+
+        plt.xlabel("Hull Area")
+        plt.ylabel("Internal Frame Area")
+        ax.set_zlabel("Max H1 Death Time")
+        plt.title("Swarm Behavior Space")
         plt.legend()
         plt.show()
 
 
-    persistence_3d()
+    convex_hull_ratio()

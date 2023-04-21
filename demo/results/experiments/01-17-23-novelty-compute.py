@@ -1,4 +1,4 @@
-from novel_swarms.novelty.NoveltyArchive import NoveltyArchive
+from src.novel_swarms.novelty.NoveltyArchive import NoveltyArchive
 from sklearn.manifold import TSNE
 import numpy as np
 import matplotlib

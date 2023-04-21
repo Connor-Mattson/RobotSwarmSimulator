@@ -96,4 +96,4 @@ class InverseConvexHull(AbstractBehavior):
     def draw(self, screen):
         if not self.polygon:
             return
-        self.polygon.draw(screen, color=(255, 0, 0))
+        self.polygon.draw(screen, color=(255, 0, 0), width=4)

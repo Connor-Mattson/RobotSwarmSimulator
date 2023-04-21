@@ -1,16 +1,16 @@
 from multiprocessing import Pool
-from novel_swarms.world.simulate import main as sim
-from novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
-from novel_swarms.behavior.AverageSpeed import AverageSpeedBehavior
-from novel_swarms.behavior.GroupRotationBehavior import GroupRotationBehavior
-from novel_swarms.behavior.RadialVariance import RadialVarianceBehavior
-from novel_swarms.behavior.ScatterBehavior import ScatterBehavior
-from novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
-from novel_swarms.sensors.SensorSet import SensorSet
-from novel_swarms.config.AgentConfig import DiffDriveAgentConfig
-from novel_swarms.config.WorldConfig import RectangularWorldConfig
-from novel_swarms.util.timer import Timer
-from novel_swarms.util.processing.multicoreprocessing import MultiWorldSimulation
+from src.novel_swarms.world.simulate import main as sim
+from src.novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
+from src.novel_swarms.behavior.AverageSpeed import AverageSpeedBehavior
+from src.novel_swarms.behavior.GroupRotationBehavior import GroupRotationBehavior
+from src.novel_swarms.behavior.RadialVariance import RadialVarianceBehavior
+from src.novel_swarms.behavior.ScatterBehavior import ScatterBehavior
+from src.novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
+from src.novel_swarms.sensors.SensorSet import SensorSet
+from src.novel_swarms.config.AgentConfig import DiffDriveAgentConfig
+from src.novel_swarms.config.WorldConfig import RectangularWorldConfig
+from src.src.novel_swarms.util import Timer
+from src.src.novel_swarms.util import MultiWorldSimulation
 import matplotlib.pyplot as plt
 
 

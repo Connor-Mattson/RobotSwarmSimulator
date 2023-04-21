@@ -1,4 +1,4 @@
-from novel_swarms.util.datasets.GenomeDataSet import GenomeDataSet
+from src.novel_swarms.util import GenomeDataSet
 
 
 class DiffDriveDataset(GenomeDataSet):

@@ -1,21 +1,21 @@
 import pygame
 import math
-from novel_swarms.config.OutputTensorConfig import OutputTensorConfig
-from novel_swarms.config.defaults import ConfigurationDefaults
-from novel_swarms.novelty.GeneRule import GeneRule, GeneBuilder, GeneRuleContinuous
-from novel_swarms.novelty.evolve import main as evolve
-from novel_swarms.results.results import main as report
-from novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
-from novel_swarms.behavior.AverageSpeed import AverageSpeedBehavior
-from novel_swarms.behavior.GroupRotationBehavior import GroupRotationBehavior
-from novel_swarms.behavior.RadialVariance import RadialVarianceBehavior
-from novel_swarms.behavior.ScatterBehavior import ScatterBehavior
-from novel_swarms.sensors.BinaryFOVSensor import BinaryFOVSensor
-from novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
-from novel_swarms.sensors.SensorSet import SensorSet
-from novel_swarms.config.AgentConfig import DiffDriveAgentConfig
-from novel_swarms.config.WorldConfig import RectangularWorldConfig
-from novel_swarms.config.EvolutionaryConfig import GeneticEvolutionConfig
+from src.novel_swarms.config.OutputTensorConfig import OutputTensorConfig
+from src.novel_swarms.config.defaults import ConfigurationDefaults
+from src.novel_swarms.novelty.GeneRule import GeneRule, GeneBuilder, GeneRuleContinuous
+from src.novel_swarms.novelty.evolve import main as evolve
+from src.novel_swarms.results.results import main as report
+from src.novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
+from src.novel_swarms.behavior.AverageSpeed import AverageSpeedBehavior
+from src.novel_swarms.behavior.GroupRotationBehavior import GroupRotationBehavior
+from src.novel_swarms.behavior.RadialVariance import RadialVarianceBehavior
+from src.novel_swarms.behavior.ScatterBehavior import ScatterBehavior
+from src.novel_swarms.sensors.BinaryFOVSensor import BinaryFOVSensor
+from src.novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
+from src.novel_swarms.sensors.SensorSet import SensorSet
+from src.novel_swarms.config.AgentConfig import DiffDriveAgentConfig
+from src.novel_swarms.config.WorldConfig import RectangularWorldConfig
+from src.novel_swarms.config.EvolutionaryConfig import GeneticEvolutionConfig
 
 if __name__ == "__main__":
 

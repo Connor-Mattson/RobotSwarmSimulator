@@ -1,10 +1,10 @@
-from novel_swarms.behavior.PersistentHomology import PersistentHomology
-from novel_swarms.world.simulate import main as simulate
-from novel_swarms.behavior.ConvexHull import ConvexHull, InverseConvexHull
-from novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
-from novel_swarms.sensors.SensorSet import SensorSet
-from novel_swarms.config.AgentConfig import DiffDriveAgentConfig
-from novel_swarms.config.WorldConfig import RectangularWorldConfig
+from src.novel_swarms.behavior.PersistentHomology import PersistentHomology
+from src.novel_swarms.world.simulate import main as simulate
+from src.novel_swarms.behavior.ConvexHull import ConvexHull, InverseConvexHull
+from src.novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
+from src.novel_swarms.sensors.SensorSet import SensorSet
+from src.novel_swarms.config.AgentConfig import DiffDriveAgentConfig
+from src.novel_swarms.config.WorldConfig import RectangularWorldConfig
 
 if __name__ == "__main__":
     CYCLIC_PURSUIT_CONTROLLER = [0.7, 0.3, 1.0, 1.0]

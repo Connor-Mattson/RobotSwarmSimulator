@@ -23,7 +23,7 @@ class CircularCollider:
         dist_difference = (self.r + other.r) - dist_between_radii
         if dist_difference < 0:
             return None
-        correction_vector = ((other.v - self.v) / dist_between_radii) * (dist_difference + 0.01)
+        correction_vector = ((other.v - self.v) / (dist_between_radii + 0.001)) * (dist_difference + 0.01)
         return -correction_vector
 
     def dist(self, other):

@@ -191,6 +191,16 @@ class DifferentialDriveAgent(Agent):
     def build_collider(self):
         return CircularCollider(self.x_pos, self.y_pos, self.radius)
 
+    def simulate_error(self, err_type="Death"):
+        if err_type == "Death":
+            self.controller = [0 for _ in self.controller]
+            self.body_color = (255, 0, 0)
+            self.body_filled = True
+        elif err_type == "Divergence":
+            self.controller = [-(i + random.random()) for i in self.controller]
+            self.body_color = (255, 255, 0)
+            self.body_filled = True
+
     def get_aabb(self):
         """
         Return the Bounding Box of the agent

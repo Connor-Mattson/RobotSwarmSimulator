@@ -1,5 +1,5 @@
-from novel_swarms.config.defaults import ConfigurationDefaults
-from novel_swarms.novelty.NoveltyArchive import NoveltyArchive
+from src.novel_swarms.config.defaults import ConfigurationDefaults
+from src.novel_swarms.novelty.NoveltyArchive import NoveltyArchive
 from sklearn.manifold import TSNE
 import matplotlib
 import matplotlib.pyplot as plt

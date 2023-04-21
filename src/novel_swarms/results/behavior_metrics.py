@@ -7,7 +7,7 @@ from ..world.RectangularWorld import RectangularWorld
 def categorized_box_plot():
     print(os.getcwd())
 
-    from novel_swarms.util.datasets.DiffDriveDataset import DiffDriveDataset
+    from src.novel_swarms.util import DiffDriveDataset
 
     SAMPLE_SIZE = 20
     TIMESTEPS = 3000
@@ -79,7 +79,7 @@ def categorized_box_plot():
 
 
 def categorized_line_plot():
-    from novel_swarms.util.datasets.DiffDriveDataset import DiffDriveDataset
+    from src.novel_swarms.util import DiffDriveDataset
 
     SAMPLE_SIZE = 20
     TIMESTEPS = 4000

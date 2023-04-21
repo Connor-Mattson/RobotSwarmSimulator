@@ -18,7 +18,7 @@ DEPRECATED - Will not work in current configuration
 
 
 def main():
-    unknown_genomes = GenomeDataSet(file="../../data/unknown.csv")
+    unknown_genomes = GenomeDataSet(file="../../../data/unknown.csv")
     cyclic_genomes = DiffDriveDataset.CYCLIC_PURSUIT
     aggreg_genomes = DiffDriveDataset.AGGREGATION
     wall_follow_genomes = DiffDriveDataset.WALL_FOLLOWING

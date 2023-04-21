@@ -1,24 +1,24 @@
 import random
 import math
-from novel_swarms.sensors.AbstractSensor import AbstractSensor
-from novel_swarms.sensors.GenomeDependentSensor import GenomeBinarySensor
-from novel_swarms.sensors.StaticSensor import StaticSensor
-from novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
-from novel_swarms.behavior.AverageSpeed import AverageSpeedBehavior
-from novel_swarms.behavior.GroupRotationBehavior import GroupRotationBehavior
-from novel_swarms.behavior.RadialVariance import RadialVarianceBehavior
-from novel_swarms.behavior.ScatterBehavior import ScatterBehavior
-from novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
-from novel_swarms.behavior.DistanceToGoal import DistanceToGoal
-from novel_swarms.behavior.AgentsAtGoal import AgentsAtGoal, PercentageAtGoal
-from novel_swarms.world.goals.Goal import AreaGoal
-from novel_swarms.world.simulate import main as simulate
-from novel_swarms.sensors.BinaryFOVSensor import BinaryFOVSensor
-from novel_swarms.sensors.SensorSet import SensorSet
-from novel_swarms.config.AgentConfig import DiffDriveAgentConfig, StaticAgentConfig, UnicycleAgentConfig, LevyAgentConfig
-from novel_swarms.config.WorldConfig import RectangularWorldConfig
-from novel_swarms.config.HeterogenSwarmConfig import HeterogeneousSwarmConfig
-from novel_swarms.world.obstacles.Wall import Wall
+from src.novel_swarms.sensors.AbstractSensor import AbstractSensor
+from src.novel_swarms.sensors.GenomeDependentSensor import GenomeBinarySensor
+from src.novel_swarms.sensors.StaticSensor import StaticSensor
+from src.novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
+from src.novel_swarms.behavior.AverageSpeed import AverageSpeedBehavior
+from src.novel_swarms.behavior.GroupRotationBehavior import GroupRotationBehavior
+from src.novel_swarms.behavior.RadialVariance import RadialVarianceBehavior
+from src.novel_swarms.behavior.ScatterBehavior import ScatterBehavior
+from src.novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
+from src.novel_swarms.behavior.DistanceToGoal import DistanceToGoal
+from src.novel_swarms.behavior.AgentsAtGoal import AgentsAtGoal, PercentageAtGoal
+from src.novel_swarms.world.goals.Goal import AreaGoal
+from src.novel_swarms.world.simulate import main as simulate
+from src.novel_swarms.sensors.BinaryFOVSensor import BinaryFOVSensor
+from src.novel_swarms.sensors.SensorSet import SensorSet
+from src.novel_swarms.config.AgentConfig import DiffDriveAgentConfig, StaticAgentConfig, UnicycleAgentConfig, LevyAgentConfig
+from src.novel_swarms.config.WorldConfig import RectangularWorldConfig
+from src.novel_swarms.config.HeterogenSwarmConfig import HeterogeneousSwarmConfig
+from src.novel_swarms.world.obstacles.Wall import Wall
 import numpy as np
 
 if __name__ == "__main__":

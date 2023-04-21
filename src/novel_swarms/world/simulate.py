@@ -6,7 +6,7 @@ from ..util.timer import Timer
 screen = None
 FRAMERATE = 200
 
-def main(world_config, show_gui=True, gui=None, stop_detection=None, step_size=1):
+def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_events=False, step_size=1):
     # initialize the pygame module
     if show_gui:
         pygame.init()
@@ -79,6 +79,8 @@ def main(world_config, show_gui=True, gui=None, stop_detection=None, step_size=1
                         steps_per_frame = round(steps_per_frame)
                     if event.key == pygame.K_w:
                         draw_world = not draw_world
+                    if world_key_events:
+                        world.handle_key_press(event)
                     if event.key in labels:
                         return event.key, steps_taken
 

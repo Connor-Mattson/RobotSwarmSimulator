@@ -1,10 +1,15 @@
+import warnings
 from multiprocessing import Pool
 from novel_swarms.world.simulate import main as sim
 
 
 def simulate(world_config, terminate_function, show_gui=False):
-    world = sim(world_config, show_gui=show_gui, stop_detection=terminate_function, step_size=5)
-    return world
+    try:
+        world = sim(world_config, show_gui=show_gui, stop_detection=terminate_function, step_size=5)
+        return world
+    except Exception as e:
+        warnings.WarningMessage("World could not be simulated: " + str(e))
+    return None
 
 class MultiWorldSimulation:
     """

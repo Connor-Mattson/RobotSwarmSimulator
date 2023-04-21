@@ -1,10 +1,10 @@
-from novel_swarms.config.AgentConfig import DiffDriveAgentConfig
-from novel_swarms.config.WorldConfig import RectangularWorldConfig
-from novel_swarms.config.defaults import ConfigurationDefaults
-from novel_swarms.novelty.NoveltyArchive import NoveltyArchive
-from novel_swarms.results.results import main as report
-from novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
-from novel_swarms.sensors.SensorSet import SensorSet
+from src.novel_swarms.config.AgentConfig import DiffDriveAgentConfig
+from src.novel_swarms.config.WorldConfig import RectangularWorldConfig
+from src.novel_swarms.config.defaults import ConfigurationDefaults
+from src.novel_swarms.novelty.NoveltyArchive import NoveltyArchive
+from src.novel_swarms.results.results import main as report
+from src.novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
+from src.novel_swarms.sensors.SensorSet import SensorSet
 
 if __name__ == "__main__":
 

@@ -1,10 +1,10 @@
 
 import random
-from novel_swarms.config.WorldConfig import RectangularWorldConfig
-from novel_swarms.world.WorldFactory import WorldFactory
-from novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
-from novel_swarms.sensors.SensorSet import SensorSet
-from novel_swarms.config.AgentConfig import DiffDriveAgentConfig
+from src.novel_swarms.config.WorldConfig import RectangularWorldConfig
+from src.novel_swarms.world.WorldFactory import WorldFactory
+from src.novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
+from src.novel_swarms.sensors.SensorSet import SensorSet
+from src.novel_swarms.config.AgentConfig import DiffDriveAgentConfig
 
 def test_A():
     SEED = 1

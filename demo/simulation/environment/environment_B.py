@@ -1,18 +1,18 @@
-from novel_swarms.behavior.AgentsAtGoal import AgentsAtGoal, PercentageAtGoal
-from novel_swarms.sensors.AbstractSensor import AbstractSensor
-from novel_swarms.sensors.GenomeDependentSensor import GenomeBinarySensor
-from novel_swarms.sensors.StaticSensor import StaticSensor
-from novel_swarms.world.simulate import main as simulate
-from novel_swarms.behavior.DistanceToGoal import DistanceToGoal
-from novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
-from novel_swarms.sensors.BinaryFOVSensor import BinaryFOVSensor
-from novel_swarms.sensors.SensorSet import SensorSet
-from novel_swarms.config.AgentConfig import MazeAgentConfig
-from novel_swarms.config.WorldConfig import RectangularWorldConfig
-from novel_swarms.world.generation.Maze import Maze
-from novel_swarms.world.goals.Goal import AreaGoal
+from src.novel_swarms.behavior.AgentsAtGoal import AgentsAtGoal, PercentageAtGoal
+from src.novel_swarms.sensors.AbstractSensor import AbstractSensor
+from src.novel_swarms.sensors.GenomeDependentSensor import GenomeBinarySensor
+from src.novel_swarms.sensors.StaticSensor import StaticSensor
+from src.novel_swarms.world.simulate import main as simulate
+from src.novel_swarms.behavior.DistanceToGoal import DistanceToGoal
+from src.novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
+from src.novel_swarms.sensors.BinaryFOVSensor import BinaryFOVSensor
+from src.novel_swarms.sensors.SensorSet import SensorSet
+from src.novel_swarms.config.AgentConfig import MazeAgentConfig
+from src.novel_swarms.config.WorldConfig import RectangularWorldConfig
+from src.novel_swarms.world.generation.Maze import Maze
+from src.novel_swarms.world.goals.Goal import AreaGoal
 import numpy as np
-from novel_swarms.world.obstacles.Wall import Wall
+from src.novel_swarms.world.obstacles.Wall import Wall
 
 if __name__ == "__main__":
 

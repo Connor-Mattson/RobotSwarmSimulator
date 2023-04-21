@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "novel_swarms"
+version = "0.1.1-alpha"
+authors = [
+  { name="Connor Mattson", email="c.mattson@utah.edu" },
+]
+description = "A Swarm Simulation Package"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/Connor-Mattson/RobotSwarmSimulator"
+"Bug Tracker" = "https://github.com/Connor-Mattson/RobotSwarmSimulator/issues"

@@ -1,14 +1,14 @@
-from novel_swarms.world.simulate import main as simulate
-from novel_swarms.behavior.ConvexHull import ConvexHull, InverseConvexHull
-from novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
-from novel_swarms.sensors.SensorSet import SensorSet
-from novel_swarms.config.AgentConfig import DiffDriveAgentConfig
-from novel_swarms.config.WorldConfig import RectangularWorldConfig
+from src.novel_swarms.world.simulate import main as simulate
+from src.novel_swarms.behavior.ConvexHull import ConvexHull, InverseConvexHull
+from src.novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
+from src.novel_swarms.sensors.SensorSet import SensorSet
+from src.novel_swarms.config.AgentConfig import DiffDriveAgentConfig
+from src.novel_swarms.config.WorldConfig import RectangularWorldConfig
 
 if __name__ == "__main__":
 
-    CYCLIC_PURSUIT_CONTROLLER = [0.73, 1.0, 0.4, 0.5]
-    SEED = 1
+    CYCLIC_PURSUIT_CONTROLLER = [0.7, 0.6, -0.0, 0.4]
+    SEED = 3
 
     sensors = SensorSet([
         BinaryLOSSensor(angle=0),
@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
     world_config = RectangularWorldConfig(
         size=(500, 500),
-        n_agents=12,
+        n_agents=24,
         seed=SEED,
         behavior=behavior,
         agentConfig=agent_config,

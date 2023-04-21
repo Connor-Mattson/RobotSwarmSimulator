@@ -29,6 +29,9 @@ class World():
     def draw(self, screen):
         pass
 
+    def handle_key_press(self, event):
+        pass
+
     def attach_gui(self, gui: AbstractGUI):
         self.gui = gui
 

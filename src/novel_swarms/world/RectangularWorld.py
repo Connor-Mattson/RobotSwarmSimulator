@@ -30,6 +30,8 @@ class RectangularWorld(World):
         self.objects = config.objects
         self.goals = config.goals
         self.seed = config.seed
+        self.selected = None
+
         if config.seed is not None:
             # print(f"World Instantiated with Seed: {config.seed}")
             # print(f"TESTING RAND: {random.random()}")
@@ -146,13 +148,16 @@ class RectangularWorld(World):
         neighborhood = self.getNeighborsWithinDistance(pos, self.population[0].radius)
 
         # Remove Highlights from all agents
-        for n in self.population:
-            n.is_highlighted = False
+        if self.selected is not None:
+            self.selected.is_highlighted = False
 
-        if self.gui is not None and len(neighborhood) == 0:
-            self.gui.set_selected(None)
+        if len(neighborhood) == 0:
+            self.selected = None
+            if self.gui is not None:
+                self.gui.set_selected(None)
             return
 
+        self.selected = neighborhood[0]
         if self.gui is not None:
             self.gui.set_selected(neighborhood[0])
             neighborhood[0].is_highlighted = True
@@ -345,3 +350,12 @@ class RectangularWorld(World):
 
     def removeAgent(self, agent):
         self.population.remove(agent)
+
+    def handle_key_press(self, event):
+        if self.selected is not None:
+            if event.key == pygame.K_l:
+                self.selected.simulate_error("Death")
+            if event.key == pygame.K_o:
+                self.selected.simulate_error("Divergence")
+            if event.key == pygame.K_p:
+                self.removeAgent(self.selected)
