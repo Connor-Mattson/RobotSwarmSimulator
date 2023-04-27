@@ -9,8 +9,8 @@ from src.novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
 from src.novel_swarms.sensors.SensorSet import SensorSet
 from src.novel_swarms.config.AgentConfig import DiffDriveAgentConfig
 from src.novel_swarms.config.WorldConfig import RectangularWorldConfig
-from src.src.novel_swarms.util import Timer
-from src.src.novel_swarms.util import MultiWorldSimulation
+from src.novel_swarms.util import Timer
+from src.novel_swarms.util import MultiWorldSimulation
 import matplotlib.pyplot as plt
 
 
