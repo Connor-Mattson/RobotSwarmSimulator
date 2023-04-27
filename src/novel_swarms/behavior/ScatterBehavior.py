@@ -4,10 +4,11 @@ from .AbstractBehavior import AbstractBehavior
 
 
 class ScatterBehavior(AbstractBehavior):
-    def __init__(self, history=100):
+    def __init__(self, history=100, regularize=True):
         super().__init__(name="Scatter", history_size=history)
         self.population = None
         self.world_radius = 0
+        self.regularize = regularize
 
     def attach_world(self, world):
         self.population = world.population
@@ -23,10 +24,17 @@ class ScatterBehavior(AbstractBehavior):
         for agent in self.population:
             x_i = agent.getPosition()
 
-            distance = np.linalg.norm(x_i - mew) ** 2
+            if self.regularize:
+                distance = np.linalg.norm(x_i - mew) ** 2
+            else:
+                distance = np.linalg.norm(x_i - mew)
             distance_list.append(distance)
 
-        scatter = sum(distance_list) / (r * r * n)
+        if self.regularize:
+            scatter = sum(distance_list) / (r * r * n)
+        else:
+            scatter = sum(distance_list) / n
+
         self.set_value(scatter)
 
     def center_of_mass(self):

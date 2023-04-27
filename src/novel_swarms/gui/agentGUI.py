@@ -70,6 +70,8 @@ class DifferentialDriveGUI(AbstractGUI):
                         self.appendTextToGUI(screen, "{} : {:0.3f}".format(out[0], out[1]))
                     except ValueError as e:
                         pass
+                    except Exception as e:
+                        self.appendTextToGUI(screen, "{} : {}".format(out[0], out[1]))
 
         else:
             print("NO FONT")

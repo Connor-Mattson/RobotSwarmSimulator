@@ -30,7 +30,9 @@ class RectangularWorld(World):
         self.objects = config.objects
         self.goals = config.goals
         self.seed = config.seed
+
         self.selected = None
+        self.highlighted_set = []
 
         if config.seed is not None:
             # print(f"World Instantiated with Seed: {config.seed}")
@@ -349,6 +351,7 @@ class RectangularWorld(World):
         return behavior
 
     def removeAgent(self, agent):
+        agent.deleted = True
         self.population.remove(agent)
 
     def handle_key_press(self, event):
@@ -359,3 +362,13 @@ class RectangularWorld(World):
                 self.selected.simulate_error("Divergence")
             if event.key == pygame.K_p:
                 self.removeAgent(self.selected)
+            if event.key == pygame.K_a:
+                COLORS = [(247, 146, 86), (146, 220, 229), (235, 185, 223), (251, 209, 162), (99, 105, 209)]
+                self.selected.body_color = COLORS[len(self.highlighted_set) % len(COLORS)]
+                self.selected.is_highlighted = True
+                self.highlighted_set.append(self.selected)
+        if event.key == pygame.K_c:
+            for agent in self.highlighted_set:
+                agent.is_highlighted = False
+                agent.body_color = agent.config.body_color
+            self.highlighted_set = []

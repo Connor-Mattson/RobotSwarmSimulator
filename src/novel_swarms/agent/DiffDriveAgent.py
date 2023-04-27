@@ -44,8 +44,10 @@ class DifferentialDriveAgent(Agent):
         self.wheel_radius = config.wheel_radius
         self.dt = config.dt
         self.is_highlighted = False
+        self.deleted = False
         self.body_filled = config.body_filled
         self.agent_in_sight = None
+        self.config = config
 
         # Set Trace Settings if a trace was assigned to this object.
         self.trace = config.trace_length is not None
@@ -197,8 +199,8 @@ class DifferentialDriveAgent(Agent):
             self.body_color = (255, 0, 0)
             self.body_filled = True
         elif err_type == "Divergence":
-            self.controller = [-(i + random.random()) for i in self.controller]
-            self.body_color = (255, 255, 0)
+            self.controller = [1, 1, 1, 1]
+            self.body_color = (255, 0, 0)
             self.body_filled = True
 
     def get_aabb(self):

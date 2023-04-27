@@ -6,10 +6,12 @@ from typing import List
 
 
 class BinaryLOSSensor(AbstractSensor):
-    def __init__(self, parent=None, angle=None, draw=True):
+    def __init__(self, parent=None, angle=None, draw=True, history_length=50):
         super(BinaryLOSSensor, self).__init__(parent=parent, draw=draw)
         self.current_state = 0
         self.angle = angle
+        self.history = []
+        self.hist_len = history_length
 
     def checkForLOSCollisions(self, world) -> None:
         sensor_position = self.parent.getPosition()
@@ -20,21 +22,24 @@ class BinaryLOSSensor(AbstractSensor):
         d_hat = d / np.linalg.norm(d)
 
         # Check seen agent from last frame first, to avoid expensive computation
-        if self.parent.agent_in_sight is not None:
+        if self.parent.agent_in_sight is not None and not self.parent.agent_in_sight.deleted:
             agent = self.parent.agent_in_sight
             if self.agent_in_sight(agent, p_0, d_hat):
                 self.parent.agent_in_sight = agent
                 self.current_state = 1
+                self.add_to_history(self.current_state)
                 return
 
         for agent in world.population:
             if self.agent_in_sight(agent, p_0, d_hat):
                 self.parent.agent_in_sight = agent
                 self.current_state = 1
+                self.add_to_history(self.current_state)
                 return
 
         self.parent.agent_in_sight = None
         self.current_state = 0
+        self.add_to_history(self.current_state)
 
     def agent_in_sight(self, agent, p_0, d_hat):
         if agent == self.parent:
@@ -93,3 +98,8 @@ class BinaryLOSSensor(AbstractSensor):
         if self.angle is None:
             return self.parent.getFrontalPoint()
         return self.parent.x_pos + math.cos(self.angle + self.parent.angle), self.parent.y_pos + math.sin(self.angle + self.parent.angle)
+
+    def add_to_history(self, value):
+        if len(self.history) > self.hist_len:
+            self.history = self.history[1:]
+        self.history.append(value)
