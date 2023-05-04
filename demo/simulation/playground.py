@@ -31,8 +31,8 @@ if __name__ == "__main__":
     # CUSTOM_GENOME = [0.2, 0.7, -0.5, -0.1]  # Dispersal
     # CUSTOM_GENOME = [0.8, 1.0, 0.5, 0.6]  # Milling
     # CUSTOM_GENOME = [1.0, 0.95, 1.0, 1.0]  # Wall Following
-    CUSTOM_GENOME = [-0.8, -0.7, 0.2, -0.5]  # Random
-    # CUSTOM_GENOME = [-0.8, -0.7, -0.7,  1. ]
+    # CUSTOM_GENOME = [-0.8, -0.7, 0.2, -0.5]  # Random
+    CUSTOM_GENOME = [0.5118773770184124, 0.12775717006510645, 0.2612236621699462, 0.5507791161133743]
 
     SEED = None
 
@@ -53,8 +53,8 @@ if __name__ == "__main__":
         controller=CUSTOM_GENOME,
         sensors=sensors,
         trace_length=0,
-        agent_radius=12,
-        wheel_radius=1,
+        agent_radius=7,
+        # wheel_radius=1,
         # body_color="Random",
         body_filled=True,
     )
@@ -74,7 +74,7 @@ if __name__ == "__main__":
         behavior=behavior,
         agentConfig=agent_config,
         padding=15,
-        stop_at=None
+        stop_at=None,
     )
 
     simulate(world_config=world_config)

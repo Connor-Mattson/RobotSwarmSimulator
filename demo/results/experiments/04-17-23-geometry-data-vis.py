@@ -101,7 +101,8 @@ if __name__ == "__main__":
         y = np.divide(wall_f_ds[Y_FIELD], wall_f_ds[X_FIELD]) if DIVIDE_X_BY_Y else y
         ax.scatter(x, y, z, c='purple', label="Wall Following")
 
-
+        total_size = len(wall_f_ds) + len(milling_ds) + len(dispersal_ds) + len(aggregation_ds) + len(cyclic_ds)
+        print(f"Total Controllers: {total_size}")
 
         plt.xlabel("Hull Area")
         plt.ylabel("Internal Frame Area")

@@ -1,86 +1,184 @@
 import cma
 import numpy as np
+from src.novel_swarms.util.processing.multicoreprocessing import MultiWorldSimulation
+from src.novel_swarms.world.simulate import main as sim
 
-# class CMAES:
-#     def __init__(self):
-#         pass
-    
-def test_optim(x):
-    return np.linalg.norm(np.array(x) - np.array([100, 20]))
+class CMAES:
+    def __init__(self,
+                 f=None,
+                 genome_to_world=None,
+                 init_genome=None,
+                 init_sigma=None,
+                 pop_size=10,
+                 bounds=None,
+                 target=0.0,
+                 num_processes=1,
+                 stop_detection_method=None,
+                 show_each_step=False):
+        self.f = f
+        self.g_to_w = genome_to_world
+        self.x0 = init_genome
+        self.s0 = init_sigma
+        self.pop = pop_size
+        self.bounds = bounds
+        self.target = target
+        self.n_processes = num_processes
+        self.w_stop_method = stop_detection_method
+        self.solution_set = {}
+        self.show_steps = show_each_step
 
-def stop_detection_method(world):
-    EPSILON = 0.001
-    if world.total_steps > 100 and world.behavior[2].out_average()[1] < EPSILON:
-        return True
-    return False
+    def minimize(self):
+        opts = {'popsize': self.pop, 'bounds': self.bounds, 'ftarget': self.target, }
+        es = cma.CMAEvolutionStrategy(self.x0, self.s0, opts)
+        while not es.stop():
+            solutions = self.ask_for_genomes(es)
+            es.tell(solutions, [self.pull_from_solution_set(s) for s in solutions])
+            es.disp()
+            if self.show_steps:
+                print(f"Current Best: {es.best.x}")
+                sim(self.g_to_w(es.best.x)[0], show_gui=True, stop_detection=self.w_stop_method, step_size=10)
 
-def get_world(n, controller):
-    from src.novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
-    from src.novel_swarms.behavior.AverageSpeed import AverageSpeedBehavior
-    from src.novel_swarms.behavior.GroupRotationBehavior import GroupRotationBehavior
-    from src.novel_swarms.behavior.RadialVariance import RadialVarianceBehavior
-    from src.novel_swarms.behavior.ScatterBehavior import ScatterBehavior
-    from src.novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
-    from src.novel_swarms.sensors.SensorSet import SensorSet
-    from src.novel_swarms.config.AgentConfig import DiffDriveAgentConfig
-    from src.novel_swarms.config.WorldConfig import RectangularWorldConfig
+        es.result_pretty()
+        return es.result, es
 
+    def ask_for_genomes(self, es):
+        parameters = es.ask()
+        configs = [self.g_to_w(parameter) for parameter in parameters]
+        processor = MultiWorldSimulation(pool_size=self.n_processes, single_step=False, with_gui=False)
 
-    sensors = SensorSet([
-        BinaryLOSSensor(angle=0),
-    ])
-    agent_config = DiffDriveAgentConfig(
-        controller=controller,
-        sensors=sensors,
-        seed=1,
-    )
-    behavior = [
-        AverageSpeedBehavior(),
-        AngularMomentumBehavior(),
-        RadialVarianceBehavior(),
-        ScatterBehavior(),
-        GroupRotationBehavior(),
-    ]
+        batched_worlds = isinstance(configs[0], list)
 
-    world_config = RectangularWorldConfig(
-        size=(500, 500),
-        n_agents=n,
-        seed=1,
-        behavior=behavior,
-        agentConfig=agent_config,
-        padding=15,
-        stop_at=1000,
-    ) 
-    return world_config
+        # Blocking MultiProcess Execution
+        ret = processor.execute(configs, world_stop_condition=self.w_stop_method, batched=batched_worlds)
+        for world in ret:
+            _key = world[0].meta["hash"] if batched_worlds else world.meta["hash"]
+            self.solution_set[_key] = self.f(world)
 
-def simulator_optim(x):
-    N = round(x[0])
-    controller = x[1:]
-    wc = get_world(N, controller)
-    
-    from src.novel_swarms.world.simulate import main as sim
-    world = sim(wc, show_gui=True, stop_detection=stop_detection_method, step_size=10)
-    return world.behavior[2].out_average()[1] + (world.total_steps / 1000)
-    
+        return parameters
+
+    def pull_from_solution_set(self, x):
+        fetch_key = hash(tuple(list(x)))
+        retrieval = None
+        if fetch_key in self.solution_set:
+            retrieval = self.solution_set[fetch_key]
+
+        if retrieval is None:
+            wc = self.g_to_w(x)
+            world = sim(wc, show_gui=True, stop_detection=self.w_stop_method, step_size=10)
+            return self.f(world)
+        else:
+            return retrieval
+
 def example_A():
-    fun = test_optim  # we could use `functools.partial(cma.ff.elli, cond=1e4)` to change the condition number to 1e
-    x0 = 2 * [2]  # initial solution
-    sigma0 = 1    # initial standard deviation to sample new solutions
+    """
+    Example: Find a Cyclic Pursuit Controller (A Controller where radial variance => 0)
+    """
+    def fitness(world):
+        return world.behavior[2].out_average()[1]
 
-    xopt, es = cma.fmin2(fun, x0, sigma0, {'bounds': [[None, None], None]})
-    return xopt, es
+    def get_world(genome):
+        from src.novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
+        from src.novel_swarms.behavior.AverageSpeed import AverageSpeedBehavior
+        from src.novel_swarms.behavior.GroupRotationBehavior import GroupRotationBehavior
+        from src.novel_swarms.behavior.RadialVariance import RadialVarianceBehavior
+        from src.novel_swarms.behavior.ScatterBehavior import ScatterBehavior
+        from src.novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
+        from src.novel_swarms.sensors.SensorSet import SensorSet
+        from src.novel_swarms.config.AgentConfig import DiffDriveAgentConfig
+        from src.novel_swarms.config.WorldConfig import RectangularWorldConfig
+
+        controller = genome
+        sensors = SensorSet([
+            BinaryLOSSensor(angle=0),
+        ])
+        agent_config = DiffDriveAgentConfig(
+            controller=controller,
+            sensors=sensors,
+            seed=1,
+        )
+        behavior = [
+            AverageSpeedBehavior(),
+            AngularMomentumBehavior(),
+            RadialVarianceBehavior(),
+            ScatterBehavior(),
+            GroupRotationBehavior(),
+        ]
+
+        world_config = RectangularWorldConfig(
+            size=(500, 500),
+            n_agents=15,
+            seed=1,
+            behavior=behavior,
+            agentConfig=agent_config,
+            padding=15,
+            stop_at=1000,
+            metadata={'hash': hash(tuple(list(genome)))}
+        )
+        return [world_config]
+
+    bounds = [[-1.0, -1.0, -1.0, -1.0], [1.0, 1.0, 1.0, 1.0]]
+    optim = CMAES(f=fitness, genome_to_world=get_world, init_sigma=0.5, init_genome=[0.0, 0.0, 0.0, 0.0], pop_size=20, num_processes=12, bounds=bounds, target=0.001)
+    c, _ = optim.minimize()
+    return c
 
 def example_B():
-    fun = simulator_optim  # we could use `functools.partial(cma.ff.elli, cond=1e4)` to change the condition number to 1e
+    """
+    To allow for double summations, you can batch process worlds for one genome. In this example, we seek to find a cyclic pursuit controller that
+    is minimized over 10 different seeds.
+    """
+    def fitness(world_set):
+        total = 0
+        for w in world_set:
+            total += w.behavior[2].out_average()[1]
+        return total / len(world_set)
 
-    # Decision Variables
-    x0 = [10, 0.0, 0.0, 0.0, 0.0]
-    sigma0 = 1    # initial standard deviation to sample new solutions
-    lower_constraints = [2, -1, -1, -1, -1]
-    upper_constraints = [30, 1, 1, 1, 1]
+    def get_world(genome):
+        from src.novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
+        from src.novel_swarms.behavior.AverageSpeed import AverageSpeedBehavior
+        from src.novel_swarms.behavior.GroupRotationBehavior import GroupRotationBehavior
+        from src.novel_swarms.behavior.RadialVariance import RadialVarianceBehavior
+        from src.novel_swarms.behavior.ScatterBehavior import ScatterBehavior
+        from src.novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
+        from src.novel_swarms.sensors.SensorSet import SensorSet
+        from src.novel_swarms.config.AgentConfig import DiffDriveAgentConfig
+        from src.novel_swarms.config.WorldConfig import RectangularWorldConfig
 
-    xopt, es = cma.fmin2(fun, x0, sigma0, {'bounds': [lower_constraints, upper_constraints]})
-    return xopt, es
+        worlds = []
+        for seed in range(10):
+            controller = genome
+            sensors = SensorSet([
+                BinaryLOSSensor(angle=0),
+            ])
+            agent_config = DiffDriveAgentConfig(
+                controller=controller,
+                sensors=sensors,
+                seed=seed,
+            )
+            behavior = [
+                AverageSpeedBehavior(),
+                AngularMomentumBehavior(),
+                RadialVarianceBehavior(),
+                ScatterBehavior(),
+                GroupRotationBehavior(),
+            ]
+
+            world_config = RectangularWorldConfig(
+                size=(500, 500),
+                n_agents=15,
+                seed=1,
+                behavior=behavior,
+                agentConfig=agent_config,
+                padding=15,
+                stop_at=1000,
+                metadata={'hash': hash(tuple(list(genome)))}
+            )
+            worlds.append(world_config)
+        return worlds
+
+    bounds = [[-1.0, -1.0, -1.0, -1.0], [1.0, 1.0, 1.0, 1.0]]
+    optim = CMAES(f=fitness, genome_to_world=get_world, init_sigma=0.25, init_genome=[0.0, 0.0, 0.0, 0.0], pop_size=20, num_processes=12, bounds=bounds, target=0.001)
+    c, _ = optim.minimize()
+    return c
 
 if __name__ == "__main__":
     print(example_B())

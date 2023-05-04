@@ -1,6 +1,6 @@
 import warnings
 from multiprocessing import Pool
-from novel_swarms.world.simulate import main as sim
+from src.novel_swarms.world.simulate import main as sim
 
 
 def simulate(world_config, terminate_function, show_gui=False):
@@ -10,6 +10,12 @@ def simulate(world_config, terminate_function, show_gui=False):
     except Exception as e:
         warnings.WarningMessage("World could not be simulated: " + str(e))
     return None
+
+def simulate_batch(world_config_list, terminate_function, show_gui=False):
+    ret = []
+    for w in world_config_list:
+        ret.append(simulate(w, terminate_function, show_gui=False))
+    return ret
 
 class MultiWorldSimulation:
     """
@@ -21,7 +27,7 @@ class MultiWorldSimulation:
         self.with_gui = with_gui
         self.pool_size = pool_size
 
-    def execute(self, world_setup: list, world_stop_condition=None):
+    def execute(self, world_setup: list, world_stop_condition=None, batched=False):
 
         if not world_setup:
             raise Exception("No world_setup list provided to execute.")
@@ -29,10 +35,13 @@ class MultiWorldSimulation:
         ret = []
         if not self.single_step:
             with Pool(self.pool_size) as pool:
-                ret = pool.starmap(simulate, zip(world_setup, [world_stop_condition for _ in world_setup]))
+                ret = pool.starmap(simulate_batch if batched else simulate, zip(world_setup, [world_stop_condition for _ in world_setup]))
         else:
             for w in world_setup:
-                print(w.agentConfig.controller)
-                ret.append(simulate(w, world_stop_condition, show_gui=self.with_gui))
-
+                if batched:
+                    ret.append(simulate_batch(w, world_stop_condition, show_gui=self.with_gui))
+                else:
+                    print(w.agentConfig.controller)
+                    ret.append(simulate(w, world_stop_condition, show_gui=self.with_gui))
         return ret
+

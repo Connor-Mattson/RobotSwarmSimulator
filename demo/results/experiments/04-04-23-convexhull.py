@@ -7,8 +7,8 @@ from src.novel_swarms.config.WorldConfig import RectangularWorldConfig
 
 if __name__ == "__main__":
 
-    CYCLIC_PURSUIT_CONTROLLER = [0.7, 0.6, -0.0, 0.4]
-    SEED = 3
+    CYCLIC_PURSUIT_CONTROLLER = [0.997247279200574, -0.23837063228493535, 0.9741522015725631, 0.9892832036595993]
+    SEED = 1
 
     sensors = SensorSet([
         BinaryLOSSensor(angle=0),

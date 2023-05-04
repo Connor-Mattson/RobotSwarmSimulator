@@ -4,7 +4,7 @@ from src.novel_swarms.behavior.AgentsAtGoal import AgentsAtGoal, PercentageAtGoa
 from src.novel_swarms.behavior.DistanceToGoal import DistanceToGoal
 from src.novel_swarms.sensors.BinaryFOVSensor import BinaryFOVSensor
 from src.novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
-from src.src.novel_swarms.util import MultiWorldSimulation
+from src.novel_swarms.util.processing.multicoreprocessing import MultiWorldSimulation
 from src.novel_swarms.world.goals.Goal import AreaGoal
 from src.novel_swarms.world.obstacles.Wall import Wall
 from src.novel_swarms.world.simulate import main as sim
@@ -13,7 +13,7 @@ from src.novel_swarms.behavior.ConvexHull import ConvexHull, InverseConvexHull
 from src.novel_swarms.sensors.SensorSet import SensorSet
 from src.novel_swarms.config.AgentConfig import DiffDriveAgentConfig, UnicycleAgentConfig, LevyAgentConfig, MazeAgentConfig
 from src.novel_swarms.config.WorldConfig import RectangularWorldConfig
-from src.src.novel_swarms.util import Timer
+from src.novel_swarms.util.timer import Timer
 import matplotlib.pyplot as plt
 from pandas import DataFrame
 

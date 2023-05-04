@@ -8,6 +8,7 @@ from .Agent import Agent
 from ..config.AgentConfig import MazeAgentConfig
 from ..sensors.GenomeDependentSensor import GenomeBinarySensor
 from ..util.collider.AABB import AABB
+from ..util.collider.CircularCollider import CircularCollider
 from ..util.timer import Timer
 
 
@@ -49,6 +50,8 @@ class MazeAgent(Agent):
         self.i_1 = np.random.normal(I1_MEAN, I1_SD) if self.idiosyncrasies else 1.0
         self.i_2 = np.random.normal(I2_MEAN, I2_SD) if self.idiosyncrasies else 1.0
         self.stop_on_collision = config.stop_on_collision
+        self.stop_at_goal = config.stop_at_goal
+        self.config = config
 
         self.sensors = deepcopy(config.sensors)
         for sensor in self.sensors:
@@ -62,6 +65,7 @@ class MazeAgent(Agent):
             self.body_color = self.get_random_color()
         else:
             self.body_color = config.body_color
+        print(self.body_color)
 
     def set_seed(self, seed):
         random.seed(seed)
@@ -75,7 +79,10 @@ class MazeAgent(Agent):
         super().step()
 
         if world.goals and world.goals[0].agent_achieved_goal(self) or self.detection_id == 2:
-            v, omega = 0, 0
+            if self.stop_at_goal:
+                v, omega = 0, 0
+            else:
+                v, omega = self.interpretSensors()
             self.detection_id = 2
             self.set_color_by_id(3)
         else:
@@ -104,8 +111,7 @@ class MazeAgent(Agent):
         if check_for_world_boundaries is not None:
             check_for_world_boundaries(self)
 
-        if check_for_agent_collisions is not None:
-            check_for_agent_collisions(self)
+        self.handle_collisions(world)
 
         # Calculate the 'real' dx, dy after collisions have been calculated.
         # This is what we use for velocity in our equations
@@ -150,7 +156,7 @@ class MazeAgent(Agent):
 
     def set_color_by_id(self, id):
         if id == 0:
-            self.body_color = (255, 255, 255)
+            self.body_color = self.config.body_color
         elif id == 2:
             self.body_color = (255, 255, 0)
             self.body_filled = True
@@ -164,6 +170,29 @@ class MazeAgent(Agent):
             rand_color = np.random.choice(256, 3)
         return rand_color
 
+    def handle_collisions(self, world):
+        collisions = True
+        attempts = 0
+        while collisions and attempts < 10:
+            collisions = False
+            attempts += 1
+            collider = self.build_collider()
+            agent_set = world.getAgentsMatchingYRange(self.get_aabb())
+            for agent in agent_set:
+                if agent.name == self.name:
+                    continue
+                if self.get_aabb().intersects(agent.get_aabb()):
+                    self.get_aabb().toggle_intersection()
+                    correction = collider.collision_then_correction(agent.build_collider())
+                    if correction is not None:
+                        self.x_pos += correction[0]
+                        self.y_pos += correction[1]
+                        collisions = True
+                        break
+
+    def build_collider(self):
+        return CircularCollider(self.x_pos, self.y_pos, self.radius)
+
     def debug_draw(self, screen):
         self.get_aabb().draw(screen)
 
@@ -174,6 +203,8 @@ class MazeAgent(Agent):
         top_left = (self.x_pos - self.radius, self.y_pos - self.radius)
         bottom_right = (self.x_pos + self.radius, self.y_pos + self.radius)
         return AABB(top_left, bottom_right)
+
+
 
     def __str__(self) -> str:
         return "(x: {}, y: {}, r: {}, θ: {})".format(self.x_pos, self.y_pos, self.radius, self.angle)

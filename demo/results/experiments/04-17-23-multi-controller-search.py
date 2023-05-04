@@ -1,4 +1,4 @@
-from src.src.novel_swarms.util import MultiWorldSimulation
+from src.novel_swarms.util.processing.multicoreprocessing import MultiWorldSimulation
 from src.novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
 from src.novel_swarms.behavior.AverageSpeed import AverageSpeedBehavior
 from src.novel_swarms.behavior.GroupRotationBehavior import GroupRotationBehavior

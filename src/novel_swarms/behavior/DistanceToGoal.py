@@ -3,6 +3,7 @@ import math
 import numpy as np
 from typing import List
 from .AbstractBehavior import AbstractBehavior
+from src.novel_swarms.world.goals.Goal import CylinderGoal, AreaGoal
 
 class DistanceToGoal(AbstractBehavior):
 
@@ -34,9 +35,12 @@ class DistanceToGoal(AbstractBehavior):
     def calc_dist_to_goal(self, agent, goal):
         if goal.agent_achieved_goal(agent):
             return 0.0
-        a_pos = [agent.x_pos, agent.y_pos]
-        goal_positions = [goal.rect.topleft, goal.rect.topright, goal.rect.bottomleft, goal.rect.bottomright]
-        dist_squared = []
-        for x, y in goal_positions:
-            dist_squared.append((x - a_pos[0]) ** 2 + (y - a_pos[1]) ** 2)
-        return math.sqrt(min(dist_squared))
+        if isinstance(goal, AreaGoal):
+            a_pos = [agent.x_pos, agent.y_pos]
+            goal_positions = [goal.rect.topleft, goal.rect.topright, goal.rect.bottomleft, goal.rect.bottomright]
+            dist_squared = []
+            for x, y in goal_positions:
+                dist_squared.append((x - a_pos[0]) ** 2 + (y - a_pos[1]) ** 2)
+            return math.sqrt(min(dist_squared))
+        elif isinstance(goal, CylinderGoal):
+            return np.linalg.norm(agent.getPosition() - np.array(goal.center))

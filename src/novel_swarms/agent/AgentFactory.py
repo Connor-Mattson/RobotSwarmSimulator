@@ -1,9 +1,10 @@
-from ..config.AgentConfig import DiffDriveAgentConfig, UnicycleAgentConfig, MazeAgentConfig, StaticAgentConfig, LevyAgentConfig
+from ..config.AgentConfig import DiffDriveAgentConfig, UnicycleAgentConfig, MazeAgentConfig, StaticAgentConfig, LevyAgentConfig, DroneAgentConfig
 from .DiffDriveAgent import DifferentialDriveAgent
 from .UnicycleAgent import UnicycleAgent
 from .StaticAgent import StaticAgent
 from .MazeAgent import MazeAgent
 from .LevyAgent import LevyAgent
+from .DroneAgent import DroneAgent
 
 
 class AgentFactory:
@@ -19,4 +20,6 @@ class AgentFactory:
             return StaticAgent(config=agent_config, name=name)
         if isinstance(agent_config, LevyAgentConfig):
             return LevyAgent(config=agent_config, name=name)
+        if isinstance(agent_config, DroneAgentConfig):
+            return DroneAgent(config=agent_config, name=name)
         raise Exception("Could not Create Agent: Unknown Config Input")

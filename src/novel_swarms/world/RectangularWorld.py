@@ -5,12 +5,14 @@ from typing import List, Tuple
 import pygame.draw
 from ..agent.Agent import Agent
 from ..agent.DiffDriveAgent import DifferentialDriveAgent
+from .. agent.HumanAgent import HumanDrivenAgent
 from ..config.WorldConfig import RectangularWorldConfig
 from ..agent.AgentFactory import AgentFactory
 from ..config.HeterogenSwarmConfig import HeterogeneousSwarmConfig
 from .World import World
 from ..util.timer import Timer
 from ..util.collider.AABB import AABB
+from .goals.Goal import CylinderGoal
 
 
 def distance(pointA, pointB) -> float:
@@ -33,6 +35,7 @@ class RectangularWorld(World):
 
         self.selected = None
         self.highlighted_set = []
+        self.human_controlled = []
 
         if config.seed is not None:
             # print(f"World Instantiated with Seed: {config.seed}")
@@ -75,8 +78,6 @@ class RectangularWorld(World):
                 agent.x_pos = random.uniform(0 + ac.agent_radius, ac.world.w - ac.agent_radius)
                 agent.y_pos = random.uniform(0 + ac.agent_radius, ac.world.h - ac.agent_radius)
                 agent.angle = random.random() * 2 * math.pi
-
-        # print([(a.x_pos, a.y_pos, a.angle) for a in self.population])
 
         for i in range(len(self.objects)):
             self.objects[i].world = self
@@ -185,11 +186,20 @@ class RectangularWorld(World):
         agent.y_pos = min((self.bounded_height - agent.radius - padding), agent.y_pos)
 
         # agent.angle += (math.pi / 720)
-        in_coll = self.handleWallCollisions(agent)
+        self.handleWallCollisions(agent)
+        self.handleGoalCollisions(agent)
 
         if agent.x_pos != old_x or agent.y_pos != old_y:
             return True
         return False
+
+    def handleGoalCollisions(self, agent):
+        for goal in self.goals:
+            if isinstance(goal, CylinderGoal):
+                correction = agent.build_collider().collision_then_correction(goal.get_collider())
+                if correction is not None:
+                    agent.x_pos += correction[0]
+                    agent.y_pos += correction[1]
 
     def handleWallCollisions(self, agent: DifferentialDriveAgent):
         # Check for distances between the agent and the line segments
@@ -276,29 +286,8 @@ class RectangularWorld(World):
                 b_to_a = agent_center - colliding_agent.getPosition()
 
                 # Check to see if the collision takes place in the forward facing direction
-                if forward_freeze:
-                    heading = agent.getFrontalPoint()
-                    dot = np.dot(a_to_b, heading)
-                    mag_a = np.linalg.norm(a_to_b)
-                    mag_b = np.linalg.norm(heading)
-                    angle = np.arccos(dot / (mag_a * mag_b))
-                    degs = np.degrees(abs(angle))
-                    if degs < 30:
-                        # print(f"Collision at angle {degs}.")
-                        agent.stopped_duration = 2
-                        continue
-
-                    # Now Calculate B_to_A
-                    heading = colliding_agent.getFrontalPoint()
-                    dot = np.dot(b_to_a, heading)
-                    mag_a = np.linalg.norm(b_to_a)
-                    mag_b = np.linalg.norm(heading)
-                    angle = np.arccos(dot / (mag_a * mag_b))
-                    degs = np.degrees(abs(angle))
-                    if degs < 30:
-                        # print(f"Collision at angle {degs}.")
-                        colliding_agent.stopped_duration = 2
-                        continue
+                if forward_freeze and self.collision_forward(agent, colliding_agent):
+                    continue
 
                 # If distance super close to 0, we have a problem. Add noise.
                 SIGNIFICANCE = 0.0001
@@ -328,12 +317,8 @@ class RectangularWorld(World):
                 if math.isnan(delta_x) or math.isnan(delta_y):
                     break
 
-                # print(delta_x, delta_y)
-
                 agent.x_pos += delta_x
                 agent.y_pos += delta_y
-
-                # agent.angle += (math.pi / 720)
                 agent_center = agent.getPosition()
 
             neighborhood = self.getNeighborsWithinDistance(agent_center, minimum_distance, excluded=agent)
@@ -354,6 +339,33 @@ class RectangularWorld(World):
         agent.deleted = True
         self.population.remove(agent)
 
+    def collision_forward(self, agent, colliding_agent):
+        a_to_b = colliding_agent.getPosition() - agent.getPosition()
+        b_to_a = agent.getPosition() - colliding_agent.getPosition()
+        heading = agent.getFrontalPoint()
+        dot = np.dot(a_to_b, heading)
+        mag_a = np.linalg.norm(a_to_b)
+        mag_b = np.linalg.norm(heading)
+        angle = np.arccos(dot / (mag_a * mag_b))
+        degs = np.degrees(abs(angle))
+        if degs < 30:
+            # print(f"Collision at angle {degs}.")
+            agent.stopped_duration = 2
+            return True
+
+        # Now Calculate B_to_A
+        heading = colliding_agent.getFrontalPoint()
+        dot = np.dot(b_to_a, heading)
+        mag_a = np.linalg.norm(b_to_a)
+        mag_b = np.linalg.norm(heading)
+        angle = np.arccos(dot / (mag_a * mag_b))
+        degs = np.degrees(abs(angle))
+        if degs < 30:
+            # print(f"Collision at angle {degs}.")
+            colliding_agent.stopped_duration = 2
+            return True
+        return False
+
     def handle_key_press(self, event):
         if self.selected is not None:
             if event.key == pygame.K_l:
@@ -367,8 +379,30 @@ class RectangularWorld(World):
                 self.selected.body_color = COLORS[len(self.highlighted_set) % len(COLORS)]
                 self.selected.is_highlighted = True
                 self.highlighted_set.append(self.selected)
+            if event.key == pygame.K_h:
+                i = self.population.index(self.selected)
+                new_human = HumanDrivenAgent(self.selected.config)
+                new_human.x_pos = self.selected.x_pos
+                new_human.y_pos = self.selected.y_pos
+                new_human.angle = self.selected.angle
+                self.population[i] = new_human
+                self.human_controlled.append(new_human)
+
         if event.key == pygame.K_c:
             for agent in self.highlighted_set:
                 agent.is_highlighted = False
                 agent.body_color = agent.config.body_color
+            for agent in self.human_controlled:
+                i = self.population.index(agent)
+                new_bot = DifferentialDriveAgent(agent.config)
+                new_bot.x_pos = agent.x_pos
+                new_bot.y_pos = agent.y_pos
+                new_bot.angle = agent.angle
+                self.population[i] = new_bot
+            self.human_controlled = []
             self.highlighted_set = []
+
+    def handle_held_keys(self, keys):
+        for agent in self.human_controlled:
+            agent.handle_key_press(keys)
+

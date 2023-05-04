@@ -3,7 +3,8 @@ import numpy as np
 import math
 from .AbstractSensor import AbstractSensor
 from typing import List
-
+from ..world.World import World
+from ..world.goals.Goal import CylinderGoal
 
 class BinaryFOVSensor(AbstractSensor):
     def __init__(self,
@@ -15,9 +16,11 @@ class BinaryFOVSensor(AbstractSensor):
                  false_positive=0.0,
                  false_negative=0.0,
                  walls=None,
+                 goal_sensing_range=10,
                  wall_sensing_range=10,
                  time_step_between_sensing=1,
-                 store_history=False
+                 store_history=False,
+                 detect_goal_with_added_state=False,
                  ):
         super(BinaryFOVSensor, self).__init__(parent=parent)
         self.current_state = 0
@@ -32,13 +35,15 @@ class BinaryFOVSensor(AbstractSensor):
         self.time_since_last_sensing = 0
         self.history = []
         self.store_history = store_history
+        self.use_goal_state = detect_goal_with_added_state
+        self.goal_sensing_range = goal_sensing_range
 
         if degrees:
             self.theta = np.deg2rad(self.theta)
             self.bias = np.deg2rad(self.bias)
         self.r = distance
 
-    def checkForLOSCollisions(self, world: object) -> None:
+    def checkForLOSCollisions(self, world: World) -> None:
         # Mathematics obtained from Sundaram Ramaswamy
         # https://legends2k.github.io/2d-fov/design.html
         # See section 3.1.1.2
@@ -94,43 +99,25 @@ class BinaryFOVSensor(AbstractSensor):
                     d_to_inter = np.linalg.norm(np.array(self.line_seg_int_point(segment, r)) - np.array(sensor_origin))
                     consideration_set.append((d_to_inter, None))
 
+        # Add this to its own class later -- need to separate the binary from the trinary sensors
+        if self.use_goal_state:
+            for world_goal in world.goals:
+                if isinstance(world_goal, CylinderGoal):
+                    u = np.array(world_goal.center) - sensor_origin
+                    if np.linalg.norm(u) < self.goal_sensing_range + world_goal.r:
+                        d = self.circle_interesect_sensing_cone(u, world_goal.r)
+                        if d is not None:
+                            self.parent.agent_in_sight = None
+                            self.current_state = 2
+                            return
+
 
         # Detect Other Agents
         for agent in bag:
             u = agent.getPosition() - sensor_origin
-            directional = np.dot(u, self.getLOSVector())
-            if directional > 0:
-                u = np.append(u, [0])
-                cross_l = np.cross(e_left, u)
-                cross_r = np.cross(u, e_right)
-                sign_l = np.sign(cross_l)
-                sign_r = np.sign(cross_r)
-                added_signs = sign_l - sign_r
-                sector_boundaries = np.all(added_signs == 0)
-                if sector_boundaries:
-                    d_to_inter = np.linalg.norm(u)
-                    consideration_set.append((d_to_inter, agent))
-
-                # It may also be the case that the center of the agent is not within the FOV, but that some part of the
-                # circle is visible and on the edges of the left and right viewing vectors.
-                # LinAlg Calculations obtained from https://www.bluebill.net/circle_ray_intersection.html
-
-                # u, defined earlier is the vector from the point of interest to the center of the circle
-                # Project u onto e_left and e_right
-                u_l = np.dot(u, e_left) * e_left
-                u_r = np.dot(u, e_right) * e_right
-
-                # Determine the minimum distance between the agent's center (center of circle) and the projected vector
-                dist_l = np.linalg.norm(u - u_l)
-                dist_r = np.linalg.norm(u - u_r)
-
-                radius = self.parent.radius    # Note: Assumes homogenous radius
-                if dist_l < radius:
-                    d_to_inter = np.linalg.norm(u)
-                    consideration_set.append((d_to_inter, agent))
-                if dist_r < radius:
-                    d_to_inter = np.linalg.norm(u)
-                    consideration_set.append((d_to_inter, agent))
+            d = self.circle_interesect_sensing_cone(u, self.parent.radius)
+            if d is not None:
+                consideration_set.append((d, agent))
 
         if not consideration_set:
             self.determineState(False, None)
@@ -224,6 +211,8 @@ class BinaryFOVSensor(AbstractSensor):
         sight_color = (255, 0, 0)
         if self.current_state == 1:
             sight_color = (0, 255, 0)
+        if self.current_state == 2:
+            sight_color = (255, 255, 0)
 
         magnitude = self.r if self.parent.is_highlighted else self.parent.radius * 5
 
@@ -243,6 +232,43 @@ class BinaryFOVSensor(AbstractSensor):
             if self.wall_sensing_range:
                 pygame.draw.circle(screen, (150, 150, 150), self.parent.getPosition(), self.wall_sensing_range, 3)
 
+    def circle_interesect_sensing_cone(self, u, r):
+        e_left, e_right = self.getSectorVectors()
+        directional = np.dot(u, self.getBiasedSightAngle())
+        if directional > 0:
+            u = np.append(u, [0])
+            cross_l = np.cross(e_left, u)
+            cross_r = np.cross(u, e_right)
+            sign_l = np.sign(cross_l)
+            sign_r = np.sign(cross_r)
+            added_signs = sign_l - sign_r
+            sector_boundaries = np.all(added_signs == 0)
+            if sector_boundaries:
+                d_to_inter = np.linalg.norm(u)
+                return d_to_inter
+
+            # It may also be the case that the center of the agent is not within the FOV, but that some part of the
+            # circle is visible and on the edges of the left and right viewing vectors.
+            # LinAlg Calculations obtained from https://www.bluebill.net/circle_ray_intersection.html
+
+            # u, defined earlier is the vector from the point of interest to the center of the circle
+            # Project u onto e_left and e_right
+            u_l = np.dot(u, e_left) * e_left
+            u_r = np.dot(u, e_right) * e_right
+
+            # Determine the minimum distance between the agent's center (center of circle) and the projected vector
+            dist_l = np.linalg.norm(u - u_l)
+            dist_r = np.linalg.norm(u - u_r)
+
+            radius = r  # Note: Assumes homogenous radius
+            if dist_l < radius:
+                d_to_inter = np.linalg.norm(u)
+                return d_to_inter
+            if dist_r < radius:
+                d_to_inter = np.linalg.norm(u)
+                return d_to_inter
+        return None
+
     def getDistance(self, a, b):
         return np.linalg.norm(b - a)
 
@@ -256,6 +282,15 @@ class BinaryFOVSensor(AbstractSensor):
             return self.parent.getFrontalPoint()
         return self.parent.x_pos + math.cos(self.angle + self.parent.angle), self.parent.y_pos + math.sin(
             self.angle + self.parent.angle)
+
+    def getBiasedSightAngle(self):
+        bias_transform = np.array([
+            [np.cos(self.bias), -np.sin(self.bias), 0],
+            [np.sin(self.bias), np.cos(self.bias), 0],
+            [0, 0, 1]
+        ])
+        v = np.append(self.getLOSVector(), [0])
+        return np.matmul(bias_transform, v)[:2]
 
     def getSectorVectors(self):
         theta_l = self.theta + self.bias

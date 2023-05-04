@@ -27,11 +27,29 @@ class DiffDriveToUnicycle(ControllerConverter):
             output.append(d_theta)
         return output
 
+class DiffDriveToRatio(ControllerConverter):
+    """
+    Takes controllers of the Form: [v_l0, vr_0, vl_1, vr_1] and converts it to the unicycle controller: [v_0, w_0, v_1, w_1]
+    """
+    def __init__(self, controller):
+        super().__init__(controller)
+
+    def convert(self):
+        output = []
+        assert len(self.from_controller) == 4
+        v_r, v_l = self.from_controller[2], self.from_controller[3]
+        v_on = (v_r + v_l) / 2
+        dtheta_on = (v_r - v_l) / 7
+
+        v_r, v_l = self.from_controller[0], self.from_controller[1]
+        v_off = (v_r + v_l) / 2
+        dtheta_off = (v_r - v_l) / 7
+        return [dtheta_on / dtheta_off, v_on / v_off]
 
 if __name__ == "__main__":
     wheel_radius = 2.0
     agent_radius = 5.0
-    input_controller = [-0.7, -1.0, 1.0, -1.0]
+    input_controller = [-1.0, 0.4285, 1.0, 0.4285]
 
-    converter = DiffDriveToUnicycle(input_controller, agent_radius, wheel_radius)
+    converter = DiffDriveToRatio(input_controller)
     print(converter.convert())

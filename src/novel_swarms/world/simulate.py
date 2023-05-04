@@ -87,6 +87,11 @@ def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_e
                 if event.type == pygame.MOUSEBUTTONUP:
                     pos = pygame.mouse.get_pos()
                     world.onClick(pos)
+
+            if world_key_events:
+                keys = pygame.key.get_pressed()
+                world.handle_held_keys(keys)
+
             if paused:
                 pygame.time.Clock().tick(FRAMERATE)
                 continue
