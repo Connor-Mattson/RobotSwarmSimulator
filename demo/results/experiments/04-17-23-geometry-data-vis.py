@@ -18,55 +18,75 @@ if __name__ == "__main__":
 
     # Import Data
     cyclic_ds = pandas.read_csv("out/geometry-cyclic.csv")
-    cyclic_ds.columns = COLUMNS
-
     aggregation_ds = pandas.read_csv("out/geometry-aggregation.csv")
-    aggregation_ds.columns = COLUMNS
-
     dispersal_ds = pandas.read_csv("out/geometry-dispersal.csv")
-    dispersal_ds.columns = COLUMNS
-
     milling_ds = pandas.read_csv("out/geometry-milling.csv")
-    milling_ds.columns = COLUMNS
-
     wall_f_ds = pandas.read_csv("out/geometry-wall-following.csv")
-    wall_f_ds.columns = COLUMNS
-
-    random_ds = pandas.read_csv("out/geometry-random.csv")
-    random_ds.columns = COLUMNS
+    # random_ds = pandas.read_csv("out/geometry-random.csv")
 
     def convex_hull_ratio():
         plt.figure(figsize=(8, 4))
         total = 0
-        x, y = cyclic_ds["CONVEX_HULL"], cyclic_ds["INVERSE_HULL"]
-        y = np.divide(cyclic_ds["INVERSE_HULL"], cyclic_ds["CONVEX_HULL"])
+        x, y = cyclic_ds["CONVEX_HULL"], cyclic_ds["INVERSE_CONVEX_HULL"]
+        y = np.divide(cyclic_ds["INVERSE_CONVEX_HULL"], cyclic_ds["CONVEX_HULL"])
         plt.scatter(x, y, c='orange', label="Cyclic Pursuit")
         total += len(x)
 
-        x, y = aggregation_ds["CONVEX_HULL"], aggregation_ds["INVERSE_HULL"]
-        y = np.divide(aggregation_ds["INVERSE_HULL"], aggregation_ds["CONVEX_HULL"])
+        x, y = aggregation_ds["CONVEX_HULL"], aggregation_ds["INVERSE_CONVEX_HULL"]
+        y = np.divide(aggregation_ds["INVERSE_CONVEX_HULL"], aggregation_ds["CONVEX_HULL"])
         plt.scatter(x, y, c='blue', label="Aggregation")
         total += len(x)
 
-        x, y = dispersal_ds["CONVEX_HULL"], dispersal_ds["INVERSE_HULL"]
-        y = np.divide(dispersal_ds["INVERSE_HULL"], dispersal_ds["CONVEX_HULL"])
+        x, y = dispersal_ds["CONVEX_HULL"], dispersal_ds["INVERSE_CONVEX_HULL"]
+        y = np.divide(dispersal_ds["INVERSE_CONVEX_HULL"], dispersal_ds["CONVEX_HULL"])
         plt.scatter(x, y, c='green', label="Dispersal")
         total += len(x)
 
-        x, y = milling_ds["CONVEX_HULL"], milling_ds["INVERSE_HULL"]
-        y = np.divide(milling_ds["INVERSE_HULL"], milling_ds["CONVEX_HULL"])
+        x, y = milling_ds["CONVEX_HULL"], milling_ds["INVERSE_CONVEX_HULL"]
+        y = np.divide(milling_ds["INVERSE_CONVEX_HULL"], milling_ds["CONVEX_HULL"])
         plt.scatter(x, y, c='red', label="Milling")
         total += len(x)
 
-        x, y = wall_f_ds["CONVEX_HULL"], wall_f_ds["INVERSE_HULL"]
-        y = np.divide(wall_f_ds["INVERSE_HULL"], wall_f_ds["CONVEX_HULL"])
+        x, y = wall_f_ds["CONVEX_HULL"], wall_f_ds["INVERSE_CONVEX_HULL"]
+        y = np.divide(wall_f_ds["INVERSE_CONVEX_HULL"], wall_f_ds["CONVEX_HULL"])
         plt.scatter(x, y, c='purple', label="Wall Following")
         total += len(x)
 
         plt.xlabel("Convex Hull Area")
         plt.ylabel("Hull:Frame Ratio")
         plt.title("Swarm Behavior Space")
-        plt.legend(bbox_to_anchor=(1.05, 1.0), loc='upper left')
+        plt.legend(loc='lower right')
+        plt.tight_layout()
+        plt.show()
+        print(f"TOTAL: {total}")
+
+    def compare_keys(k1, k2, l1, l2):
+        plt.figure(figsize=(8, 4))
+        total = 0
+        x, y = cyclic_ds[k1], cyclic_ds[k2]
+        plt.scatter(x, y, c='orange', label="Cyclic Pursuit")
+        total += len(x)
+
+        x, y = aggregation_ds[k1], aggregation_ds[k2]
+        plt.scatter(x, y, c='blue', label="Aggregation")
+        total += len(x)
+
+        x, y = dispersal_ds[k1], dispersal_ds[k2]
+        plt.scatter(x, y, c='green', label="Dispersal")
+        total += len(x)
+
+        x, y = milling_ds[k1], milling_ds[k2]
+        plt.scatter(x, y, c='red', label="Milling")
+        total += len(x)
+
+        x, y = wall_f_ds[k1], wall_f_ds[k2]
+        plt.scatter(x, y, c='purple', label="Wall Following")
+        total += len(x)
+
+        plt.xlabel(l1)
+        plt.ylabel(l2)
+        plt.title("Swarm Behavior Space")
+        plt.legend(loc='lower right')
         plt.tight_layout()
         plt.show()
         print(f"TOTAL: {total}")
@@ -112,4 +132,36 @@ if __name__ == "__main__":
         plt.show()
 
 
-    convex_hull_ratio()
+    k1, k2 = "ANGULAR_MOMENTUM", "GROUP_ROTATION"
+    l1, l2 = "Angular Momentum", "Group Rotation"
+    fig, axs = plt.subplots(2, 2)
+    plt.figure(figsize=(8, 4))
+    total = 0
+
+    ax = axs[0][0]
+    x, y = cyclic_ds[k1], cyclic_ds[k2]
+    ax.scatter(x, y, c='orange', label="Cyclic Pursuit")
+    total += len(x)
+
+    x, y = aggregation_ds[k1], aggregation_ds[k2]
+    ax.scatter(x, y, c='blue', label="Aggregation")
+    total += len(x)
+
+    x, y = dispersal_ds[k1], dispersal_ds[k2]
+    ax.scatter(x, y, c='green', label="Dispersal")
+    total += len(x)
+
+    x, y = milling_ds[k1], milling_ds[k2]
+    ax.scatter(x, y, c='red', label="Milling")
+    total += len(x)
+
+    x, y = wall_f_ds[k1], wall_f_ds[k2]
+    ax.scatter(x, y, c='purple', label="Wall Following")
+    total += len(x)
+
+    ax.set_xlabel(l1)
+    ax.set_ylabel(l2)
+
+    fig.legend(loc='lower right')
+    fig.tight_layout()
+    fig.show()

@@ -20,6 +20,9 @@ class Point:
     def dist(self, other):
         return np.linalg.norm(other.p - self.p)
 
+    def __lt__(self, other):
+        return self.x < other.x
+
     @staticmethod
     def from_agent(agent):
         return Point(agent.x_pos, agent.y_pos)

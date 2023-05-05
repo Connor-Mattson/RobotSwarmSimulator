@@ -2,6 +2,11 @@ import numpy as np
 
 from src.novel_swarms.behavior.AgentsAtGoal import AgentsAtGoal, PercentageAtGoal
 from src.novel_swarms.behavior.DistanceToGoal import DistanceToGoal
+from src.novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
+from src.novel_swarms.behavior.AverageSpeed import AverageSpeedBehavior
+from src.novel_swarms.behavior.GroupRotationBehavior import GroupRotationBehavior
+from src.novel_swarms.behavior.RadialVariance import RadialVarianceBehavior
+from src.novel_swarms.behavior.ScatterBehavior import ScatterBehavior
 from src.novel_swarms.sensors.BinaryFOVSensor import BinaryFOVSensor
 from src.novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
 from src.novel_swarms.util.processing.multicoreprocessing import MultiWorldSimulation
@@ -23,6 +28,11 @@ def get_world_config(seed, agent, rm_agent = False, n=30):
         n_agents=n,
         seed=seed,
         behavior=[
+            AverageSpeedBehavior(),
+            RadialVarianceBehavior(),
+            ScatterBehavior(),
+            GroupRotationBehavior(),
+            AngularMomentumBehavior(),
             ConvexHull(),
             InverseConvexHull(),
             PersistentHomology(dims=0, history_size=10),
@@ -90,6 +100,7 @@ if __name__ == "__main__":
             geo_data = get_geometry_data(ret)
             d += geo_data
         df = DataFrame(d)
+        df.columns = ["POP", "SEED", "STEPS", "AVERAGE_SPEED", "RADIAL_VARIANCE", "SCATTER", "GROUP_ROTATION", "ANGULAR_MOMENTUM", "CONVEX_HULL", "INVERSE_CONVEX_HULL", "H0", "H1", "H0_MAX", "H1_MAX"]
         df.to_csv(f"out/geometry-{name[31:]}")
 
 
