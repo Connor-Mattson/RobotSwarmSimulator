@@ -1,5 +1,6 @@
 from src.novel_swarms.behavior.DistanceToGoal import DistanceToGoal
 from src.novel_swarms.behavior.AgentsAtGoal import AgentsAtGoal, PercentageAtGoal
+from src.novel_swarms.behavior.TotalCollisions import TotalCollisionsBehavior
 from src.novel_swarms.world.goals.Goal import CylinderGoal
 from src.novel_swarms.world.simulate import main as simulate
 from src.novel_swarms.sensors.BinaryFOVSensor import BinaryFOVSensor
@@ -8,6 +9,7 @@ from src.novel_swarms.config.AgentConfig import DiffDriveAgentConfig, StaticAgen
 from src.novel_swarms.config.WorldConfig import RectangularWorldConfig
 from src.novel_swarms.config.HeterogenSwarmConfig import HeterogeneousSwarmConfig
 import numpy as np
+
 
 if __name__ == "__main__":
 
@@ -95,12 +97,10 @@ if __name__ == "__main__":
     heterogeneous_swarm_config.add_sub_populuation(agent_maze, 10)
 
     behavior = [
+        TotalCollisionsBehavior(),
         DistanceToGoal(),
         AgentsAtGoal(history=1),
         PercentageAtGoal(0.01, history=1),
-        PercentageAtGoal(0.10, history=1),
-        PercentageAtGoal(0.25, history=1),
-        PercentageAtGoal(0.50, history=1),
         PercentageAtGoal(0.80, history=1),
         PercentageAtGoal(1.0, history=1),
     ]

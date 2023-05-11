@@ -13,6 +13,7 @@ from src.novel_swarms.behavior.AverageSpeed import AverageSpeedBehavior
 from src.novel_swarms.behavior.GroupRotationBehavior import GroupRotationBehavior
 from src.novel_swarms.behavior.RadialVariance import RadialVarianceBehavior
 from src.novel_swarms.behavior.ScatterBehavior import ScatterBehavior
+from src.novel_swarms.behavior.TotalCollisions import TotalCollisionsBehavior
 from src.novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
 from src.novel_swarms.sensors.BinaryFOVSensor import BinaryFOVSensor
 from src.novel_swarms.sensors.SensorSet import SensorSet
@@ -65,6 +66,7 @@ if __name__ == "__main__":
         RadialVarianceBehavior(),
         ScatterBehavior(),
         GroupRotationBehavior(),
+        TotalCollisionsBehavior(),
     ]
 
     world_config = RectangularWorldConfig(

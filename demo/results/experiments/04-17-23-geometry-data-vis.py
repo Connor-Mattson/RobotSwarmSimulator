@@ -162,6 +162,85 @@ if __name__ == "__main__":
     ax.set_xlabel(l1)
     ax.set_ylabel(l2)
 
-    fig.legend(loc='lower right')
+
+    k1, k2 = "SCATTER", "GROUP_ROTATION"
+    l1, l2 = "Scatter", "Group Rotation"
+    ax = axs[0][1]
+    x, y = cyclic_ds[k1], cyclic_ds[k2]
+    ax.scatter(x, y, c='orange', label="Cyclic Pursuit")
+    total += len(x)
+
+    x, y = aggregation_ds[k1], aggregation_ds[k2]
+    ax.scatter(x, y, c='blue', label="Aggregation")
+    total += len(x)
+
+    x, y = dispersal_ds[k1], dispersal_ds[k2]
+    ax.scatter(x, y, c='green', label="Dispersal")
+    total += len(x)
+
+    x, y = milling_ds[k1], milling_ds[k2]
+    ax.scatter(x, y, c='red', label="Milling")
+    total += len(x)
+
+    x, y = wall_f_ds[k1], wall_f_ds[k2]
+    ax.scatter(x, y, c='purple', label="Wall Following")
+    total += len(x)
+
+    ax.set_xlabel(l1)
+    ax.set_ylabel(l2)
+
+    k1, k2 = "AVERAGE_SPEED", "RADIAL_VARIANCE"
+    l1, l2 = "Average Speed", "Radial Variance"
+    ax = axs[1][0]
+    x, y = cyclic_ds[k1], cyclic_ds[k2]
+    ax.scatter(x, y, c='orange', label="Cyclic Pursuit")
+    total += len(x)
+
+    x, y = aggregation_ds[k1], aggregation_ds[k2]
+    ax.scatter(x, y, c='blue', label="Aggregation")
+    total += len(x)
+
+    x, y = dispersal_ds[k1], dispersal_ds[k2]
+    ax.scatter(x, y, c='green', label="Dispersal")
+    total += len(x)
+
+    x, y = milling_ds[k1], milling_ds[k2]
+    ax.scatter(x, y, c='red', label="Milling")
+    total += len(x)
+
+    x, y = wall_f_ds[k1], wall_f_ds[k2]
+    ax.scatter(x, y, c='purple', label="Wall Following")
+    total += len(x)
+
+    ax.set_xlabel(l1)
+    ax.set_ylabel(l2)
+
+    k1, k2 = "ANGULAR_MOMENTUM", "RADIAL_VARIANCE"
+    l1, l2 = "Angular Momentum", "Radial Variance"
+    ax = axs[1][1]
+    x, y = cyclic_ds[k1], cyclic_ds[k2]
+    ax.scatter(x, y, c='orange', label="Cyclic Pursuit")
+    total += len(x)
+
+    x, y = aggregation_ds[k1], aggregation_ds[k2]
+    ax.scatter(x, y, c='blue', label="Aggregation")
+    total += len(x)
+
+    x, y = dispersal_ds[k1], dispersal_ds[k2]
+    ax.scatter(x, y, c='green', label="Dispersal")
+    total += len(x)
+
+    x, y = milling_ds[k1], milling_ds[k2]
+    ax.scatter(x, y, c='red', label="Milling")
+    total += len(x)
+
+    x, y = wall_f_ds[k1], wall_f_ds[k2]
+    ax.scatter(x, y, c='purple', label="Wall Following")
+    total += len(x)
+
+    ax.set_xlabel(l1)
+    ax.set_ylabel(l2)
+
+    # fig.legend(loc='lower right')
     fig.tight_layout()
-    fig.show()
+    plt.show()

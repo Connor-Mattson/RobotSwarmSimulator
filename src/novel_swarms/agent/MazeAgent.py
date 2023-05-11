@@ -65,7 +65,6 @@ class MazeAgent(Agent):
             self.body_color = self.get_random_color()
         else:
             self.body_color = config.body_color
-        print(self.body_color)
 
     def set_seed(self, seed):
         random.seed(seed)
@@ -108,6 +107,7 @@ class MazeAgent(Agent):
 
         self.angle += dw * self.dt
 
+        self.collision_flag = False
         if check_for_world_boundaries is not None:
             check_for_world_boundaries(self)
 
@@ -182,6 +182,7 @@ class MazeAgent(Agent):
                 if agent.name == self.name:
                     continue
                 if self.get_aabb().intersects(agent.get_aabb()):
+                    self.collision_flag = True
                     self.get_aabb().toggle_intersection()
                     correction = collider.collision_then_correction(agent.build_collider())
                     if correction is not None:

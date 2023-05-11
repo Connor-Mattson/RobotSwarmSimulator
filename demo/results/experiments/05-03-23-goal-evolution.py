@@ -5,6 +5,7 @@ from src.novel_swarms.world.simulate import main as simulate
 from src.novel_swarms.sensors.BinaryFOVSensor import BinaryFOVSensor
 from src.novel_swarms.sensors.SensorSet import SensorSet
 from src.novel_swarms.config.AgentConfig import DiffDriveAgentConfig, StaticAgentConfig, UnicycleAgentConfig, LevyAgentConfig, MazeAgentConfig
+from src.novel_swarms.behavior.TotalCollisions import TotalCollisionsBehavior
 from src.novel_swarms.config.WorldConfig import RectangularWorldConfig
 from src.novel_swarms.config.HeterogenSwarmConfig import HeterogeneousSwarmConfig
 from src.novel_swarms.optim.CMAES import CMAES
@@ -68,7 +69,9 @@ def get_world(genome):
 
         G = [goal]
         objects = []
-        behavior = []
+        behavior = [
+            TotalCollisionsBehavior()
+        ]
 
         init = [(400, 900, np.random.random() * 2 * np.pi) for i in range(N_AGENTS)]
         world_config = RectangularWorldConfig(
@@ -156,7 +159,7 @@ def get_heterogeneous_world(genome):
 
         G = [goal]
         objects = []
-        behavior = []
+        behavior = [TotalCollisionsBehavior()]
 
         init = [(500, 900, np.random.random() * 2 * np.pi) for i in range(N_AGENTS)]
         world_config = RectangularWorldConfig(
@@ -185,14 +188,15 @@ def evolve_goal_proximity():
             for agent in w.population:
                 dist = np.linalg.norm((np.array(w.goals[0].center) - agent.getPosition())) - w.goals[0].range
                 total_dist_to_goal += max(0, dist)
-            total += (total_dist_to_goal / len(w.population))
+            penalty = w.behavior[0].out_current()[1] / 100
+            total += (total_dist_to_goal / len(w.population)) + penalty
         return total / len(world_set)
 
     MAX_V, MAX_OMEGA = 20.0, 2.0
     MIN_V = 0
     bounds = [[MIN_V, -MAX_OMEGA, MIN_V, -MAX_OMEGA, MIN_V, -MAX_OMEGA, MIN_V, -MAX_OMEGA], [MAX_V, MAX_OMEGA, MAX_V, MAX_OMEGA, MAX_V, MAX_OMEGA, MAX_V, MAX_OMEGA]]
     x0 = [0.47830279, -0.32490957,  0.92724408,  0.99523116,  0.31646829,  0.39684449, 0.0, 0.0]
-    optim = CMAES(f=fitness, genome_to_world=get_heterogeneous_world, init_sigma=3.0, init_genome=x0, pop_size=12, num_processes=12, bounds=bounds, target=0, show_each_step=True)
+    optim = CMAES(f=fitness, genome_to_world=get_heterogeneous_world, init_sigma=3.0, init_genome=x0, pop_size=12, num_processes=12, bounds=bounds, target=0, show_each_step=False)
     c, _ = optim.minimize()
     return c
 

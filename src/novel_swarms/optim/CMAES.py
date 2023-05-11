@@ -34,8 +34,8 @@ class CMAES:
             solutions = self.ask_for_genomes(es)
             es.tell(solutions, [self.pull_from_solution_set(s) for s in solutions])
             es.disp()
+            print(f"Current Best: {es.best.x}")
             if self.show_steps:
-                print(f"Current Best: {es.best.x}")
                 sim(self.g_to_w(es.best.x)[0], show_gui=True, stop_detection=self.w_stop_method, step_size=10)
 
         es.result_pretty()
