@@ -154,8 +154,8 @@ def get_heterogeneous_world(genome):
             stop_at_goal=False,
         )
         heterogeneous_swarm_config = HeterogeneousSwarmConfig()
-        heterogeneous_swarm_config.add_sub_populuation(agent_maze_a, 6)
-        heterogeneous_swarm_config.add_sub_populuation(agent_maze_b, 6)
+        heterogeneous_swarm_config.add_sub_populuation(agent_maze_a, 9)
+        heterogeneous_swarm_config.add_sub_populuation(agent_maze_b, 3)
 
         G = [goal]
         objects = []
