@@ -6,8 +6,6 @@ import time
 import numpy as np
 from copy import deepcopy
 
-import scipy.special
-
 from .Agent import Agent
 from .UnicycleAgent import UnicycleAgent
 from ..config.AgentConfig import UnicycleAgentConfig, LevyAgentConfig
@@ -15,7 +13,7 @@ from ..sensors.GenomeDependentSensor import GenomeBinarySensor, GenomeFOVSensor
 from ..util.timer import Timer
 from ..util.collider.AABB import AABB
 from ..util.collider.AngleSensitiveCC import AngleSensitiveCC
-from scipy.special import gamma
+
 
 class LevyAgent(UnicycleAgent):
     def __init__(self, config: LevyAgentConfig = None, name=None) -> None:
@@ -141,6 +139,7 @@ class LevyAgent(UnicycleAgent):
         return np.power((numer / denom), 1 / beta)
 
     def _gamma(self, z):
+        from scipy.special import gamma
         return gamma(z)
 
     def get_action(self):
