@@ -2,6 +2,7 @@ import pygame
 from ..gui.agentGUI import DifferentialDriveGUI
 from .WorldFactory import WorldFactory
 from ..util.timer import Timer
+from PIL import Image
 
 screen = None
 FRAMERATE = 500
@@ -32,7 +33,7 @@ def main(world_config):
     gui.set_world(world)
     world.attach_gui(gui)
 
-    total_allowed_steps = None
+    total_allowed_steps = 300
     steps_taken = 0
     steps_per_frame = 1
 
@@ -87,7 +88,10 @@ def main(world_config):
                 # noinspection PyTypeChecker
                 if steps_taken > total_allowed_steps:
                     time_me.check_watch()
-                    running=False
+                    running = False
+                    density_map = world.evaluate(5, alternative_approach="density-map") * 255
+                    img = Image.fromarray(density_map.astype('uint8'), 'L')
+                    img.save("density_map.png")
                     break
 
             world.step()
