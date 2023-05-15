@@ -3,6 +3,7 @@ from ..gui.agentGUI import DifferentialDriveGUI
 from .WorldFactory import WorldFactory
 from ..util.timer import Timer
 from PIL import Image
+import os
 
 screen = None
 FRAMERATE = 500
@@ -33,9 +34,13 @@ def main(world_config):
     gui.set_world(world)
     world.attach_gui(gui)
 
-    total_allowed_steps = 300
+    total_allowed_steps = None
     steps_taken = 0
     steps_per_frame = 1
+
+    density_map_on = True  # Indicates whether we want to collect a density map of the agents
+    if density_map_on:
+        total_allowed_steps = 1200
 
     labels = [pygame.K_RETURN, pygame.K_q, pygame.K_0, pygame.K_KP0, pygame.K_1, pygame.K_KP1, pygame.K_2, pygame.K_KP2,
               pygame.K_3, pygame.K_KP3, pygame.K_4, pygame.K_KP4, pygame.K_5, pygame.K_KP5]
@@ -89,9 +94,10 @@ def main(world_config):
                 if steps_taken > total_allowed_steps:
                     time_me.check_watch()
                     running = False
-                    density_map = world.evaluate(5, alternative_approach="density-map") * 255
-                    img = Image.fromarray(density_map.astype('uint8'), 'L')
-                    img.save("density_map.png")
+                    if density_map_on:
+                        density_map = world.evaluate(20, alternative_approach="density-map") * 255
+                        img = Image.fromarray(density_map.astype('uint8'), 'L')
+                        img.save("density.png")
                     break
 
             world.step()
