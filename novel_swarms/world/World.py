@@ -5,6 +5,7 @@ from ..config.OutputTensorConfig import OutputTensorConfig
 import numpy as np
 import math
 from scipy.ndimage.filters import gaussian_filter
+from PIL import Image
 
 class World():
 
@@ -36,7 +37,8 @@ class World():
     returns the sum of all of the agents within a 100x100 box centered at that index.
     Overflow is accounted for in evaluate_denisty_map
     """
-    def _scan_kernel(self, point_map, h, w):
+    @staticmethod
+    def _scan_kernel(point_map, h, w):
         # Get window area
         row_start = h - 50
         row_end = h + 50
@@ -55,7 +57,8 @@ class World():
     Helper function for evaluate_density_map
     Normalizes the density map so that all of the values in the map are between 0 and 1.
     """
-    def _normalize_density_map(self, density_map):
+    @staticmethod
+    def _normalize_density_map(density_map):
         return density_map / np.max(density_map)
 
 
@@ -70,7 +73,7 @@ class World():
     Stride = 5
     Kernel = 100
     """
-    def evaluate_density_map(self, steps: int, skip=10, stride=5):
+    def evaluate_density_map(self, steps: int, filepath="density.png", skip=10, stride=5):
         # Keeps track of the number of agents at each point. Padded by 50 on all sides
         point_map = np.zeros((self.bounded_height + 100, self.bounded_width + 100), dtype=int)
 
@@ -97,12 +100,62 @@ class World():
             output_h += 1
             output_w = 0
         # Ensures that all values in the map are between 0 and 1 so that we can represent it as a single-channel image
-        return self._normalize_density_map(output)
 
-    def evaluate(self, steps: int, output_capture: OutputTensorConfig = None, screen=None, alternative_approach=None):
+        imgarray = self._normalize_density_map(output) * 255
+        img = Image.fromarray(imgarray.astype('uint8'), 'L')
+        img.save(filepath)
+
+    @staticmethod
+    def _make_circle_mask(radius=5):
+        mask = np.zeros((radius * 2, radius * 2), dtype=int)
+        for (h, w), _ in np.ndenumerate(mask):
+            y = (h + 1) - 5
+            x = (w + 1) - 5
+            dist = math.sqrt(math.pow(y, 2) + math.pow(x, 2))
+            if dist > 5:
+                mask[h, w] = 1
+        return mask
+
+    @staticmethod
+    def _add_circle_mask(output, x, y, mask):
+        region = output[y:y + 10, x:x + 10]
+        output[y:y + 10, x:x + 10] *= mask
+        return output
+
+    def _collect_data(self, output):
+        circle_mask = self._make_circle_mask()
+        new_output = output
+        for agent in self.population:
+            agent_position = agent.getPosition()
+            x = int(agent_position[0])
+            y = int(agent_position[1])
+            new_output = self._add_circle_mask(output, x - 5, y - 5, circle_mask)
+        return new_output
+
+    def evaluate_trails(self, steps: int, skip=3, filepath="trails.png"):
+        output = np.ones((500, 500), dtype=int)
+        for i in range(steps * skip):
+            self.step()
+            if i % skip == 0:
+                output = self._collect_data(output)
+        output *= 255
+        img = Image.fromarray(output.astype('uint8'), 'L')
+        img.save("trails.png")
+
+    def evaluate(
+            self,
+            steps: int,
+            output_capture: OutputTensorConfig = None,
+            screen=None,
+            alternative_approach=None,
+            save_to=None
+    ):
         # Alternative approach query
         if alternative_approach == "density-map":
-            return self.evaluate_density_map(steps)
+            self.evaluate_density_map(steps, filepath=save_to)
+        if alternative_approach == "evaluate-trails":
+            self.evaluate_trails(steps, filepath=save_to)
+
         frame_markers = []
         output = None
         screen = None

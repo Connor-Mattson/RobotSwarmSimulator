@@ -2,7 +2,6 @@ import pygame
 from ..gui.agentGUI import DifferentialDriveGUI
 from .WorldFactory import WorldFactory
 from ..util.timer import Timer
-from PIL import Image
 import os
 
 screen = None
@@ -15,9 +14,17 @@ def main(world_config):
     pygame.init()
     pygame.display.set_caption("Swarm Simulation")
 
+    density_map_on = False  # Indicates whether we want to collect a density map of the agents
+    total_allowed_steps = None
+    evaluate_trails = True
+    pygame_flags = None
+    if density_map_on or evaluate_trails:
+        total_allowed_steps = 1200
+        pygame_flags = pygame.HIDDEN
+
     # screen must be global so that other modules can access + draw to the window
     global screen
-    screen = pygame.display.set_mode((world_config.w + GUI_WIDTH, world_config.h))
+    screen = pygame.display.set_mode((world_config.w + GUI_WIDTH, world_config.h), flags=pygame_flags)
 
     # define a variable to control the main loop
     running = True
@@ -34,13 +41,8 @@ def main(world_config):
     gui.set_world(world)
     world.attach_gui(gui)
 
-    total_allowed_steps = None
     steps_taken = 0
     steps_per_frame = 1
-
-    density_map_on = True  # Indicates whether we want to collect a density map of the agents
-    if density_map_on:
-        total_allowed_steps = 1200
 
     labels = [pygame.K_RETURN, pygame.K_q, pygame.K_0, pygame.K_KP0, pygame.K_1, pygame.K_KP1, pygame.K_2, pygame.K_KP2,
               pygame.K_3, pygame.K_KP3, pygame.K_4, pygame.K_KP4, pygame.K_5, pygame.K_KP5]
@@ -95,12 +97,14 @@ def main(world_config):
                     time_me.check_watch()
                     running = False
                     if density_map_on:
-                        density_map = world.evaluate(20, alternative_approach="density-map") * 255
-                        img = Image.fromarray(density_map.astype('uint8'), 'L')
-                        img.save("density.png")
+                        world.evaluate(500, alternative_approach="density-map")
+                    if evaluate_trails:
+                        world.evaluate(20, alternative_approach="evaluate-trails")
+
                     break
 
             world.step()
+
             steps_taken += 1
             # if steps_taken % 1000 == 0:
             # print(f"Total steps: {steps_taken}")
@@ -108,12 +112,13 @@ def main(world_config):
         gui.set_time(steps_taken)
 
         # Draw!
-        screen.fill((0, 0, 0))
-        world.draw(screen)
-        gui.draw(screen)
-        pygame.display.flip()
+        if not density_map_on and not evaluate_trails:
+            screen.fill((0, 0, 0))
+            world.draw(screen)
+            gui.draw(screen)
+            pygame.display.flip()
 
         # Limit the FPS of the simulation to FRAMERATE
-        pygame.time.Clock().tick(FRAMERATE)
+            pygame.time.Clock().tick(FRAMERATE)
 
 

@@ -5,6 +5,9 @@ pixels on the screen
 
 
 class OutputTensorConfig:
+    """
+    :param screen: This is the screen
+    """
     def __init__(self,
                  screen=None,
                  total_frames=5,
