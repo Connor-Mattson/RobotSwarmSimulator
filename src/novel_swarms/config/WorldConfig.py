@@ -28,7 +28,8 @@ class RectangularWorldConfig:
             self.defined_start = True
             self.agent_init = agent_initialization
             if len(agent_initialization) != n_agents:
-                raise Exception(f"Length of Predefined Starting Locations ({len(agent_initialization)}) must equal number of agents ({n_agents})")
+                raise Exception(
+                    f"Length of Predefined Starting Locations ({len(agent_initialization)}) must equal number of agents ({n_agents})")
 
         self.behavior = behavior
         self.w = size[0]
@@ -67,3 +68,22 @@ class RectangularWorldConfig:
     def set_attributes(self, dictionary):
         for key in dictionary:
             setattr(self, key, dictionary[key])
+
+    def as_dict(self):
+        return {
+            "behavior": [b.as_config_dict() for b in self.behavior],
+            "w": self.w,
+            "h": self.h,
+            "population_size": self.population_size,
+            "seed": self.seed,
+            "padding": self.padding,
+            "agent_config": self.agentConfig.as_dict(),
+            "radius": self.radius,
+            "show_walls": self.show_walls,
+            "collide_walls": self.collide_walls,
+            "stop_at": self.stop_at,
+            "objects": [o.as_config_dict() for o in self.objects],
+            "goals": [g.as_config_dict() for g in self.goals],
+            "background_color": self.background_color,
+            "metadata": self.metadata
+        }

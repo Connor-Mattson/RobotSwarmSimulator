@@ -1,10 +1,11 @@
-from ..config.AgentConfig import DiffDriveAgentConfig, UnicycleAgentConfig, MazeAgentConfig, StaticAgentConfig, LevyAgentConfig, DroneAgentConfig
+from ..config.AgentConfig import DiffDriveAgentConfig, UnicycleAgentConfig, MazeAgentConfig, StaticAgentConfig, LevyAgentConfig, DroneAgentConfig, ModeSwitchingAgentConfig
 from .DiffDriveAgent import DifferentialDriveAgent
 from .UnicycleAgent import UnicycleAgent
 from .StaticAgent import StaticAgent
 from .MazeAgent import MazeAgent
 from .LevyAgent import LevyAgent
 from .DroneAgent import DroneAgent
+from .ModeSwitchingAgent import ModeSwitchingAgent
 
 
 class AgentFactory:
@@ -22,4 +23,6 @@ class AgentFactory:
             return LevyAgent(config=agent_config, name=name)
         if isinstance(agent_config, DroneAgentConfig):
             return DroneAgent(config=agent_config, name=name)
+        if isinstance(agent_config, ModeSwitchingAgentConfig):
+            return ModeSwitchingAgent(config=agent_config, name=name)
         raise Exception("Could not Create Agent: Unknown Config Input")

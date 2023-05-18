@@ -13,11 +13,11 @@ import numpy as np
 
 if __name__ == "__main__":
 
-    AGGREGATION_CONTROLLER = [ 4.3155251,  -0.71469968, -0.43351827,  1.87505216,  2.37840557,  0.41038622]
+    AGGREGATION_CONTROLLER = [-1.7, 0.030000000000000006, 0.0, 0.2]
     SEED = None
     GUI_PADDING = 15
     BL = 15.1
-    N_AGENTS = 10
+    N_AGENTS = 12
     # WIDTH, HEIGHT = int(BL * 29.8), int(BL * 29.8)
     WIDTH, HEIGHT = 1000, 1000
 
@@ -37,12 +37,13 @@ if __name__ == "__main__":
             degrees=True,
             false_positive=0.0,
             false_negative=0.0,
-            # Rectangle Representing Environment Boundaries
-            walls=[[GUI_PADDING, GUI_PADDING], [GUI_PADDING + WIDTH, GUI_PADDING + HEIGHT]],
-            wall_sensing_range=(BL * 4),
+            # # Rectangle Representing Environment Boundaries
+            # walls=[[GUI_PADDING, GUI_PADDING], [GUI_PADDING + WIDTH, GUI_PADDING + HEIGHT]],
+            # wall_sensing_range=(BL * 4),
             time_step_between_sensing=2,
             goal_sensing_range=(BL * 29.13),
             detect_goal_with_added_state=True,
+
         )
     ],
     custom_state_decision=controller)
@@ -94,7 +95,7 @@ if __name__ == "__main__":
 
     heterogeneous_swarm_config = HeterogeneousSwarmConfig()
     heterogeneous_swarm_config.add_sub_populuation(agent_levy, 0)
-    heterogeneous_swarm_config.add_sub_populuation(agent_maze, 10)
+    heterogeneous_swarm_config.add_sub_populuation(agent_maze, 12)
 
     behavior = [
         TotalCollisionsBehavior(),
@@ -105,18 +106,18 @@ if __name__ == "__main__":
         PercentageAtGoal(1.0, history=1),
     ]
 
-    goals = [CylinderGoal(250, 200, 20, remove_agents_at_goal=True, range=100)]
+    goals = [CylinderGoal(500, 500, 20, remove_agents_at_goal=True, range=100)]
     objects = []
 
-    initial_conditions = [(500, 900, np.random.random() * 2 * np.pi) for i in range(N_AGENTS)]
+    initial_conditions = [(500, 500, np.random.random() * (np.pi / 2)) for i in range(N_AGENTS)]
 
     world_config = RectangularWorldConfig(
         size=(WIDTH, HEIGHT),
-        n_agents=10,
+        n_agents=12,
         seed=SEED,
         behavior=behavior,
-        show_walls=True,
-        collide_walls=True,
+        show_walls=False,
+        collide_walls=False,
         agent_initialization=initial_conditions,
         agentConfig=heterogeneous_swarm_config,
         padding=15,

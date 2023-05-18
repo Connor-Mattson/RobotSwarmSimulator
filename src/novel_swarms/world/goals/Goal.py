@@ -2,18 +2,20 @@ import pygame
 import numpy as np
 from src.novel_swarms.util.collider.CircularCollider import CircularCollider
 
+
 class AbstractGoal:
     def __init__(self):
         pass
 
-    def draw(self,screen):
+    def draw(self, screen):
         pass
 
     def agent_achieved_goal(self, agent):
         pass
 
+
 class AreaGoal(AbstractGoal):
-    def __init__(self, x, y, w, h, color=(0, 255, 0), remove_agents_at_goal = False):
+    def __init__(self, x, y, w, h, color=(0, 255, 0), remove_agents_at_goal=False):
         super().__init__()
         self.rect = pygame.Rect(x, y, w, h)
         self.color = color
@@ -32,6 +34,7 @@ class AreaGoal(AbstractGoal):
 
     def get_count(self):
         return len(self.agents_seen)
+
 
 class CylinderGoal(AbstractGoal):
     def __init__(self, x, y, r, color=(0, 255, 0), range=100, remove_agents_at_goal=False):
@@ -61,3 +64,13 @@ class CylinderGoal(AbstractGoal):
 
     def get_collider(self):
         return CircularCollider(self.center[0], self.center[1], self.r)
+
+    def as_config_dict(self):
+        return {
+            "type": "CylinderGoal",
+            "center": self.center,
+            "r": self.r,
+            "color": self.color,
+            "remove_at": self.remove_at,
+            "range": self.range
+        }

@@ -56,12 +56,12 @@ class RectangularWorld(World):
         if config.defined_start:
             for i in range(len(config.agent_init)):
                 init = config.agent_init[i]
-                noise_x = ((np.random.random() * 2) - 1) * 20
-                noise_y = ((np.random.random() * 2) - 1) * 20
-                noise_theta = ((np.random.random() * 2) - 1) * (np.pi / 8)
-                # noise_x = 0
-                # noise_y = 0
-                # noise_theta = 0
+                # noise_x = ((np.random.random() * 2) - 1) * 20
+                # noise_y = ((np.random.random() * 2) - 1) * 20
+                # noise_theta = ((np.random.random() * 2) - 1) * (np.pi / 8)
+                noise_x = 0
+                noise_y = 0
+                noise_theta = 0
                 self.population[i].x_pos = init[0] + noise_x
                 self.population[i].y_pos = init[1] + noise_y
                 if len(init) > 2:
@@ -106,6 +106,7 @@ class RectangularWorld(World):
                 check_for_agent_collisions=self.preventAgentCollisions,
                 world=self
             )
+            self.handleGoalCollisions(agent)
         # agent_step_timer.check_watch()
 
         behavior_timer = Timer("Behavior Calculation Step")
@@ -187,7 +188,6 @@ class RectangularWorld(World):
 
         # agent.angle += (math.pi / 720)
         self.handleWallCollisions(agent)
-        self.handleGoalCollisions(agent)
 
         if agent.x_pos != old_x or agent.y_pos != old_y:
             return True
@@ -367,6 +367,10 @@ class RectangularWorld(World):
         return False
 
     def handle_key_press(self, event):
+
+        for a in self.population:
+            a.on_key_press(event)
+
         if self.selected is not None:
             if event.key == pygame.K_l:
                 self.selected.simulate_error("Death")
@@ -405,4 +409,7 @@ class RectangularWorld(World):
     def handle_held_keys(self, keys):
         for agent in self.human_controlled:
             agent.handle_key_press(keys)
+
+    def as_config_dict(self):
+        return self.config.as_dict()
 

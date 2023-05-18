@@ -22,8 +22,7 @@ class DiffDriveAgentConfig:
                  trace_color=None,
                  body_color=(255, 255, 255),
                  body_filled=False
-                ):
-
+                 ):
         self.x = x
         self.y = y
         self.angle = angle
@@ -42,6 +41,25 @@ class DiffDriveAgentConfig:
     def attach_world_config(self, world_config):
         self.world = world_config
 
+    def as_dict(self):
+        return {
+            "type": "DiffDriveAgentConfig",
+            "x": self.x,
+            "y": self.y,
+            "angle": self.angle,
+            "seed": self.seed,
+            "dt": self.dt,
+            "agent_radius": self.agent_radius,
+            "wheel_radius": self.wheel_radius,
+            "body_color": self.body_color,
+            "body_filled": self.body_filled,
+            "controller": self.controller,
+            "sensors": self.sensors.as_config_dict(),
+            "trace_length": self.trace_length,
+            "trace_color": self.trace_color,
+        }
+
+
 class DroneAgentConfig:
     def __init__(self,
                  x=None,
@@ -57,8 +75,7 @@ class DroneAgentConfig:
                  trace_color=None,
                  body_color=(255, 255, 255),
                  body_filled=False
-                ):
-
+                 ):
         self.x = x
         self.y = y
         self.angle = angle
@@ -75,6 +92,24 @@ class DroneAgentConfig:
 
     def attach_world_config(self, world_config):
         self.world = world_config
+
+    def as_dict(self):
+        return {
+            "type": "DroneAgentConfig",
+            "x": self.x,
+            "y": self.y,
+            "angle": self.angle,
+            "seed": self.seed,
+            "dt": self.dt,
+            "agent_radius": self.agent_radius,
+            "body_color": self.body_color,
+            "body_filled": self.body_filled,
+            "controller": self.controller,
+            "sensors": self.sensors.as_config_dict(),
+            "trace_length": self.trace_length,
+            "trace_color": self.trace_color,
+        }
+
 
 class UnicycleAgentConfig:
     def __init__(self,
@@ -95,7 +130,6 @@ class UnicycleAgentConfig:
                  trace_length=None,
                  trace_color=None,
                  ):
-
         self.x = x
         self.y = y
         self.angle = angle
@@ -115,6 +149,27 @@ class UnicycleAgentConfig:
 
     def attach_world_config(self, world_config):
         self.world = world_config
+
+    def as_dict(self):
+        return {
+            "type": "UnicycleAgentConfig",
+            "x": self.x,
+            "y": self.y,
+            "angle": self.angle,
+            "seed": self.seed,
+            "dt": self.dt,
+            "agent_radius": self.agent_radius,
+            "wheel_radius": self.wheel_radius,
+            "body_color": self.body_color,
+            "body_filled": self.body_filled,
+            "controller": self.controller,
+            "sensors": self.sensors.as_config_dict(),
+            "idiosyncrasies": self.idiosyncrasies,
+            "stop_on_collision": self.stop_on_collision,
+            "trace_length": self.trace_length,
+            "trace_color": self.trace_color,
+        }
+
 
 class LevyAgentConfig:
     def __init__(self,
@@ -141,6 +196,21 @@ class LevyAgentConfig:
         self.world = world_config
         self.unicycle_config.attach_world_config(world_config)
 
+    def as_dict(self):
+        return {
+            "type": "LevyAgentConfig",
+            "x": self.x,
+            "y": self.y,
+            "seed": self.seed,
+            "agent_radius": self.agent_radius,
+            "unicycle_config": self.unicycle_config.as_dict(),
+            "levy_constant": self.levy_constant,
+            "forward_rate": self.forward_rate,
+            "turning_rate": self.turning_rate,
+            "step_scale": self.step_scale,
+        }
+
+
 class MazeAgentConfig:
     def __init__(self,
                  x=None,
@@ -158,7 +228,6 @@ class MazeAgentConfig:
                  body_color=(255, 255, 255),
                  body_filled=False
                  ):
-
         self.x = x
         self.y = y
         self.angle = angle
@@ -177,6 +246,65 @@ class MazeAgentConfig:
     def attach_world_config(self, world_config):
         self.world = world_config
 
+    def as_dict(self):
+        return {
+            "type": "MazeAgentConfig",
+            "x": self.x,
+            "y": self.y,
+            "angle": self.angle,
+            "seed": self.seed,
+            "dt": self.dt,
+            "agent_radius": self.agent_radius,
+            "body_color": self.body_color,
+            "body_filled": self.body_filled,
+            "controller": self.controller,
+            "sensors": self.sensors.as_config_dict(),
+            "idiosyncrasies": self.idiosyncrasies,
+            "stop_on_collision": self.stop_on_collision,
+            "stop_at_goal": self.stop_at_goal,
+        }
+
+
+class ModeSwitchingAgentConfig():
+    def __init__(self,
+                 parent_config: MazeAgentConfig,
+                 controllers,
+                 switch_mode="Keyboard"  # Elem in ["Keyboard", "Time", "Distribution"]
+                 ):
+        self.copy_config(parent_config)
+        self.world = parent_config.world
+        self.parent_config = parent_config
+        self.controllers = controllers
+        self.switch_mode = switch_mode
+
+    def copy_config(self, config):
+        self.x = config.x
+        self.y = config.y
+        self.angle = config.angle
+        self.world = config.world
+        self.seed = config.seed
+        self.dt = config.dt
+        self.agent_radius = config.agent_radius
+        self.controller = config.controller
+        self.sensors = config.sensors
+        self.idiosyncrasies = config.idiosyncrasies
+        self.stop_on_collision = config.stop_on_collision
+        self.stop_at_goal = config.stop_at_goal
+        self.body_color = config.body_color
+        self.body_filled = config.body_filled
+
+    def attach_world_config(self, world_config):
+        self.world = world_config
+        self.parent_config.attach_world_config(world_config)
+
+    def as_dict(self):
+        return {
+            "type": "ModeSwitchingAgentConfig",
+            "parent_config": self.parent_config.as_dict(),
+            "controllers": self.controllers,
+            "switch_mode": self.switch_mode
+        }
+
 
 class StaticAgentConfig:
     def __init__(self,
@@ -190,7 +318,6 @@ class StaticAgentConfig:
                  body_color=(255, 255, 255),
                  body_filled=False
                  ):
-
         self.x = x
         self.y = y
         self.angle = angle
@@ -203,3 +330,16 @@ class StaticAgentConfig:
 
     def attach_world_config(self, world_config):
         self.world = world_config
+
+    def as_dict(self):
+        return {
+            "type": "StaticAgentConfig",
+            "x": self.x,
+            "y": self.y,
+            "angle": self.angle,
+            "seed": self.seed,
+            "dt": self.dt,
+            "agent_radius": self.agent_radius,
+            "body_color": self.body_color,
+            "body_filled": self.body_filled
+        }

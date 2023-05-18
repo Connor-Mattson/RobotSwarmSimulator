@@ -21,3 +21,14 @@ class HeterogeneousSwarmConfig:
         self.world = world_config
         for key in self.subpopulation_information:
             key.attach_world_config(world_config)
+
+    def as_dict(self):
+        return {
+            "type": "HeterogeneousSwarmConfig",
+            "sub_population_configs": [
+                k.as_dict() for k in self.subpopulation_information.keys()
+            ],
+            "counts": [
+                v for v in self.subpopulation_information.values()
+            ]
+        }

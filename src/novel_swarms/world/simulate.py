@@ -6,7 +6,7 @@ from ..util.timer import Timer
 screen = None
 FRAMERATE = 200
 
-def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_events=False, step_size=1):
+def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_events=False, gui_key_events=False, step_size=1):
     # initialize the pygame module
     if show_gui:
         pygame.init()
@@ -52,7 +52,7 @@ def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_e
             for event in pygame.event.get():
                 # Cancel the game loop if user quits the GUI
                 if event.type == pygame.QUIT:
-                    running = False
+                    return world
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
                         paused = not paused
@@ -79,8 +79,13 @@ def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_e
                         steps_per_frame = round(steps_per_frame)
                     if event.key == pygame.K_w:
                         draw_world = not draw_world
+                    if event.key == pygame.K_F3:
+                        from src.novel_swarms.world.WorldIO import WorldIO
+                        WorldIO.save_world(world)
                     if world_key_events:
                         world.handle_key_press(event)
+                    if gui and gui_key_events:
+                        gui.pass_key_events(event)
                     if event.key in labels:
                         return event.key, steps_taken
 

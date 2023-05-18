@@ -103,3 +103,10 @@ class BinaryLOSSensor(AbstractSensor):
         if len(self.history) > self.hist_len:
             self.history = self.history[1:]
         self.history.append(value)
+
+    def as_config_dict(self):
+        return {
+            "type": "BinaryLOSSensor",
+            "angle": self.angle,
+            "history_length": self.hist_len,
+        }

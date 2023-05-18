@@ -84,7 +84,7 @@ def get_heterogeneous_world(genome):
             stop_at_goal=False,
         )
 
-        NUM_A, NUM_B = 10, 1
+        NUM_A, NUM_B = 6, 6
         heterogeneous_swarm_config = HeterogeneousSwarmConfig()
         heterogeneous_swarm_config.add_sub_populuation(agent_maze_a, NUM_A)
         heterogeneous_swarm_config.add_sub_populuation(agent_maze_b, NUM_B)
@@ -121,7 +121,8 @@ def get_heterogeneous_world(genome):
 def run_simulation():
     # genome = [11.94, -0.48, 2.80, 0.38, 12.82, -0.66, 0.13, -1.41]
     # genome = [14.09449214, -0.09365658, 13.13571482,  1.09531036, 13.28770632, -0.08053101, 8.05740008,  0.69650941]
-    genome = [11.94, -0.48, 2.80, 0.38, -7.5, -1.2, -7.5, 0.0]
+    # genome = [11.94, -0.48, 2.80, 0.38, -7.5, -1.2, -7.5, 0.0]
+    genome = [9.102606569057237, -0.5421272904664225, 8.058778104654735, 1.9838181101468948, 4.111952286073679, 1.1365864486282389, 11.779289043922235, -0.13073055734697725]
     # genome = [11.94, -0.48, 2.80, 0.38, -8, -0.15, -6, 0.87]
     worlds = get_heterogeneous_world(genome)
     simulate(worlds[0], show_gui=True, world_key_events=False, step_size=5)

@@ -14,7 +14,8 @@ class CMAES:
                  target=0.0,
                  num_processes=1,
                  stop_detection_method=None,
-                 show_each_step=False):
+                 show_each_step=False,
+                 sigma_vec = None):
         self.f = f
         self.g_to_w = genome_to_world
         self.x0 = init_genome
@@ -26,6 +27,7 @@ class CMAES:
         self.w_stop_method = stop_detection_method
         self.solution_set = {}
         self.show_steps = show_each_step
+        self.sigma_vec = sigma_vec
 
     def minimize(self):
         opts = {'popsize': self.pop, 'bounds': self.bounds, 'ftarget': self.target, }

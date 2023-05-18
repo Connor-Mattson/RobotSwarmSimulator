@@ -44,3 +44,6 @@ class Agent:
 
     def get_aabb(self):
         pass
+
+    def on_key_press(self, event):
+        pass

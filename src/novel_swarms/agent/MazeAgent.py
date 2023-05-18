@@ -147,8 +147,8 @@ class MazeAgent(Agent):
         sensor_detection_id = self.sensors.getDetectionId()
         self.set_color_by_id(sensor_detection_id)
 
-        if sensor_detection_id == 2:
-            return 12, 0
+        # if sensor_state == 2:
+        #     return 12, 0
 
         v = self.controller[sensor_state * 2]
         omega = self.controller[(sensor_state * 2) + 1]

@@ -30,3 +30,6 @@ class AbstractBehavior():
 
     def draw(self, screen):
         pass
+
+    def as_config_dict(self):
+        return {"name": self.name, "history_size": self.history_size}

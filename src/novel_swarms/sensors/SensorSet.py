@@ -38,4 +38,7 @@ class SensorSet:
     def getStatePermutationSize(self):
         return sum([s.n_possible_states for s in self.sensors])
 
+    def as_config_dict(self):
+        return [s.as_config_dict() for s in self.sensors]
+
 
