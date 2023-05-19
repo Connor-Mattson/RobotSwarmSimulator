@@ -25,4 +25,4 @@ class AgentFactory:
             return DroneAgent(config=agent_config, name=name)
         if isinstance(agent_config, ModeSwitchingAgentConfig):
             return ModeSwitchingAgent(config=agent_config, name=name)
-        raise Exception("Could not Create Agent: Unknown Config Input")
+        raise Exception(f"Could not Create Agent of type: {agent_config.__class__.__name__}")

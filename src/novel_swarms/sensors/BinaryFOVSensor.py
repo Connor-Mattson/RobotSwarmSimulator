@@ -318,14 +318,29 @@ class BinaryFOVSensor(AbstractSensor):
     def as_config_dict(self):
         return {
             "type": "BinaryFOVSensor",
-            "angle": self.angle,
             "theta": self.theta,
             "bias": self.bias,
             "fp": self.fp,
             "fn": self.fn,
             "time_step_between_sensing": self.time_step_between_sensing,
-            "time_since_last_sensing": self.time_since_last_sensing,
             "store_history": self.store_history,
             "use_goal_state": self.use_goal_state,
-            "goal_sensing_range": self.goal_sensing_range
+            "wall_sensing_range": self.wall_sensing_range,
+            "goal_sensing_range": self.goal_sensing_range,
+            "agent_sensing_range": self.r,
         }
+
+    @staticmethod
+    def from_dict(d):
+        return BinaryFOVSensor(
+            parent=None,
+            theta=d["theta"],
+            distance=d["agent_sensing_range"],
+            bias=d["bias"],
+            false_positive=d["fp"],
+            false_negative=d["fn"],
+            store_history=d["store_history"],
+            detect_goal_with_added_state=d["use_goal_state"],
+            wall_sensing_range=d["wall_sensing_range"],
+            goal_sensing_range=d["goal_sensing_range"]
+        )

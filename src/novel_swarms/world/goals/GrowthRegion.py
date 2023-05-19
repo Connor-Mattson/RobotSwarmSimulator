@@ -1,7 +1,7 @@
 import numpy as np
 import pygame.draw
 import shapely
-from src.novel_swarms.world.WorldObject import WorldObject
+from src.novel_swarms.world.objects.WorldObject import WorldObject
 
 class GrowthRegion(WorldObject):
     def __init__(self, world, points, growth_step=1, growth_method="Centroid", detectable=False):

@@ -1,6 +1,12 @@
 import time
 import json
 
+
+
+"""
+WorldIO: Import/Export World Configurations for easy Reproducibility
+[STATIC METHODS HOLDER] -- No instantiation Needed
+"""
 class WorldIO:
     @staticmethod
     def save_world(world, file_name=None):
@@ -13,5 +19,27 @@ class WorldIO:
         print(f"World data saved to {file_name}.")
 
     @staticmethod
-    def load_world(file_name):
-        pass
+    def load_world_dictionary(file_name):
+        file = open(file_name, mode='r')
+        contents = file.read()
+        file.close()
+        d = json.loads(contents)
+        return d
+
+    @staticmethod
+    def sim_from_json(file_name):
+        from src.novel_swarms.config.WorldConfig import RectangularWorldConfig
+        from src.novel_swarms.world.simulate import main as sim
+
+        d = WorldIO.load_world_dictionary(file_name)
+        config = RectangularWorldConfig.from_dict(d)
+        sim(config)
+
+
+
+"""
+Given a File, JSON_WORLD, simulate the entire experiment with a single function call
+"""
+if __name__ == "__main__":
+    JSON_WORLD = "../../../demo/results/experiments/heterogeneous_behaviors/2_Species_Engulfing.json"
+    WorldIO.sim_from_json(JSON_WORLD)

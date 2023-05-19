@@ -1,5 +1,5 @@
 import pygame
-from ..WorldObject import WorldObject
+from src.novel_swarms.world.objects.WorldObject import WorldObject
 
 
 class Wall(WorldObject):

@@ -110,3 +110,11 @@ class BinaryLOSSensor(AbstractSensor):
             "angle": self.angle,
             "history_length": self.hist_len,
         }
+
+    @staticmethod
+    def from_dict(d):
+        return BinaryLOSSensor(
+            parent=None,
+            angle=d["angle"],
+            history_length=d["history_length"],
+        )

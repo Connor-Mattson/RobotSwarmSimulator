@@ -82,8 +82,8 @@ class MazeAgent(Agent):
                 v, omega = 0, 0
             else:
                 v, omega = self.interpretSensors()
-            self.detection_id = 2
-            self.set_color_by_id(3)
+            # self.detection_id = 2
+            # self.set_color_by_id(3)
         else:
             v, omega = self.interpretSensors()
 
@@ -145,7 +145,7 @@ class MazeAgent(Agent):
     def interpretSensors(self) -> Tuple:
         sensor_state = self.sensors.getState()
         sensor_detection_id = self.sensors.getDetectionId()
-        self.set_color_by_id(sensor_detection_id)
+        # self.set_color_by_id(sensor_detection_id)
 
         # if sensor_state == 2:
         #     return 12, 0

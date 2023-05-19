@@ -4,6 +4,7 @@ from pygame import math
 
 from .WorldConfig import RectangularWorldConfig
 from ..sensors.SensorSet import SensorSet
+from ..sensors.SensorFactory import SensorFactory
 
 
 class DiffDriveAgentConfig:
@@ -59,6 +60,15 @@ class DiffDriveAgentConfig:
             "trace_color": self.trace_color,
         }
 
+    @staticmethod
+    def from_dict(d):
+        ret = DiffDriveAgentConfig()
+        for k, v in d.items():
+            if k != "type":
+                setattr(ret, k, v)
+        ret.sensors = SensorFactory.create(ret.sensors)
+        return ret
+
 
 class DroneAgentConfig:
     def __init__(self,
@@ -109,6 +119,15 @@ class DroneAgentConfig:
             "trace_length": self.trace_length,
             "trace_color": self.trace_color,
         }
+
+    @staticmethod
+    def from_dict(d):
+        ret = DroneAgentConfig()
+        for k, v in d.items():
+            if k != "type":
+                setattr(ret, k, v)
+        ret.sensors = SensorFactory.create(ret.sensors)
+        return ret
 
 
 class UnicycleAgentConfig:
@@ -170,6 +189,15 @@ class UnicycleAgentConfig:
             "trace_color": self.trace_color,
         }
 
+    @staticmethod
+    def from_dict(d):
+        ret = UnicycleAgentConfig()
+        for k, v in d.items():
+            if k != "type":
+                setattr(ret, k, v)
+        ret.sensors = SensorFactory.create(ret.sensors)
+        return ret
+
 
 class LevyAgentConfig:
     def __init__(self,
@@ -209,6 +237,14 @@ class LevyAgentConfig:
             "turning_rate": self.turning_rate,
             "step_scale": self.step_scale,
         }
+
+    @staticmethod
+    def from_dict(d):
+        ret = LevyAgentConfig()
+        for k, v in d.items():
+            if k != "type":
+                setattr(ret, k, v)
+        return ret
 
 
 class MazeAgentConfig:
@@ -264,6 +300,15 @@ class MazeAgentConfig:
             "stop_at_goal": self.stop_at_goal,
         }
 
+    @staticmethod
+    def from_dict(d):
+        ret = MazeAgentConfig()
+        for k, v in d.items():
+            if k != "type":
+                setattr(ret, k, v)
+        ret.sensors = SensorFactory.create(ret.sensors)
+        return ret
+
 
 class ModeSwitchingAgentConfig():
     def __init__(self,
@@ -305,6 +350,17 @@ class ModeSwitchingAgentConfig():
             "switch_mode": self.switch_mode
         }
 
+    @staticmethod
+    def from_dict(d):
+        parent_config = AgentConfigFactory.create(d["parent_config"])
+        controllers = d["controllers"]
+        switch_mode = d["switch_mode"]
+        return ModeSwitchingAgentConfig(
+            parent_config=parent_config,
+            controllers=controllers,
+            switch_mode=switch_mode
+        )
+
 
 class StaticAgentConfig:
     def __init__(self,
@@ -343,3 +399,34 @@ class StaticAgentConfig:
             "body_color": self.body_color,
             "body_filled": self.body_filled
         }
+
+    @staticmethod
+    def from_dict(d):
+        ret = StaticAgentConfig()
+        for k, v in d.items():
+            if k != "type":
+                setattr(ret, k, v)
+        return ret
+
+class AgentConfigFactory:
+    @staticmethod
+    def create(d):
+        if d["type"] == "StaticAgentConfig":
+            return StaticAgentConfig.from_dict(d)
+        elif d["type"] == "ModeSwitchingAgentConfig":
+            return ModeSwitchingAgentConfig.from_dict(d)
+        elif d["type"] == "MazeAgentConfig":
+            return MazeAgentConfig.from_dict(d)
+        elif d["type"] == "LevyAgentConfig":
+            return LevyAgentConfig.from_dict(d)
+        elif d["type"] == "UnicycleAgentConfig":
+            return UnicycleAgentConfig.from_dict(d)
+        elif d["type"] == "DroneAgentConfig":
+            return DroneAgentConfig.from_dict(d)
+        elif d["type"] == "DiffDriveAgentConfig":
+            return DiffDriveAgentConfig.from_dict(d)
+        elif d["type"] == "HeterogeneousSwarmConfig":
+            from ..config.HeterogenSwarmConfig import HeterogeneousSwarmConfig
+            return HeterogeneousSwarmConfig.from_dict(d)
+        else:
+            raise Exception(f"Cannot instantiate a config of type: {d['type']}")

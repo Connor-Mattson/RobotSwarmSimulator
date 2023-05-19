@@ -11,14 +11,6 @@ from src.novel_swarms.sensors.BinaryFOVSensor import BinaryFOVSensor
 from src.novel_swarms.sensors.SensorSet import SensorSet
 from src.novel_swarms.world.goals.Goal import CylinderGoal
 from src.novel_swarms.world.simulate import main as sim
-
-def controller(sensor_states):
-    if sensor_states[0] == 0:
-        return 0
-    if sensor_states[0] == 1:
-        return 1
-    if sensor_states[0] == 2:
-        return 2
 def get_heterogeneous_world(genome):
 
     world_hash = hash(tuple(list(genome)))
@@ -54,7 +46,7 @@ def get_heterogeneous_world(genome):
             detect_goal_with_added_state=True,
         )
     ],
-        custom_state_decision=controller)
+        custom_state_decision="Linear")
 
     sensor_2 = SensorSet([
         BinaryFOVSensor(
@@ -72,7 +64,7 @@ def get_heterogeneous_world(genome):
             detect_goal_with_added_state=False,
         )
     ],
-        custom_state_decision=controller)
+        custom_state_decision="Linear")
 
     agent_maze_a = MazeAgentConfig(
         controller=species_A,

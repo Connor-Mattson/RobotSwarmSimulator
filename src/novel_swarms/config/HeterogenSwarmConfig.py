@@ -1,4 +1,5 @@
 from ..agent.AgentFactory import AgentFactory
+from .AgentConfig import AgentConfigFactory
 
 
 class HeterogeneousSwarmConfig:
@@ -32,3 +33,18 @@ class HeterogeneousSwarmConfig:
                 v for v in self.subpopulation_information.values()
             ]
         }
+
+    @staticmethod
+    def from_dict(d):
+        counts = d['counts']
+        configs = []
+        for c in d["sub_population_configs"]:
+            configs.append(AgentConfigFactory.create(c))
+        ret = HeterogeneousSwarmConfig()
+
+        i = 0
+        for config in configs:
+            ret.add_sub_populuation(config, counts[i])
+            i += 1
+
+        return ret

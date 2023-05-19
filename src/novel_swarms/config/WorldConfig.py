@@ -78,12 +78,41 @@ class RectangularWorldConfig:
             "seed": self.seed,
             "padding": self.padding,
             "agent_config": self.agentConfig.as_dict(),
-            "radius": self.radius,
             "show_walls": self.show_walls,
             "collide_walls": self.collide_walls,
             "stop_at": self.stop_at,
             "objects": [o.as_config_dict() for o in self.objects],
             "goals": [g.as_config_dict() for g in self.goals],
             "background_color": self.background_color,
-            "metadata": self.metadata
+            "metadata": self.metadata,
+            "agent_init": self.agent_init
         }
+
+    @staticmethod
+    def from_dict(d):
+        from src.novel_swarms.world.objects.ObjectFactory import ObjectFactory
+        from src.novel_swarms.world.goals.GoalFactory import GoalFactory
+        from src.novel_swarms.behavior.BehaviorFactory import BehaviorFactory
+        from src.novel_swarms.config.AgentConfig import AgentConfigFactory
+
+        objects = [ObjectFactory.create(o) for o in d["objects"]]
+        goals = [GoalFactory.create(g) for g in d["goals"]]
+        behavior = [BehaviorFactory.create(b) for b in d["behavior"]]
+        a_config = AgentConfigFactory.create(d["agent_config"])
+
+        return RectangularWorldConfig(
+            size=(d["w"], d["h"]),
+            behavior=behavior,
+            n_agents=d["population_size"],
+            seed=d["seed"],
+            padding=d["padding"],
+            agentConfig=a_config,
+            show_walls=d["show_walls"],
+            collide_walls=d["collide_walls"],
+            stop_at=d["stop_at"],
+            goals=goals,
+            objects=objects,
+            metadata=d["metadata"],
+            agent_initialization=d["agent_init"]
+        )
+
