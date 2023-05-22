@@ -1,18 +1,18 @@
-from src.novel_swarms.behavior.AgentsAtGoal import AgentsAtGoal
-from src.novel_swarms.behavior.AverageSpeed import AverageSpeedBehavior
-from src.novel_swarms.behavior.AlgebraicConnectivity import AlgebraicConn
-from src.novel_swarms.behavior.ScatterBehavior import ScatterBehavior
-from src.novel_swarms.behavior.DistanceToGoal import DistanceToGoal
-from src.novel_swarms.behavior.TotalCollisions import TotalCollisionsBehavior
-from src.novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
-from src.novel_swarms.behavior.Centroid import Centroid
-from src.novel_swarms.behavior.ConvexHull import ConvexHull
-from src.novel_swarms.behavior.DistanceToGoal import DistanceToGoal
-from src.novel_swarms.behavior.GroupRotationBehavior import GroupRotationBehavior
-from src.novel_swarms.behavior.RadialVariance import RadialVarianceBehavior
-from src.novel_swarms.behavior.SensorOffset import GeneElementDifference
-from src.novel_swarms.behavior.SensorRotation import SensorRotation
-from src.novel_swarms.behavior.SensorSignal import SensorSignalBehavior
+from ..behavior.AgentsAtGoal import AgentsAtGoal
+from ..behavior.AverageSpeed import AverageSpeedBehavior
+from ..behavior.AlgebraicConnectivity import AlgebraicConn
+from ..behavior.ScatterBehavior import ScatterBehavior
+from ..behavior.DistanceToGoal import DistanceToGoal
+from ..behavior.TotalCollisions import TotalCollisionsBehavior
+from ..behavior.AngularMomentum import AngularMomentumBehavior
+from ..behavior.Centroid import Centroid
+from ..behavior.ConvexHull import ConvexHull
+from ..behavior.DistanceToGoal import DistanceToGoal
+from ..behavior.GroupRotationBehavior import GroupRotationBehavior
+from ..behavior.RadialVariance import RadialVarianceBehavior
+from ..behavior.SensorOffset import GeneElementDifference
+from ..behavior.SensorRotation import SensorRotation
+from ..behavior.SensorSignal import SensorSignalBehavior
 
 class BehaviorFactory:
     @staticmethod

@@ -1,6 +1,6 @@
 import warnings
 from multiprocessing import Pool
-from src.novel_swarms.world.simulate import main as sim
+from ...world.simulate import main as sim
 
 
 def simulate(world_config, terminate_function, show_gui=False):

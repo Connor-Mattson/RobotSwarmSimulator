@@ -28,8 +28,8 @@ class WorldIO:
 
     @staticmethod
     def sim_from_json(file_name):
-        from src.novel_swarms.config.WorldConfig import RectangularWorldConfig
-        from src.novel_swarms.world.simulate import main as sim
+        from ..config.WorldConfig import RectangularWorldConfig
+        from ..world.simulate import main as sim
 
         d = WorldIO.load_world_dictionary(file_name)
         config = RectangularWorldConfig.from_dict(d)

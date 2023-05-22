@@ -1,7 +1,7 @@
 import cma
 import numpy as np
-from src.novel_swarms.util.processing.multicoreprocessing import MultiWorldSimulation
-from src.novel_swarms.world.simulate import main as sim
+from ..util.processing.multicoreprocessing import MultiWorldSimulation
+from ..world.simulate import main as sim
 
 class CMAES:
     def __init__(self,
@@ -79,15 +79,15 @@ def example_A():
         return world.behavior[2].out_average()[1]
 
     def get_world(genome):
-        from src.novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
-        from src.novel_swarms.behavior.AverageSpeed import AverageSpeedBehavior
-        from src.novel_swarms.behavior.GroupRotationBehavior import GroupRotationBehavior
-        from src.novel_swarms.behavior.RadialVariance import RadialVarianceBehavior
-        from src.novel_swarms.behavior.ScatterBehavior import ScatterBehavior
-        from src.novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
-        from src.novel_swarms.sensors.SensorSet import SensorSet
-        from src.novel_swarms.config.AgentConfig import DiffDriveAgentConfig
-        from src.novel_swarms.config.WorldConfig import RectangularWorldConfig
+        from ..behavior.AngularMomentum import AngularMomentumBehavior
+        from ..behavior.AverageSpeed import AverageSpeedBehavior
+        from ..behavior.GroupRotationBehavior import GroupRotationBehavior
+        from ..behavior.RadialVariance import RadialVarianceBehavior
+        from ..behavior.ScatterBehavior import ScatterBehavior
+        from ..sensors.BinaryLOSSensor import BinaryLOSSensor
+        from ..sensors.SensorSet import SensorSet
+        from ..config.AgentConfig import DiffDriveAgentConfig
+        from ..config.WorldConfig import RectangularWorldConfig
 
         controller = genome
         sensors = SensorSet([
@@ -135,15 +135,15 @@ def example_B():
         return total / len(world_set)
 
     def get_world(genome):
-        from src.novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
-        from src.novel_swarms.behavior.AverageSpeed import AverageSpeedBehavior
-        from src.novel_swarms.behavior.GroupRotationBehavior import GroupRotationBehavior
-        from src.novel_swarms.behavior.RadialVariance import RadialVarianceBehavior
-        from src.novel_swarms.behavior.ScatterBehavior import ScatterBehavior
-        from src.novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
-        from src.novel_swarms.sensors.SensorSet import SensorSet
-        from src.novel_swarms.config.AgentConfig import DiffDriveAgentConfig
-        from src.novel_swarms.config.WorldConfig import RectangularWorldConfig
+        from ..behavior.AngularMomentum import AngularMomentumBehavior
+        from ..behavior.AverageSpeed import AverageSpeedBehavior
+        from ..behavior.GroupRotationBehavior import GroupRotationBehavior
+        from ..behavior.RadialVariance import RadialVarianceBehavior
+        from ..behavior.ScatterBehavior import ScatterBehavior
+        from ..sensors.BinaryLOSSensor import BinaryLOSSensor
+        from ..sensors.SensorSet import SensorSet
+        from ..config.AgentConfig import DiffDriveAgentConfig
+        from ..config.WorldConfig import RectangularWorldConfig
 
         worlds = []
         for seed in range(10):

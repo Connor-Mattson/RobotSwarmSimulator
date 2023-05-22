@@ -1,6 +1,6 @@
 import math
-from src.novel_swarms.agent.MazeAgent import MazeAgent
-from src.novel_swarms.config.AgentConfig import ModeSwitchingAgentConfig
+from ..agent.MazeAgent import MazeAgent
+from ..config.AgentConfig import ModeSwitchingAgentConfig
 from typing import Tuple
 import pygame
 

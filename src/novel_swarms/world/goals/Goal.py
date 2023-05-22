@@ -1,6 +1,6 @@
 import pygame
 import numpy as np
-from src.novel_swarms.util.collider.CircularCollider import CircularCollider
+from ...util.collider.CircularCollider import CircularCollider
 
 
 class AbstractGoal:

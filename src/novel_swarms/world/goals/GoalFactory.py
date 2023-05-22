@@ -1,4 +1,4 @@
-from src.novel_swarms.world.goals.Goal import CylinderGoal
+from ...world.goals.Goal import CylinderGoal
 
 class GoalFactory:
     @staticmethod

@@ -90,10 +90,10 @@ class RectangularWorldConfig:
 
     @staticmethod
     def from_dict(d):
-        from src.novel_swarms.world.objects.ObjectFactory import ObjectFactory
-        from src.novel_swarms.world.goals.GoalFactory import GoalFactory
-        from src.novel_swarms.behavior.BehaviorFactory import BehaviorFactory
-        from src.novel_swarms.config.AgentConfig import AgentConfigFactory
+        from ..world.objects.ObjectFactory import ObjectFactory
+        from ..world.goals.GoalFactory import GoalFactory
+        from ..behavior.BehaviorFactory import BehaviorFactory
+        from ..config.AgentConfig import AgentConfigFactory
 
         objects = [ObjectFactory.create(o) for o in d["objects"]]
         goals = [GoalFactory.create(g) for g in d["goals"]]

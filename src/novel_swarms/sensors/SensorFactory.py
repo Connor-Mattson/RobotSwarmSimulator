@@ -1,6 +1,6 @@
-from src.novel_swarms.sensors.BinaryFOVSensor import BinaryFOVSensor
-from src.novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
-from src.novel_swarms.sensors.SensorSet import SensorSet
+from ..sensors.BinaryFOVSensor import BinaryFOVSensor
+from ..sensors.BinaryLOSSensor import BinaryLOSSensor
+from ..sensors.SensorSet import SensorSet
 
 
 class SensorFactory:

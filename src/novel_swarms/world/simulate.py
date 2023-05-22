@@ -80,7 +80,7 @@ def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_e
                     if event.key == pygame.K_w:
                         draw_world = not draw_world
                     if event.key == pygame.K_F3:
-                        from src.novel_swarms.world.WorldIO import WorldIO
+                        from .WorldIO import WorldIO
                         WorldIO.save_world(world)
                     if world_key_events:
                         world.handle_key_press(event)

@@ -1,4 +1,4 @@
-from src.novel_swarms.world.objects.Wall import Wall
+from ...world.objects.Wall import Wall
 
 
 class ObjectFactory:

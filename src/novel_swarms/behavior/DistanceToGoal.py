@@ -3,7 +3,7 @@ import math
 import numpy as np
 from typing import List
 from .AbstractBehavior import AbstractBehavior
-from src.novel_swarms.world.goals.Goal import CylinderGoal, AreaGoal
+from ..world.goals.Goal import CylinderGoal, AreaGoal
 
 class DistanceToGoal(AbstractBehavior):
 

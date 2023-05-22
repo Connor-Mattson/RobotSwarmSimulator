@@ -1,4 +1,4 @@
-from src.novel_swarms.sensors.AbstractSensor import AbstractSensor
+from ..sensors.AbstractSensor import AbstractSensor
 
 
 class StaticSensor(AbstractSensor):
