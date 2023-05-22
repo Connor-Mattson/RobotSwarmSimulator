@@ -2,6 +2,7 @@ import math
 import random
 import numpy as np
 from .NoveltyArchive import NoveltyArchive
+from ..config.HeterogenSwarmConfig import HeterogeneousSwarmConfig
 from ..results.Trends import Trends
 from ..world.WorldFactory import WorldFactory
 from ..cache.ExternalSimulationArchive import ExternalSimulationArchive
@@ -64,15 +65,23 @@ class BehaviorDiscovery:
         self.scores = np.array([0.0 for i in range(self.population_size)])
         self.behavior = np.array([[-1.0 for j in range(len(self.behavior_config))] for i in range(self.population_size)])
 
-    def runSinglePopulation(self, screen=None, i=0, save=True, genome=None, seed=None, output_config=None):
+    def runSinglePopulation(self, screen=None, i=0, save=True, genome=None, seed=None, output_config=None, heterogeneous=False):
         """
         Evaluates the Novelty of a Single Genome located at the ith index
         """
+        print(f"Ratio Rule: {self.gene_builder.rules[-1].domain}")
         if genome is None:
             genome = self.population[i]
 
         self.status = "Simulation"
-        self.world_config.agentConfig.controller = genome
+        if not heterogeneous:
+            self.world_config.agentConfig.controller = genome
+        else:
+            # Currently Assumes Two Species Only
+            self.world_config.agentConfig.from_n_species_controller(genome)
+            self.world_config.agentConfig = self.world_config.agentConfig.clone()
+            self.world_config.agentConfig.attach_world_config(self.world_config)
+
         for key in self.genome_dependent_world:
             print("Setting Key!", key, " with Value: ", genome[self.genome_dependent_world[key]])
             setattr(self.world_config, key, genome[self.genome_dependent_world[key]])

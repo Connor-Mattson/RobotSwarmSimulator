@@ -41,5 +41,5 @@ class WorldIO:
 Given a File, JSON_WORLD, simulate the entire experiment with a single function call
 """
 if __name__ == "__main__":
-    JSON_WORLD = "../../../demo/results/experiments/heterogeneous_behaviors/2_Species_Engulfing.json"
+    JSON_WORLD = "../../../demo/results/experiments/heterogeneous_behaviors/embedded-cycles-heterogeneous.json"
     WorldIO.sim_from_json(JSON_WORLD)

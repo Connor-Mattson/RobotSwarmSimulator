@@ -85,7 +85,7 @@ class RectangularWorldConfig:
             "goals": [g.as_config_dict() for g in self.goals],
             "background_color": self.background_color,
             "metadata": self.metadata,
-            "agent_init": self.agent_init
+            "agent_init": self.agent_init if hasattr(self, "agent_init") else None
         }
 
     @staticmethod

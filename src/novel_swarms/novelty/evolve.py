@@ -9,7 +9,7 @@ FRAMERATE = 200
 GUI_WIDTH = 200
 
 
-def main(config: GeneticEvolutionConfig, output_config=None):
+def main(config: GeneticEvolutionConfig, output_config=None, heterogeneous=False):
 
     # initialize the pygame module
     pygame.init()
@@ -78,7 +78,7 @@ def main(config: GeneticEvolutionConfig, output_config=None):
             screen.fill((0, 0, 0))
 
             evolution.curr_genome = i
-            evolution.runSinglePopulation(screen=screen, i=i, seed=i, output_config=output_config)
+            evolution.runSinglePopulation(screen=screen, i=i, seed=i, output_config=output_config, heterogeneous=heterogeneous)
 
             if config.show_gui:
                 gui.draw(screen=screen)
