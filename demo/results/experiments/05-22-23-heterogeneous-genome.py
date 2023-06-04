@@ -23,8 +23,8 @@ SINGLE_SENSOR_HETEROGENEOUS_MODEL = GeneBuilder(
 )
 
 def simulate_from_single_controller():
-    c = [-0.6, -1.0, 1.0, -1.0, -1.0, -0.7, -1.0, 1.0, 0.5]
-    n = 30
+    c = [-1.0, 1.0, 0.3, 0.2, 0.3, -0.9, 0.4, 1.0, 0.3]
+    n = 24
 
     agent_A = DiffDriveAgentConfig(controller=None, sensors=ConfigurationDefaults.SIMPLE_SENSOR, dt=1.0, body_color=(255, 0, 0), body_filled=True)
     agent_B = DiffDriveAgentConfig(controller=None, sensors=ConfigurationDefaults.SIMPLE_SENSOR, dt=1.0, body_color=(0, 255, 0), body_filled=True)
@@ -47,8 +47,8 @@ def simulate_from_single_controller():
 
 def evolve_heterogeneity():
     # Use the default Differential Drive Agent, initialized with a single sensor and normal physics
-    agent_A = DiffDriveAgentConfig(controller=None, sensors=ConfigurationDefaults.SIMPLE_SENSOR, dt=1.0, body_color=(255, 0, 0))
-    agent_B = DiffDriveAgentConfig(controller=None, sensors=ConfigurationDefaults.SIMPLE_SENSOR, dt=1.0, body_color=(0, 255, 0))
+    agent_A = DiffDriveAgentConfig(controller=None, sensors=ConfigurationDefaults.FLOCKBOT_SENSOR_SET, dt=0.13, body_color=(255, 0, 0))
+    agent_B = DiffDriveAgentConfig(controller=None, sensors=ConfigurationDefaults.FLOCKBOT_SENSOR_SET, dt=0.13, body_color=(0, 255, 0))
     h_config = HeterogeneousSwarmConfig()
     h_config.add_sub_populuation(agent_A, 24//2)
     h_config.add_sub_populuation(agent_B, 24//2)
@@ -75,8 +75,8 @@ def evolve_heterogeneity():
     novelty_config = GeneticEvolutionConfig(
         gene_builder=genotype,
         phenotype_config=phenotype,
-        n_generations=100,
-        n_population=100,
+        n_generations=20,
+        n_population=20,
         crossover_rate=0.7,
         mutation_rate=0.15,
         world_config=world_config,
@@ -98,5 +98,5 @@ def evolve_heterogeneity():
     report(config=results_config, heterogeneous=True)
 
 if __name__ == "__main__":
-    # simulate_from_single_controller()
-    evolve_heterogeneity()
+    simulate_from_single_controller()
+    # evolve_heterogeneity()

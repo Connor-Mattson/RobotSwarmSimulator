@@ -5,7 +5,7 @@ from typing import Tuple
 
 class Agent:
 
-    def __init__(self, x, y, name=None, sensors=None, angle=0) -> None:
+    def __init__(self, x, y, name=None, sensors=None, angle=0, group=0) -> None:
         self.x_pos = x
         self.y_pos = y
         self.name = name
@@ -18,6 +18,7 @@ class Agent:
         self.stopped_duration = 0
         self.detection_id = 0
         self.aabb = None
+        self.group = group
         pass
 
     def step(self, check_for_world_boundaries=None) -> None:

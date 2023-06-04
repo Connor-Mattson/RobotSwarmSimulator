@@ -27,6 +27,7 @@ def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_e
 
     # Create the simulation world
     world = WorldFactory.create(world_config)
+    world_subscribers = []
 
     # Create the GUI
     if show_gui and not gui:
@@ -82,6 +83,9 @@ def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_e
                     if event.key == pygame.K_F3:
                         from .WorldIO import WorldIO
                         WorldIO.save_world(world)
+                    if event.key == pygame.K_F4:
+                        from .subscribers.World2Gif import World2Gif
+                        world_subscribers.append(World2Gif())
                     if world_key_events:
                         world.handle_key_press(event)
                     if gui and gui_key_events:
@@ -115,6 +119,10 @@ def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_e
                     return world
 
             world.step()
+
+            # Broadcast to any world subscribers
+            _ = [sub.notify(screen) for sub in world_subscribers]
+
             steps_taken += 1
             # if steps_taken % 1000 == 0:
             # print(f"Total steps: {steps_taken}")
@@ -132,5 +140,3 @@ def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_e
         if gui:
             pygame.display.flip()
             pygame.time.Clock().tick(FRAMERATE)
-
-

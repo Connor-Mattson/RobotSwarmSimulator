@@ -18,10 +18,13 @@ class HeterogeneousSwarmConfig:
 
     def build_agent_population(self):
         population = []
+        group = 0
         for key in self.subpopulation_information:
             for n in range(self.subpopulation_information[key]):
                 agent = AgentFactory.create(key)
+                agent.group = group
                 population.append(agent)
+            group += 1
         return population
 
     def attach_world_config(self, world_config):

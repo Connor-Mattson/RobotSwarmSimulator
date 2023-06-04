@@ -51,13 +51,15 @@ if __name__ == "__main__":
     # CUSTOM_CONTROLLER = [16.6, -0.4, 14.0, 0.5]  # Wall Following - Sweeping Version
     # CUSTOM_CONTROLLER = [-12.0, -0.6, -14.0, -0.5]  # Dispersal
     # CUSTOM_CONTROLLER = [8.0, -0.9, 15.0, 0.1]  # Milling/Cyclic
-    CUSTOM_CONTROLLER = [-1.7, 0.2, 0.0, 0.2]
+    # CUSTOM_CONTROLLER = [-1.7, 0.2, 0.0, 0.2]
+
+    CUSTOM_CONTROLLER = [5, 0.5, 0.0, 0.0]
 
     # CUSTOM_CONTROLLER = [20.0, -1.6, 20.0, 1.2]
 
     SEED = 1
     GUI_PADDING = 15
-    N_AGENTS = 9
+    N_AGENTS = 1
     WIDTH, HEIGHT = int(BL * 29.8), int(BL * 29.8)
 
     sensors = SensorSet([
@@ -67,8 +69,8 @@ if __name__ == "__main__":
             # distance=(BL * 3),
             bias=-7,
             degrees=True,
-            false_positive=0.1,
-            false_negative=0.05,
+            false_positive=0.0,
+            false_negative=0.0,
             # Rectangle Representing Environment Boundaries
             # walls=[[GUI_PADDING, GUI_PADDING], [GUI_PADDING + WIDTH, GUI_PADDING + HEIGHT]],
             walls=None,
@@ -81,11 +83,10 @@ if __name__ == "__main__":
     agent_config = UnicycleAgentConfig(
         controller=CUSTOM_CONTROLLER,
         agent_radius=BL / 2,
-        wheel_radius=BL * 0.44,
         dt=0.13,  # 130ms sampling period
         sensors=sensors,
         seed=None,
-        idiosyncrasies=True
+        idiosyncrasies=False
     )
 
     behavior = [
@@ -94,7 +95,7 @@ if __name__ == "__main__":
         RadialVarianceBehavior(),
         ScatterBehavior(),
         GroupRotationBehavior(),
-        AlgebraicConn(),
+        # AlgebraicConn(),
     ]
 
     r = 80
