@@ -3,6 +3,7 @@ from warnings import warn
 
 class GeneticEvolutionConfig:
     def __init__(self,
+                 seed=None,
                  gene_rules=None,
                  gene_builder=None,
                  phenotype_config=None,
@@ -29,6 +30,7 @@ class GeneticEvolutionConfig:
         else:
             self.gene_builder = gene_builder
 
+        self.seed = seed
         self.generations = n_generations
         self.population = n_population
         self.crossover_rate = crossover_rate

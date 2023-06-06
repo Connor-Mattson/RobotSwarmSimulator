@@ -198,7 +198,6 @@ class BehaviorDiscovery:
                     child_A = self.gene_builder.round_to(child_A)
                     child_B = self.gene_builder.round_to(child_B)
 
-            print(f"Child_A: {child_A}, Child_B: {child_B}")
             self.addToPopulation(child_A)
             self.addToPopulation(child_B)
 

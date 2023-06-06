@@ -50,7 +50,7 @@ def main(config: GeneticEvolutionConfig, output_config=None, heterogeneous=False
         mutation_flip_chance=config.mutation_flip_chance,
         allow_external_archive=config.use_external_archive,
         genome_dependent_world=config.world_metadata,
-        seed=0,
+        seed=config.seed,
     )
 
     if config.show_gui:

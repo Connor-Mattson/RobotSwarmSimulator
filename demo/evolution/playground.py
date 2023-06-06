@@ -71,6 +71,7 @@ if __name__ == "__main__":
         save_archive=True,
         show_gui=True,
         save_every=1,
+        seed=None
     )
 
     # Novelty Search through Genetic Evolution
