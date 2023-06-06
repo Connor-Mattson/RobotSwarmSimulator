@@ -17,7 +17,8 @@ class BehaviorDiscovery:
 
     def __init__(self, generations=10, population_size=20, crossover_rate=0.3, mutation_rate=0.1, genome_builder=None,
                  lifespan=200, world_config=None, behavior_config=None, k_neighbors=15, tournament_members=10,
-                 mutation_flip_chance = 0.2, allow_external_archive=False, genome_dependent_world=None):
+                 mutation_flip_chance = 0.2, allow_external_archive=False, genome_dependent_world=None, force_repeats=False,
+                 seed=None):
         self.population = np.array([])
         self.behavior = np.array([])
         self.scores = np.array([])
@@ -42,10 +43,14 @@ class BehaviorDiscovery:
         self.min_theta = []
         self.tournament_members = tournament_members
         self.allow_external_archive = allow_external_archive
-        self.force_repeats = False
+        self.force_repeats = force_repeats
         self.genome_dependent_world = genome_dependent_world
         if self.genome_dependent_world is None:
             self.genome_dependent_world = {}
+
+        if seed is not None:
+            np.random.seed(seed)
+            random.seed(seed)
 
         if genome_builder is None:
             raise Exception("BehaviorDiscovery must be initialized with a genotype ruleset.")
@@ -74,8 +79,12 @@ class BehaviorDiscovery:
             genome = self.population[i]
 
         self.status = "Simulation"
+        if seed is not None:
+            self.world_config.seed = seed
+
         if not heterogeneous:
             self.world_config.agentConfig.controller = genome
+            # self.world_config.agentConfig.controller = [0.0, 0.0, 0.0, 0.0]
         else:
             # Currently Assumes Two Species Only
             self.world_config.agentConfig.from_n_species_controller(genome)
@@ -189,6 +198,7 @@ class BehaviorDiscovery:
                     child_A = self.gene_builder.round_to(child_A)
                     child_B = self.gene_builder.round_to(child_B)
 
+            print(f"Child_A: {child_A}, Child_B: {child_B}")
             self.addToPopulation(child_A)
             self.addToPopulation(child_B)
 
