@@ -53,7 +53,7 @@ if __name__ == "__main__":
     # CUSTOM_CONTROLLER = [8.0, -0.9, 15.0, 0.1]  # Milling/Cyclic
     # CUSTOM_CONTROLLER = [-1.7, 0.2, 0.0, 0.2]
 
-    CUSTOM_CONTROLLER = [5, 0.5, 0.0, 0.0]
+    CUSTOM_CONTROLLER = [15.0, 1.5, 0.0, 0.0]
 
     # CUSTOM_CONTROLLER = [20.0, -1.6, 20.0, 1.2]
 
@@ -86,7 +86,7 @@ if __name__ == "__main__":
         dt=0.13,  # 130ms sampling period
         sensors=sensors,
         seed=None,
-        idiosyncrasies=False
+        idiosyncrasies=True
     )
 
     behavior = [
@@ -119,7 +119,16 @@ if __name__ == "__main__":
     )
 
     # import matplotlib.pyplot as plot
-    world = simulate(world_config=world_config)
+    def stop_at(w):
+        if w.total_steps > 20 and w.population[0].angle > 6.2831:
+            return True
+        return False
+
+    for i in range(5):
+        world = simulate(world_config=world_config, stop_detection=stop_at)
+        # world = simulate(world_config=world_config)
+        print(f"Time to Circle: {world.total_steps * agent_config.dt}, timesteps: {world.total_steps}")
+
     # neighbors_at = int(input("Time of Neighbor?"))
     # converged_at = int(input("Time of Convergence?"))
     # for i, agent in enumerate(world.population):

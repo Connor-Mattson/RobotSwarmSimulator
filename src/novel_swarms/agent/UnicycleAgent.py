@@ -236,7 +236,6 @@ class UnicycleAgent(Agent):
     def get_icc(self):
         v, w = self.c_now
         r = v / w
-        print(r)
         return self.x_pos - (r * np.sin(self.angle)), self.y_pos + (r * np.cos(self.angle))
 
     def __str__(self) -> str:

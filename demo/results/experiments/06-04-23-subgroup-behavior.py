@@ -26,8 +26,8 @@ SINGLE_SENSOR_HETEROGENEOUS_MODEL = GeneBuilder(
 
 def display_subgroup_behaviors(c=None):
     if c is None:
-        c = [-1.0, 1.0, 0.3, 0.2, 0.3, -0.9, 0.4, 1.0, 0.4]
-        # c = [0.6, 0.7, 0.95, 0.95, 0.7, 0.8, 0.8, 0.7, 0.01]
+        # c = [ 0.7,  -0.4,   0.9,   0.7,   0.8,  -0.1,   0.4,  -0.8,   0.01]
+        c = [0.6, 0.7, 0.95, 0.95, 0.7, 0.8, 0.8, 0.7, 0.01]
     n = 24
 
     agent_A = DiffDriveAgentConfig(controller=None, sensors=ConfigurationDefaults.SIMPLE_SENSOR, dt=1.0, body_color=(255, 0, 0), body_filled=True)
@@ -65,5 +65,5 @@ def display_random_behaviors(n):
         display_subgroup_behaviors(c)
 
 if __name__ == "__main__":
-    # display_subgroup_behaviors()
-    display_random_behaviors(500)
+    display_subgroup_behaviors()
+    # display_random_behaviors(500)

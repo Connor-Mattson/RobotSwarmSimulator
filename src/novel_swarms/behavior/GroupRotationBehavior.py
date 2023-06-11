@@ -13,6 +13,9 @@ class GroupRotationBehavior(AbstractBehavior):
 
     def calculate(self):
         n = len(self.population)
+        if n == 1:
+            self.set_value(0.0)
+            return
 
         momentum_list = []
         mew = self.center_of_mass()
