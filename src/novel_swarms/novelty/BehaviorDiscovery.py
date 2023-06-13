@@ -74,7 +74,7 @@ class BehaviorDiscovery:
         """
         Evaluates the Novelty of a Single Genome located at the ith index
         """
-        print(f"Ratio Rule: {self.gene_builder.rules[-1].domain}")
+        # print(f"Ratio Rule: {self.gene_builder.rules[-1].domain}")
         if genome is None:
             genome = self.population[i]
 
@@ -92,7 +92,7 @@ class BehaviorDiscovery:
             self.world_config.agentConfig.attach_world_config(self.world_config)
 
         for key in self.genome_dependent_world:
-            print("Setting Key!", key, " with Value: ", genome[self.genome_dependent_world[key]])
+            # print("Setting Key!", key, " with Value: ", genome[self.genome_dependent_world[key]])
             setattr(self.world_config, key, genome[self.genome_dependent_world[key]])
 
         behavior = None
@@ -109,9 +109,9 @@ class BehaviorDiscovery:
                     break
             if genome_index >= 0 and not output_config:
                 behavior = self.archive.archive[genome_index]
-                print("I've seen this genome before!")
-                print(genome_index, behavior)
-                print(f"Controller: {genome}")
+                # print("I've seen this genome before!")
+                # print(genome_index, behavior)
+                # print(f"Controller: {genome}")
                 if save:
                     self.behavior[i] = behavior
                     self.archive.addToArchive(behavior, genome)
@@ -123,7 +123,7 @@ class BehaviorDiscovery:
             r, _ = self.external_archive.retrieve_if_exists(rounded_genome, with_image=False)
             if r is not None:
                 behavior = r
-                print(f"We just utilized the archive: {rounded_genome}")
+                # print(f"We just utilized the archive: {rounded_genome}")
                 if save:
                     self.behavior[i] = behavior
                     self.archive.addToArchive(behavior, genome)
@@ -142,7 +142,7 @@ class BehaviorDiscovery:
             if self.allow_external_archive:
                 rounded_genome = self.round_genome(genome)
                 self.external_archive.save_if_empty(rounded_genome, behavior, image=output)
-                print(f"We just saved to the archive: {rounded_genome}")
+                # print(f"We just saved to the archive: {rounded_genome}")
 
             return output
 
@@ -181,7 +181,7 @@ class BehaviorDiscovery:
                     force_mutation = True
 
                 if force_mutation:
-                    print("Forcing Mutation!")
+                    # print("Forcing Mutation!")
                     a_mutated = False
                     while not a_mutated:
                         child_A, a_mutated = self.mutation(child_A)
@@ -250,7 +250,7 @@ class BehaviorDiscovery:
         if len(self.population) == 0:
             self.population = np.array([vector])
             return
-        print(vector)
+        # print(vector)
         self.population = np.concatenate((self.population, [vector]))
 
     def getBestScore(self):

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "novel_swarms"
-version = "0.1.7-alpha"
+version = "0.1.8-alpha"
 authors = [
   { name="Connor Mattson", email="c.mattson@utah.edu" },
 ]
