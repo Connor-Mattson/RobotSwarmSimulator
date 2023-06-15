@@ -29,14 +29,16 @@ if __name__ == "__main__":
     # Evolutionary archives are saved to files if GeneticEvolutionConfig.save_archive
     #   is set to True. Files can be found in /out,
     archive = NoveltyArchive(
-        pheno_file="/home/connor/Desktop/Experiments/Daily-Trials/01-09-23-seeded/b_1673303183_final_1673306585.csv",
-        geno_file="/home/connor/Desktop/Experiments/Daily-Trials/01-09-23-seeded/g_1673303183_final_1673306585.csv",
+        pheno_file="/home/jeremy/Documents/RobotSwarmSimulator/data/NS5_s0_t1686683208_b__1686697837.csv",
+        geno_file="/home/jeremy/Documents/RobotSwarmSimulator/data/NS5_s0_t1686683208_g__1686697837.csv",
         absolute=True
     )
 
     results_config = ConfigurationDefaults.RESULTS
     results_config.world = world_config
     results_config.archive = archive
+    results_config.clustering_type = "dbscan"
+    results_config.k = 6
 
     # Cluster and Explore Reduced Behavior Space
     report(config=results_config)
