@@ -67,8 +67,12 @@ class Cluster:
     def clustering(self):
         print("Starting Clustering")
         implementation = self.results_config.clustering_type
-        dataset = self.archive.archive
-        # dataset = self.reduced
+        dataset = None
+        if self.dim_reduction:
+            dataset = self.reduced
+        else:
+            dataset = self.archive.archive
+
         if implementation == "k-medoids":
             kmedoids = KMedoids(n_clusters=self.results_config.k, random_state=0).fit(dataset)
             self.cluster_indices = kmedoids.labels_
@@ -91,6 +95,7 @@ class Cluster:
                 dbscan_model = DBSCAN(eps=0.5, min_samples=10)
             dbscan_model.fit(dataset)
             self.cluster_indices = dbscan_model.labels_
+            # print(list(self.cluster_indices).count(-1))  # The number of outliers
             self.cluster_medoids = self.get_cluster_medoids(dataset)
 
         self.medoid_genomes = [[] for _ in self.cluster_medoids]

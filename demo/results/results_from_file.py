@@ -1,4 +1,3 @@
-from src.novel_swarms.config.AgentConfig import DiffDriveAgentConfig
 from src.novel_swarms.config.WorldConfig import RectangularWorldConfig
 from src.novel_swarms.config.defaults import ConfigurationDefaults
 from src.novel_swarms.novelty.NoveltyArchive import NoveltyArchive
