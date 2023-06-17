@@ -16,7 +16,7 @@ from ..util.collider.AngleSensitiveCC import AngleSensitiveCC
 
 class UnicycleAgent(Agent):
     SEED = -1
-    DEBUG = True
+    DEBUG = False
 
     def __init__(self, config: UnicycleAgentConfig = None, name=None) -> None:
 

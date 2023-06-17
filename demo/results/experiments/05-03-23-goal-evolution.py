@@ -93,23 +93,26 @@ def get_homogeneous_world(genome):
 def get_heterogeneous_world(genome):
 
     world_hash = hash(tuple(list(genome)))
-    genome = scale_type_3_genome(genome)
-    species_A = list(genome[0:4]) + [4.0, 0.0]
+    genome = scale_type_2_genome(genome)
+    species_A = list(genome[0:4]) + [3.8, 0.0]
     species_B = list(genome[4:8]) + [4.0, 0.0]
-    starting_A = list(genome[8:])
 
     worlds = []
     goals = [
-        CylinderGoal(500, 500, 20, remove_agents_at_goal=True, range=100),
-        # CylinderGoal(650, 350, 20, remove_agents_at_goal=True, range=100),
+        # CylinderGoal(200, 250, 20, remove_agents_at_goal=True, range=100),
+        # CylinderGoal(800, 750, 20, remove_agents_at_goal=True, range=100),
+
+        # CylinderGoal(100, 100, 20, remove_agents_at_goal=True, range=75),
+        CylinderGoal(500, 500, 20, remove_agents_at_goal=True, range=75),
+
         # CylinderGoal(750, 200, 20, remove_agents_at_goal=True, range=100)
     ]
     for goal in goals:
         SEED = 1
         GUI_PADDING = 15
         BL = 15.1
-        N_AGENTS = 24
-        WIDTH, HEIGHT = 1000, 1000
+        N_AGENTS = 12
+        WIDTH, HEIGHT = BL * 45, BL * 45
 
         sensors = SensorSet([
             BinaryFOVSensor(
@@ -154,10 +157,11 @@ def get_heterogeneous_world(genome):
             dt=0.26,
             sensors=sensors,
             seed=SEED,
-            idiosyncrasies=False,
+            idiosyncrasies=True,
             body_filled=True,
             body_color=(255, 0, 0),
             stop_at_goal=False,
+            catastrophic_collisions=True
         )
 
         agent_maze_b = MazeAgentConfig(
@@ -167,10 +171,11 @@ def get_heterogeneous_world(genome):
             dt=0.26,
             sensors=sensor_2,
             seed=SEED,
-            idiosyncrasies=False,
+            idiosyncrasies=True,
             body_filled=True,
             body_color=(0, 255, 0),
             stop_at_goal=False,
+            catastrophic_collisions=True
         )
         heterogeneous_swarm_config = HeterogeneousSwarmConfig()
         heterogeneous_swarm_config.add_sub_populuation(agent_maze_a, 1)
@@ -182,10 +187,12 @@ def get_heterogeneous_world(genome):
 
         np.random.seed(SEED)
         random.seed(SEED)
-        first_agent_pos = [(starting_A[0], starting_A[1], starting_A[2])]
+
         # init = [(100 + (i * 10), 800 + (i * 10), np.random.random() * 2 * np.pi) for i in range(N_AGENTS - 1)]
-        init = [(100, 800, np.random.random() * 2 * np.pi) for _ in range(N_AGENTS - 1)]
-        init = first_agent_pos + init
+        r = 80
+        pi_frac = 2 * (np.pi / N_AGENTS)
+        center_x, center_y = 200, 200
+        init = [(center_x + r*np.cos(pi_frac * i), center_y + r*np.sin(pi_frac * i), i * pi_frac) for i in range(N_AGENTS)]
         world_config = RectangularWorldConfig(
             size=(WIDTH, HEIGHT),
             n_agents=N_AGENTS,
@@ -198,7 +205,7 @@ def get_heterogeneous_world(genome):
             padding=15,
             objects=objects,
             goals=G,
-            stop_at=4000,
+            stop_at=3000,
             metadata={'hash': world_hash}
         )
         worlds.append(world_config)
@@ -342,14 +349,14 @@ def evolve_goal_proximity_heterogeneous_with_positional_init():
             for agent in w.population:
                 dist = np.linalg.norm((np.array(w.goals[0].center) - agent.getPosition())) - w.goals[0].range
                 total_dist_to_goal += max(0, dist)
-            penalty = w.behavior[0].out_current()[1] / 100
-            # penalty = 0
+            # penalty = w.behavior[0].out_current()[1] / 30
+            penalty = 0
             total += (total_dist_to_goal / len(w.population)) + penalty
         return total / len(world_set)
 
-    bounds = [[0 for _ in range(11)], [1 for _ in range(11)]]
-    x0 = [0.5 for _ in range(11)]
-    optim = CMAES(f=fitness, genome_to_world=get_heterogeneous_world, init_sigma=0.16, init_genome=x0, pop_size=16, num_processes=16, bounds=bounds, target=0, show_each_step=False)
+    bounds = [[0 for _ in range(8)], [1 for _ in range(8)]]
+    x0 = [0.5 for _ in range(8)]
+    optim = CMAES(f=fitness, genome_to_world=get_heterogeneous_world, init_sigma=0.16, init_genome=x0, pop_size=48, num_processes=16, bounds=bounds, target=0, show_each_step=True)
     c, _ = optim.minimize()
     return c
 
@@ -379,7 +386,7 @@ def evolve_goal_proximity_homogeneous():
             for agent in w.population:
                 dist = np.linalg.norm((np.array(w.goals[0].center) - agent.getPosition())) - w.goals[0].range
                 total_dist_to_goal += max(0, dist)
-            penalty = w.behavior[0].out_current()[1] / 100
+            penalty = w.behavior[0].out_current()[1] / 10
             # penalty = 0
             total += (total_dist_to_goal / len(w.population)) + penalty
         return total / len(world_set)
@@ -396,15 +403,15 @@ def lerp(x, _min, _max):
     return (x * (_max - _min)) + _min
 
 def scale_type_2_genome(g):
-    MIN_V, MAX_V = -20.0, 20.0
-    MIN_W, MAX_W = -2.0, 2.0
+    MIN_V, MAX_V = -10.0, 10.0
+    MIN_W, MAX_W = -1.2, 1.2
     g_0, g_2, g_4, g_6 = lerp(g[0], MIN_V, MAX_V), lerp(g[2], MIN_V, MAX_V), lerp(g[4], MIN_V, MAX_V), lerp(g[6], MIN_V, MAX_V)
     g_1, g_3, g_5, g_7 = lerp(g[1], MIN_W, MAX_W), lerp(g[3], MIN_W, MAX_W), lerp(g[5], MIN_W, MAX_W), lerp(g[7], MIN_W, MAX_W)
     return [g_0, g_1, g_2, g_3, g_4, g_5, g_6, g_7]
 
 def scale_type_3_genome(g):
-    MIN_V, MAX_V = -20.0, 20.0
-    MIN_W, MAX_W = -2.0, 2.0
+    MIN_V, MAX_V = -10.0, 10.0
+    MIN_W, MAX_W = -1.2, 1.2
     X_MIN, X_MAX = 0, 150
     Y_MIN, Y_MAX = 600, 750
     ROT_MIN, ROT_MAX = 0, np.pi * 2
@@ -414,7 +421,7 @@ def scale_type_3_genome(g):
     return [g_0, g_1, g_2, g_3, g_4, g_5, g_6, g_7, g_8, g_9, g_10]
 
 def simulate_result(g):
-    w = evolve_goal_proximity_heterogeneous_with_positional_init(g)
+    w = get_heterogeneous_world(g)
     simulate(w[0], show_gui=True)
 
 if __name__ == "__main__":
@@ -422,10 +429,14 @@ if __name__ == "__main__":
     # evolve_x_dist_heterogeneous_with_positional_init()
 
     # c = [0.5012, -1.298, -10.21, -0.9, 13.25, 1.731, 17.53, -0.32, 73.9, 638.57, 4.4]
-    c = [0.5012, -1.298, -10.21, -0.9, 5, -0.1745, 5, -0.1745, 73.9, 638.57, 4.4]
+    # c = [0.5012, -1.298, -10.21, -0.9, 5, -0.1745, 5, -0.1745, 73.9, 638.57, 4.4]
     # c = [0.95199212, 0.86892135, 0.96099064, 0.21897237, 0.93191356, 0.38231108, 0.85665234, 0.73857901]
     # c = [0.75411337, 0.49950559, 0.34436176, 0.76382902, 0.43953329, 0.01289864, 0.002985, 0.7177732]
+
+    c = [0.5954984,  0.97682786, 0.45479072, 0.45116579, 0.87895314, 0.66900569, 0.18677705, 0.12903347]
+    # c = [0.7,  0.97682786, 0.63, 0.45116579, 0.70, 0.66900569, 0.65, 0.12903347]
+    # c = [0.56337476, 0.4683324,  0.67845789, 0.66909528, 0.7455056,  0.45408008, 0.30222887, 0.69179092]
     print(f"FOUND: {c}")
-    print(f"REAL FORM: {scale_type_3_genome(c)}")
+    print(f"REAL FORM: {scale_type_2_genome(c)}")
     simulate_result(c)
     # evolve_goal_proximity_heterogeneous()

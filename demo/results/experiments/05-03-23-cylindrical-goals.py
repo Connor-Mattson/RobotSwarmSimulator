@@ -42,7 +42,7 @@ if __name__ == "__main__":
             # wall_sensing_range=(BL * 4),
             time_step_between_sensing=2,
             goal_sensing_range=(BL * 29.13),
-            detect_goal_with_added_state=True,
+            detect_goal_with_added_state=False,
 
         )
     ],
@@ -80,6 +80,8 @@ if __name__ == "__main__":
         body_filled=True,
         body_color=(255, 0, 0),
         stop_at_goal=False,
+        stop_on_collide=True,
+        catastrophic_collisions=False
     )
 
     agent_config_b = UnicycleAgentConfig(
@@ -90,7 +92,8 @@ if __name__ == "__main__":
         seed=None,
         idiosyncrasies=False,
         body_filled=True,
-        body_color=(255, 0, 0)
+        body_color=(255, 0, 0),
+        stop_on_collide=True,
     )
 
     heterogeneous_swarm_config = HeterogeneousSwarmConfig()

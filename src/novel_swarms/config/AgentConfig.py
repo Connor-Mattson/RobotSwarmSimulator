@@ -262,7 +262,8 @@ class MazeAgentConfig:
                  stop_on_collide=False,
                  stop_at_goal=True,
                  body_color=(255, 255, 255),
-                 body_filled=False
+                 body_filled=False,
+                 catastrophic_collisions=False,
                  ):
         self.x = x
         self.y = y
@@ -278,6 +279,7 @@ class MazeAgentConfig:
         self.stop_at_goal = stop_at_goal
         self.body_color = body_color
         self.body_filled = body_filled
+        self.catastophic_collisions = catastrophic_collisions
 
     def attach_world_config(self, world_config):
         self.world = world_config
@@ -298,6 +300,7 @@ class MazeAgentConfig:
             "idiosyncrasies": self.idiosyncrasies,
             "stop_on_collision": self.stop_on_collision,
             "stop_at_goal": self.stop_at_goal,
+            "catastophic_collisions" : self.catastophic_collisions
         }
 
     @staticmethod

@@ -65,7 +65,7 @@ class Cluster:
 
     def clustering(self):
         print("Starting k-Medoids Clustering")
-        MEDOIDS = False
+        MEDOIDS = True
         if MEDOIDS:
             kmedoids = KMedoids(n_clusters=self.results_config.k, random_state=0).fit(self.reduced)
             self.cluster_indices = kmedoids.labels_

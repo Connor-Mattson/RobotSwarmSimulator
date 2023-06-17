@@ -50,6 +50,8 @@ class MazeAgent(Agent):
         self.i_1 = np.random.normal(I1_MEAN, I1_SD) if self.idiosyncrasies else 1.0
         self.i_2 = np.random.normal(I2_MEAN, I2_SD) if self.idiosyncrasies else 1.0
         self.stop_on_collision = config.stop_on_collision
+        self.catastrophic_collisions = config.catastophic_collisions
+        self.dead = False
         self.stop_at_goal = config.stop_at_goal
         self.config = config
 
@@ -77,6 +79,9 @@ class MazeAgent(Agent):
         # timer = Timer("Calculations")
         super().step()
 
+        if self.dead:
+            return
+
         if world.goals and world.goals[0].agent_achieved_goal(self) or self.detection_id == 2:
             if self.stop_at_goal:
                 v, omega = 0, 0
@@ -100,6 +105,10 @@ class MazeAgent(Agent):
 
         if self.stopped_duration > 0:
             self.stopped_duration -= 1
+            if self.catastrophic_collisions:
+                self.dead = True
+                self.body_color = (200, 200, 200)
+                return
 
         else:
             self.x_pos += self.dx * self.dt
@@ -188,8 +197,15 @@ class MazeAgent(Agent):
                     if correction is not None:
                         self.x_pos += correction[0]
                         self.y_pos += correction[1]
+                        if self.catastrophic_collisions:
+                            self.dead = True
+                            self.body_color = (200, 200, 200)
+                            agent.dead = True
+                            agent.body_color = (200, 200, 200)
                         collisions = True
                         break
+
+
 
     def build_collider(self):
         return CircularCollider(self.x_pos, self.y_pos, self.radius)

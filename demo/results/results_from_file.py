@@ -1,4 +1,5 @@
 from src.novel_swarms.config.AgentConfig import DiffDriveAgentConfig
+from src.novel_swarms.config.HeterogenSwarmConfig import HeterogeneousSwarmConfig
 from src.novel_swarms.config.WorldConfig import RectangularWorldConfig
 from src.novel_swarms.config.defaults import ConfigurationDefaults
 from src.novel_swarms.novelty.NoveltyArchive import NoveltyArchive
@@ -16,12 +17,21 @@ if __name__ == "__main__":
     ])
 
     agent_config = ConfigurationDefaults.DIFF_DRIVE_AGENT
+    agent_config.body_color = (255,0,0)
+    agent_config_2 = DiffDriveAgentConfig(
+        sensors=sensors,
+        body_color=(0, 255, 0)
+    )
+    hetero_config = HeterogeneousSwarmConfig()
+    hetero_config.add_sub_populuation(agent_config, 12)
+    hetero_config.add_sub_populuation(agent_config_2, 12)
+
 
     world_config = RectangularWorldConfig(
         size=(500, 500),
         n_agents=24,
         seed=1,
-        agentConfig=agent_config,
+        agentConfig=hetero_config,
         padding=15
     )
 
@@ -29,14 +39,17 @@ if __name__ == "__main__":
     # Evolutionary archives are saved to files if GeneticEvolutionConfig.save_archive
     #   is set to True. Files can be found in /out,
     archive = NoveltyArchive(
-        pheno_file="/home/connor/Desktop/Experiments/Daily-Trials/01-09-23-seeded/b_1673303183_final_1673306585.csv",
-        geno_file="/home/connor/Desktop/Experiments/Daily-Trials/01-09-23-seeded/g_1673303183_final_1673306585.csv",
+        pheno_file="/home/connor/Desktop/research/SwarmNoveltyNetwork/out/NS5_s0_t1686683208_b__1686697837.csv",
+        geno_file="/home/connor/Desktop/research/SwarmNoveltyNetwork/out/NS5_s0_t1686683208_g__1686697837.csv",
         absolute=True
     )
 
     results_config = ConfigurationDefaults.RESULTS
     results_config.world = world_config
     results_config.archive = archive
+    results_config.early_exaggeration = 5
+    results_config.perplexity = 50
+    results_config.k = 18
 
     # Cluster and Explore Reduced Behavior Space
-    report(config=results_config)
+    report(config=results_config, heterogeneous=True)

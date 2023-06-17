@@ -7,7 +7,7 @@ from typing import List
 
 class BinaryLOSSensor(AbstractSensor):
     def __init__(self, parent=None, angle=None, draw=True, history_length=50):
-        super(BinaryLOSSensor, self).__init__(parent=parent, draw=draw)
+        super().__init__(parent=parent, draw=draw)
         self.current_state = 0
         self.angle = angle
         self.history = []

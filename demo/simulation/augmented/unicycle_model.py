@@ -5,15 +5,12 @@ If you do not plan to make commits to the GitHub repository or if you can ensure
 are not included in your commits, you may directly edit and run this file.
 
 """
+from src.novel_swarms.behavior.Centroid import Centroid
 from src.novel_swarms.sensors.AbstractSensor import AbstractSensor
 from src.novel_swarms.sensors.GenomeDependentSensor import GenomeBinarySensor
 from src.novel_swarms.sensors.StaticSensor import StaticSensor
 from src.novel_swarms.world.simulate import main as simulate
-from src.novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
-from src.novel_swarms.behavior.AverageSpeed import AverageSpeedBehavior
-from src.novel_swarms.behavior.GroupRotationBehavior import GroupRotationBehavior
-from src.novel_swarms.behavior.RadialVariance import RadialVarianceBehavior
-from src.novel_swarms.behavior.ScatterBehavior import ScatterBehavior
+from src.novel_swarms.behavior import *
 from src.novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
 from src.novel_swarms.sensors.BinaryFOVSensor import BinaryFOVSensor
 from src.novel_swarms.sensors.SensorSet import SensorSet
@@ -53,18 +50,18 @@ if __name__ == "__main__":
     # CUSTOM_CONTROLLER = [8.0, -0.9, 15.0, 0.1]  # Milling/Cyclic
     # CUSTOM_CONTROLLER = [-1.7, 0.2, 0.0, 0.2]
 
-    CUSTOM_CONTROLLER = [15.0, 1.5, 0.0, 0.0]
+    CUSTOM_CONTROLLER = [7.5, 0.2, 7.5, -0.2]
 
     # CUSTOM_CONTROLLER = [20.0, -1.6, 20.0, 1.2]
 
     SEED = 1
     GUI_PADDING = 15
-    N_AGENTS = 1
+    N_AGENTS = 7
     WIDTH, HEIGHT = int(BL * 29.8), int(BL * 29.8)
 
     sensors = SensorSet([
         BinaryFOVSensor(
-            theta=50 / 2,
+            theta=14 / 2,
             distance=(BL * 12.5),
             # distance=(BL * 3),
             bias=-7,
@@ -86,15 +83,12 @@ if __name__ == "__main__":
         dt=0.13,  # 130ms sampling period
         sensors=sensors,
         seed=None,
-        idiosyncrasies=True
+        idiosyncrasies=False
     )
 
     behavior = [
-        AverageSpeedBehavior(),
-        AngularMomentumBehavior(),
-        RadialVarianceBehavior(),
-        ScatterBehavior(),
-        GroupRotationBehavior(),
+        ScatterBehavior(history=1, regularize=False),
+        Centroid(),
         # AlgebraicConn(),
     ]
 
@@ -119,15 +113,8 @@ if __name__ == "__main__":
     )
 
     # import matplotlib.pyplot as plot
-    def stop_at(w):
-        if w.total_steps > 20 and w.population[0].angle > 6.2831:
-            return True
-        return False
 
-    for i in range(5):
-        world = simulate(world_config=world_config, stop_detection=stop_at)
-        # world = simulate(world_config=world_config)
-        print(f"Time to Circle: {world.total_steps * agent_config.dt}, timesteps: {world.total_steps}")
+    world = simulate(world_config=world_config)
 
     # neighbors_at = int(input("Time of Neighbor?"))
     # converged_at = int(input("Time of Convergence?"))
