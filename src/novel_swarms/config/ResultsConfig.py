@@ -5,7 +5,8 @@ class ResultsConfig:
                  tsne_early_exaggeration=12.0,
                  archive=None,
                  world_config=None,
-                 display_trends=False
+                 display_trends=False,
+                 clustering_type="k-medoids"
                  ):
         self.perplexity = tsne_perplexity
         self.k = k_clusters
@@ -13,3 +14,4 @@ class ResultsConfig:
         self.archive = archive
         self.world = world_config
         self.show_trends = display_trends
+        self.clustering_type = clustering_type

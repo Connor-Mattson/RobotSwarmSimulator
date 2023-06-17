@@ -1,13 +1,13 @@
-import numpy
 import numpy as np
+import math
 import pygame
 from sklearn.manifold import TSNE
-from sklearn.cluster import AgglomerativeClustering
+from sklearn.cluster import AgglomerativeClustering, SpectralClustering, DBSCAN
 from sklearn_extra.cluster import KMedoids
 
-from ..novelty.NoveltyArchive import NoveltyArchive
-from .ClusterPoint import ClusterPoint
-from ..config.ResultsConfig import ResultsConfig
+from src.novel_swarms.novelty.NoveltyArchive import NoveltyArchive
+from src.novel_swarms.results.ClusterPoint import ClusterPoint
+from src.novel_swarms.config.ResultsConfig import ResultsConfig
 
 
 class Cluster:
@@ -27,8 +27,8 @@ class Cluster:
         (34, 153, 84),  # GREEN
         (133, 146, 158),  # GREY
     ]
-
-    def __init__(self, config: ResultsConfig, world_metadata=None, heterogeneous=False):
+    
+    def __init__(self, config: ResultsConfig, world_metadata=None, dim_reduction=True, heterogeneous=False):
 
         archive = config.archive
         if archive is None or not issubclass(type(archive), NoveltyArchive):
@@ -43,9 +43,11 @@ class Cluster:
         self.world_config = config.world
         self.world_metadata = world_metadata
         self.results_config = config
+        self.dim_reduction = dim_reduction  # Whether to perform dimensionality reduction before clustering
         self.heterogeneous = heterogeneous
 
-        self.initTSNE()
+        if self.dim_reduction:
+            self.initTSNE()
         self.clustering()
         self.pointMapping()
 
@@ -64,22 +66,96 @@ class Cluster:
         print("TSNE Finished!")
 
     def clustering(self):
-        print("Starting k-Medoids Clustering")
-        MEDOIDS = True
-        if MEDOIDS:
-            kmedoids = KMedoids(n_clusters=self.results_config.k, random_state=0).fit(self.reduced)
+        print("Starting Clustering")
+        implementation = self.results_config.clustering_type
+        dataset = None
+        if self.dim_reduction:
+            dataset = self.reduced
+        else:
+            dataset = self.archive.archive
+
+        if implementation == "k-medoids":
+            kmedoids = KMedoids(n_clusters=self.results_config.k, random_state=0).fit(dataset)
             self.cluster_indices = kmedoids.labels_
             self.cluster_medoids = kmedoids.cluster_centers_
-            self.medoid_genomes = [[] for _ in self.cluster_medoids]
-            for i, medoid in enumerate(self.cluster_medoids):
-                index = numpy.where(self.reduced == medoid)[0][0]
-                if index > -1:
-                    self.medoid_genomes[i] = self.archive.genotypes[index]
-        else:
-            kmedoids = AgglomerativeClustering(n_clusters=self.results_config.k).fit(self.reduced)
-            self.cluster_indices = kmedoids.labels_
+        elif implementation == "hierarchical":
+            hierarchical = AgglomerativeClustering(n_clusters=self.results_config.k)
+            hierarchical.fit(dataset)
+            self.cluster_indices = hierarchical.labels_
+            self.cluster_medoids = self.get_cluster_medoids(dataset)
+        elif implementation == "spectral":
+            spectral_model = SpectralClustering(n_clusters=self.results_config.k, affinity='nearest_neighbors')
+            spectral_model.fit(dataset)
+            self.cluster_indices = spectral_model.labels_
+            self.cluster_medoids = self.get_cluster_medoids(dataset)
+        elif implementation == "dbscan":
+            dbscan_model = None
+            if self.dim_reduction:
+                dbscan_model = DBSCAN(eps=4.5, min_samples=10)
+            else:
+                dbscan_model = DBSCAN(eps=0.5, min_samples=10)
+            dbscan_model.fit(dataset)
+            self.cluster_indices = dbscan_model.labels_
+            # print(list(self.cluster_indices).count(-1))  # The number of outliers
+            self.cluster_medoids = self.get_cluster_medoids(dataset)
 
-        print("k-Medoids Finished!")
+        self.medoid_genomes = [[] for _ in self.cluster_medoids]
+        for i, medoid in enumerate(self.cluster_medoids):
+            index = np.where(dataset == medoid)[0][0]
+            if index > -1:
+                self.medoid_genomes[i] = self.archive.genotypes[index]
+
+        print("Clustering Finished!")
+        print("\nMedoid Genomes")
+        for genome in self.medoid_genomes:
+            print('[' + ', '.join([str(x) for x in genome]) + '],')
+
+    def get_cluster_medoids(self, dataset):
+        """
+        Get the medoids of the clusters.
+        For use with clustering algorithms that are not k-medoids.
+        """
+        clusters = []
+        index_set = set(self.cluster_indices)
+        for _ in index_set:
+            clusters.append(list())
+
+        for i in range(len(self.cluster_indices)):
+            cluster_index = self.cluster_indices[i]
+            coords = dataset[i]
+            clusters[cluster_index].append(coords)
+
+        centroids = []
+        for cluster in clusters:
+            centroid = Cluster.find_closest_point(cluster)
+            centroids.append(centroid)
+        return centroids
+
+    @staticmethod
+    def find_closest_point(points):
+        """
+        Given a list of points, returns the one point that is closest to the center of the cluster.
+        Works in an arbitrary number of dimensions.
+        """
+        # Step 1: Compute the centroid of the cluster
+        total_points = len(points)
+        dimensions = len(points[0])  # Assuming all points have the same number of dimensions
+
+        centroid = [sum(point[i] for point in points) / total_points for i in range(dimensions)]
+
+        # Step 2 and 3: Calculate the distance between each point and the centroid,
+        # and find the point with the minimum distance
+        closest_point = None
+        min_distance = float('inf')  # Initialize with a large value
+
+        for point in points:
+            distance = math.sqrt(sum((point[i] - centroid[i]) ** 2 for i in range(dimensions)))
+            if distance < min_distance:
+                min_distance = distance
+                closest_point = point
+
+        # Step 4: Return the closest point
+        return closest_point
 
     def pointMapping(self):
         min_x = min(self.reduced[:, 0])
