@@ -27,10 +27,10 @@ def get_heterogeneous_world(genome):
 
     worlds = []
     goals = [
-        # CylinderGoal(250, 200, 20, remove_agents_at_goal=True, range=100),
+        CylinderGoal(250, 200, 20, remove_agents_at_goal=True, range=100),
         # CylinderGoal(650, 350, 20, remove_agents_at_goal=True, range=100),
-        CylinderGoal(0, 1000, 20, remove_agents_at_goal=True, range=100),
-        CylinderGoal(1000, 0, 20, remove_agents_at_goal=True, range=100),
+        # CylinderGoal(0, 1000, 20, remove_agents_at_goal=True, range=100),
+        # CylinderGoal(1000, 0, 20, remove_agents_at_goal=True, range=100),
         # CylinderGoal(750, 200, 20, remove_agents_at_goal=True, range=100)
     ]
     for goal in goals:
@@ -84,7 +84,7 @@ def get_heterogeneous_world(genome):
             stop_at_goal=False,
         )
 
-        NUM_A, NUM_B = 10, 1
+        NUM_A, NUM_B = 1, 11
         heterogeneous_swarm_config = HeterogeneousSwarmConfig()
         heterogeneous_swarm_config.add_sub_populuation(agent_maze_a, NUM_A)
         heterogeneous_swarm_config.add_sub_populuation(agent_maze_b, NUM_B)
@@ -99,8 +99,10 @@ def get_heterogeneous_world(genome):
 
         N_AGENTS = NUM_A + NUM_B
         np.random.seed(SEED)
-        # init = [(500, 900, np.random.random() * 2 * np.pi) for i in range(N_AGENTS)]
-        init = [(600 - i * 10, 500, -np.pi / 2) for i in range(N_AGENTS)]
+        r = 80
+        pi_frac = 2 * (np.pi / N_AGENTS)
+        center_x, center_y = 500, 500
+        init = [(center_x + r * np.cos(pi_frac * i), center_y + r * np.sin(pi_frac * i), i * pi_frac) for i in range(N_AGENTS)]
         world_config = RectangularWorldConfig(
             size=(WIDTH, HEIGHT),
             n_agents=N_AGENTS,
@@ -121,7 +123,12 @@ def get_heterogeneous_world(genome):
 def run_simulation():
     # genome = [11.94, -0.48, 2.80, 0.38, 12.82, -0.66, 0.13, -1.41]
     # genome = [14.09449214, -0.09365658, 13.13571482,  1.09531036, 13.28770632, -0.08053101, 8.05740008,  0.69650941]
-    genome = [11.94, -0.48, 2.80, 0.38, -7.5, -1.2, -7.5, 0.0]
+    # genome = [11.94, -0.48, 2.80, 0.38, -7.5, -1.2, -7.5, 0.0]
+
+
+    genome = [0.5012, -1.298, -10.21, -0.9, 5, -0.1745, 5, -0.1745, 73.9, 638.57, 4.4]
+    # genome = [1.91, 1.14, -0.90, -0.12, 7.58, 0.41, -6.26, -0.89]
+
     # genome = [11.94, -0.48, 2.80, 0.38, -8, -0.15, -6, 0.87]
     worlds = get_heterogeneous_world(genome)
     simulate(worlds[0], show_gui=True, world_key_events=False, step_size=5)

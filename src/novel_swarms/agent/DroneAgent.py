@@ -4,11 +4,11 @@ import pygame
 import numpy as np
 from typing import Tuple
 from copy import deepcopy
-from src.novel_swarms.agent.Agent import Agent
-from src.novel_swarms.config.AgentConfig import DroneAgentConfig
-from src.novel_swarms.sensors.GenomeDependentSensor import GenomeBinarySensor
-from src.novel_swarms.util.collider.AABB import AABB
-from src.novel_swarms.util.collider.CircularCollider import CircularCollider
+from ..agent.Agent import Agent
+from ..config.AgentConfig import DroneAgentConfig
+from ..sensors.GenomeDependentSensor import GenomeBinarySensor
+from ..util.collider.AABB import AABB
+from ..util.collider.CircularCollider import CircularCollider
 
 
 class DroneAgent(Agent):

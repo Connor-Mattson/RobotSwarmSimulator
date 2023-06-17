@@ -27,8 +27,8 @@ class Cluster:
         (34, 153, 84),  # GREEN
         (133, 146, 158),  # GREY
     ]
-
-    def __init__(self, config: ResultsConfig, world_metadata=None, dim_reduction=True):
+    
+    def __init__(self, config: ResultsConfig, world_metadata=None, dim_reduction=True, heterogeneous=False):
 
         archive = config.archive
         if archive is None or not issubclass(type(archive), NoveltyArchive):
@@ -44,6 +44,7 @@ class Cluster:
         self.world_metadata = world_metadata
         self.results_config = config
         self.dim_reduction = dim_reduction  # Whether to perform dimensionality reduction before clustering
+        self.heterogeneous = heterogeneous
 
         if self.dim_reduction:
             self.initTSNE()
@@ -205,7 +206,11 @@ class Cluster:
                 print(f"Display Controller: {controller}")
 
                 metadata = self.sync_metadata_with_controller(controller)
-                self.world_config.agentConfig.controller = controller
+                if self.heterogeneous:
+                    self.world_config.agentConfig.from_n_species_controller(controller)
+                else:
+                    self.world_config.agentConfig.controller = controller
+
                 self.world_config.set_attributes(metadata)
 
                 main(world_config=self.world_config)

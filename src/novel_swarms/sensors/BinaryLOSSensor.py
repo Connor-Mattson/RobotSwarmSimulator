@@ -7,7 +7,7 @@ from typing import List
 
 class BinaryLOSSensor(AbstractSensor):
     def __init__(self, parent=None, angle=None, draw=True, history_length=50):
-        super(BinaryLOSSensor, self).__init__(parent=parent, draw=draw)
+        super().__init__(parent=parent, draw=draw)
         self.current_state = 0
         self.angle = angle
         self.history = []
@@ -103,3 +103,18 @@ class BinaryLOSSensor(AbstractSensor):
         if len(self.history) > self.hist_len:
             self.history = self.history[1:]
         self.history.append(value)
+
+    def as_config_dict(self):
+        return {
+            "type": "BinaryLOSSensor",
+            "angle": self.angle,
+            "history_length": self.hist_len,
+        }
+
+    @staticmethod
+    def from_dict(d):
+        return BinaryLOSSensor(
+            parent=None,
+            angle=d["angle"],
+            history_length=d["history_length"],
+        )

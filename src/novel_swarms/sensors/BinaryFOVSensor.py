@@ -6,7 +6,9 @@ from typing import List
 from ..world.World import World
 from ..world.goals.Goal import CylinderGoal
 
+
 class BinaryFOVSensor(AbstractSensor):
+
     def __init__(self,
                  parent=None,
                  theta=10,
@@ -81,7 +83,8 @@ class BinaryFOVSensor(AbstractSensor):
             for wall in [wall_top, wall_right, wall_bottom, wall_left]:
                 for line in [l, r]:
                     if self.lines_segments_intersect(line, wall):
-                        d_to_inter = np.linalg.norm(np.array(self.line_seg_int_point(line, wall)) - np.array(sensor_origin))
+                        d_to_inter = np.linalg.norm(
+                            np.array(self.line_seg_int_point(line, wall)) - np.array(sensor_origin))
                         consideration_set.append((d_to_inter, None))
 
         # Detect for World Objects
@@ -110,7 +113,6 @@ class BinaryFOVSensor(AbstractSensor):
                             self.parent.agent_in_sight = None
                             self.current_state = 2
                             return
-
 
         # Detect Other Agents
         for agent in bag:
@@ -312,3 +314,33 @@ class BinaryFOVSensor(AbstractSensor):
         e_left = np.matmul(rot_z_left, v)
         e_right = np.matmul(rot_z_right, v)
         return e_left, e_right
+
+    def as_config_dict(self):
+        return {
+            "type": "BinaryFOVSensor",
+            "theta": self.theta,
+            "bias": self.bias,
+            "fp": self.fp,
+            "fn": self.fn,
+            "time_step_between_sensing": self.time_step_between_sensing,
+            "store_history": self.store_history,
+            "use_goal_state": self.use_goal_state,
+            "wall_sensing_range": self.wall_sensing_range,
+            "goal_sensing_range": self.goal_sensing_range,
+            "agent_sensing_range": self.r,
+        }
+
+    @staticmethod
+    def from_dict(d):
+        return BinaryFOVSensor(
+            parent=None,
+            theta=d["theta"],
+            distance=d["agent_sensing_range"],
+            bias=d["bias"],
+            false_positive=d["fp"],
+            false_negative=d["fn"],
+            store_history=d["store_history"],
+            detect_goal_with_added_state=d["use_goal_state"],
+            wall_sensing_range=d["wall_sensing_range"],
+            goal_sensing_range=d["goal_sensing_range"]
+        )

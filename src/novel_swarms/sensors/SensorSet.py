@@ -27,6 +27,9 @@ class SensorSet:
             binary_states = [str(sensor.current_state) for sensor in self.sensors]
             state = int(''.join(binary_states), 2)
             return state
+        if self.custom_state_decision == "Linear":
+            sensor_states = [sensor.current_state for sensor in self.sensors]
+            return sensor_states[0]
         else:
             sensor_states = [sensor.current_state for sensor in self.sensors]
             state = self.custom_state_decision(sensor_states)
@@ -38,4 +41,8 @@ class SensorSet:
     def getStatePermutationSize(self):
         return sum([s.n_possible_states for s in self.sensors])
 
-
+    def as_config_dict(self):
+        return {
+            "sensors": [s.as_config_dict() for s in self.sensors],
+            "custom_state_decision": "Linear" if self.custom_state_decision == "Linear" else None
+        }

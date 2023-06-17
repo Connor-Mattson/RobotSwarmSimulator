@@ -29,7 +29,7 @@ class DiffDriveToUnicycle(ControllerConverter):
 
 class DiffDriveToRatio(ControllerConverter):
     """
-    Takes controllers of the Form: [v_l0, vr_0, vl_1, vr_1] and converts it to the unicycle controller: [v_0, w_0, v_1, w_1]
+    Takes controllers of the Form: [v_l0, vr_0, vl_1, vr_1] and converts it into a ratio?
     """
     def __init__(self, controller):
         super().__init__(controller)
@@ -47,9 +47,11 @@ class DiffDriveToRatio(ControllerConverter):
         return [dtheta_on / dtheta_off, v_on / v_off]
 
 if __name__ == "__main__":
-    wheel_radius = 2.0
-    agent_radius = 5.0
-    input_controller = [-1.0, 0.4285, 1.0, 0.4285]
+    wheel_radius = 4.1
+    agent_radius = 15.1 / 2
+    input_controller = [0.65, 1.0, 0.4, 0.5]
+    SCALE = 4.5
+    input_controller = [i * SCALE for i in input_controller]
 
-    converter = DiffDriveToRatio(input_controller)
+    converter = DiffDriveToUnicycle(input_controller, agent_radius, wheel_radius)
     print(converter.convert())

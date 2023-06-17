@@ -63,6 +63,7 @@ class UnicycleAgent(Agent):
         self.collider = None
         self.body_filled = config.body_filled
         self.body_color = config.body_color
+        self.c_now = (0, 0)
 
         self.attach_agent_to_sensors()
 
@@ -90,6 +91,8 @@ class UnicycleAgent(Agent):
             v, omega = 0, 0
         else:
             v, omega = self.interpretSensors()
+
+        self.c_now = v, omega
 
         # Define Idiosyncrasies that may occur in actuation/sensing
         idiosync_1 = self.i_1
@@ -202,6 +205,7 @@ class UnicycleAgent(Agent):
     def debug_draw(self, screen):
         # self.aabb.draw(screen)
         self.collider.draw(screen)
+        pygame.draw.circle(screen, (255, 0, 255), self.get_icc(), 3, width=0)
 
     def get_action(self):
         return np.array([self.dx * self.dt, self.dy, self.dt])
@@ -228,6 +232,11 @@ class UnicycleAgent(Agent):
         self.trace_path.append((x, y))
         if len(self.trace_path) > self.trace_length:
             self.trace_path.pop(0)
+
+    def get_icc(self):
+        v, w = self.c_now
+        r = v / w
+        return self.x_pos - (r * np.sin(self.angle)), self.y_pos + (r * np.cos(self.angle))
 
     def __str__(self) -> str:
         return "(x: {}, y: {}, r: {}, θ: {})".format(self.x_pos, self.y_pos, self.radius, self.angle)
