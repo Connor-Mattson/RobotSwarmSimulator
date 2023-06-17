@@ -2,17 +2,13 @@
 DO NOT ALTER THIS FILE.
 This file should remain a constant reference to the experiments conducted in Brown et al.
 Please create your own file for experiments or alter 'demo/evolution/playground.py' instead.
-
-Connor Mattson
-University of Utah
-September 2022
 """
-from novel_swarms.novelty.GeneRule import GeneRule
-from novel_swarms.novelty.evolve import main as evolve
-from novel_swarms.results.results import main as report
-from novel_swarms.config.WorldConfig import RectangularWorldConfig
-from novel_swarms.config.defaults import ConfigurationDefaults
-from novel_swarms.config.EvolutionaryConfig import GeneticEvolutionConfig
+from src.novel_swarms.novelty.GeneRule import GeneRule, GeneRuleContinuous
+from src.novel_swarms.novelty.evolve import main as evolve
+from src.novel_swarms.results.results import main as report
+from src.novel_swarms.config.WorldConfig import RectangularWorldConfig
+from src.novel_swarms.config.defaults import ConfigurationDefaults
+from src.novel_swarms.config.EvolutionaryConfig import GeneticEvolutionConfig
 
 if __name__ == "__main__":
 
@@ -23,10 +19,10 @@ if __name__ == "__main__":
     # the maximum and minimum acceptable values for that index in the genome. mutation_step specifies the largest
     # possible step in any direction that the genome can experience during mutation.
     genotype = [
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=4),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=4),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=4),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=4),
+        GeneRuleContinuous(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=4),
+        GeneRuleContinuous(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=4),
+        GeneRuleContinuous(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=4),
+        GeneRuleContinuous(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=4),
     ]
 
     # Use the default Behavior Vector (from Brown et al.) to measure the collective swarm behaviors
@@ -54,7 +50,7 @@ if __name__ == "__main__":
         mutation_rate=0.15,
         world_config=world_config,
         k_nn=15,
-        simulation_lifespan=300,
+        simulation_lifespan=1200,
         display_novelty=False,
         save_archive=False,
         show_gui=True

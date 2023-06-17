@@ -1,6 +1,5 @@
 # Novel Behavior Discovery in Computation Free Swarms
-Contributors: Daniel S. Brown, Connor Mattson <br>
-Experiments replicated from *Discovery and Exploration of Novel Swarm Behaviors given Limited Robot Capabilities* by Daniel S. Brown, Ryan Turner, Oliver Hennigh, and Steven Loscalzo
+Contributors: Connor Mattson, Jeremy Clark, Daniel S. Brown
 
 ## Required Software
 - Python & Pip
@@ -101,10 +100,10 @@ Use the common configuration interfaces to modify common parameters that do not 
     # the maximum and minimum acceptable values for that index in the genome. mutation_step specifies the largest
     # possible step in any direction that the genome can experience during mutation.
     genotype = [
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=4),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=4),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=4),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=4),
+        GeneRuleContinuous(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=4),
+        GeneRuleContinuous(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=4),
+        GeneRuleContinuous(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=4),
+        GeneRuleContinuous(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=4),
     ]
 
     # Use the default Behavior Vector (from Brown et al.) to measure the collective swarm behaviors
