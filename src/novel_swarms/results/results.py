@@ -8,10 +8,10 @@ def foo():
 
 
 # define a main function
-def main(config: ResultsConfig, world_metadata=None, heterogeneous=False):
+def main(config: ResultsConfig, world_metadata=None, heterogeneous=False, dim_reduction=False):
     if config.show_trends:
         Trends().graphArchiveComparisons(config.archive)
         Trends().plotMetricHistograms(config.archive)
 
-    clustering = Cluster(config=config, world_metadata=world_metadata, heterogeneous=heterogeneous)
+    clustering = Cluster(config=config, world_metadata=world_metadata, heterogeneous=heterogeneous, dim_reduction=False)
     clustering.displayGUI()

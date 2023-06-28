@@ -39,6 +39,7 @@ class Cluster:
         self.center_population = []
         self.cluster_indices = []
         self.cluster_medoids = []
+        self.medoid_indices = []
         self.medoid_genomes = []
         self.world_config = config.world
         self.world_metadata = world_metadata
@@ -46,8 +47,7 @@ class Cluster:
         self.dim_reduction = dim_reduction  # Whether to perform dimensionality reduction before clustering
         self.heterogeneous = heterogeneous
 
-        if self.dim_reduction:
-            self.initTSNE()
+        self.initTSNE()
         self.clustering()
         self.pointMapping()
 
@@ -75,7 +75,8 @@ class Cluster:
             dataset = self.archive.archive
 
         if implementation == "k-medoids":
-            kmedoids = KMedoids(n_clusters=self.results_config.k, random_state=0).fit(dataset)
+            kmedoids = KMedoids(n_clusters=self.results_config.k, random_state=1, method="pam").fit(dataset)
+            print(kmedoids.labels_)
             self.cluster_indices = kmedoids.labels_
             self.cluster_medoids = kmedoids.cluster_centers_
         elif implementation == "hierarchical":
@@ -91,19 +92,23 @@ class Cluster:
         elif implementation == "dbscan":
             dbscan_model = None
             if self.dim_reduction:
-                dbscan_model = DBSCAN(eps=4.5, min_samples=10)
+                eps = 4.5 if self.results_config.eps is None else self.results_config.eps
+                dbscan_model = DBSCAN(eps=4.5, min_samples=7)
             else:
-                dbscan_model = DBSCAN(eps=0.5, min_samples=10)
+                eps = 0.5 if self.results_config.eps is None else self.results_config.eps
+                dbscan_model = DBSCAN(eps=0.5, min_samples=7)
             dbscan_model.fit(dataset)
             self.cluster_indices = dbscan_model.labels_
             # print(list(self.cluster_indices).count(-1))  # The number of outliers
             self.cluster_medoids = self.get_cluster_medoids(dataset)
 
         self.medoid_genomes = [[] for _ in self.cluster_medoids]
+        self.medoid_indices = [-1 for _ in self.cluster_medoids]
         for i, medoid in enumerate(self.cluster_medoids):
             index = np.where(dataset == medoid)[0][0]
             if index > -1:
                 self.medoid_genomes[i] = self.archive.genotypes[index]
+                self.medoid_indices[i] = index
 
         print("Clustering Finished!")
         print("\nMedoid Genomes")
@@ -163,16 +168,24 @@ class Cluster:
         max_x = max(self.reduced[:, 0])
         max_y = max(self.reduced[:, 1])
 
+        print(f"i_classes: {len(self.cluster_indices)}, reduced_len: {len(self.reduced)}")
         for i, point in enumerate(self.reduced):
-            color = self.COLORS[self.cluster_indices[i] % (len(self.COLORS) - 1)]
+            c_i = self.cluster_indices[i]
+            color = self.COLORS[c_i % (len(self.COLORS) - 1)]
             cluster_point = self.pointFromReductionToDisplaySpace(point, min_x, max_x, min_y, max_y, color,
                                                                   self.archive.genotypes[i])
             self.point_population.append(cluster_point)
 
-        for i in range(len(self.cluster_medoids)):
-            cluster_point = self.pointFromReductionToDisplaySpace(self.cluster_medoids[i], min_x, max_x, min_y, max_y,
-                                                                  None, None)
-            self.cluster_medoids[i] = [cluster_point.x, cluster_point.y]
+        self.cluster_medoids = [[self.point_population[i].x, self.point_population[i].y] for i in self.medoid_indices]
+
+        # medoids_copy = self.cluster_medoids
+        # self.cluster_medoids = [[0, 0] for _ in range(len(medoids_copy))]
+        # for i in range(len(medoids_copy)):
+        #     cluster_point = self.pointFromReductionToDisplaySpace(medoids_copy[i], min_x, max_x, min_y, max_y,
+        #                                                           None, self.medoid_genomes[i])
+        #     self.cluster_medoids[i] = [cluster_point.x, cluster_point.y]
+
+        print(self.cluster_medoids)
 
     def displayGUI(self):
         pygame.init()
@@ -191,7 +204,10 @@ class Cluster:
                 print(f"Display Controller (Medoid): {controller}")
 
                 metadata = self.sync_metadata_with_controller(controller)
-                self.world_config.agentConfig.controller = controller
+                if self.heterogeneous:
+                    self.world_config.agentConfig.from_n_species_controller(controller)
+                else:
+                    self.world_config.agentConfig.controller = controller
                 self.world_config.set_attributes(metadata)
 
                 main(world_config=self.world_config)

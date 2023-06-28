@@ -39,17 +39,25 @@ if __name__ == "__main__":
     # Evolutionary archives are saved to files if GeneticEvolutionConfig.save_archive
     #   is set to True. Files can be found in /out,
     archive = NoveltyArchive(
-        pheno_file="/home/connor/Desktop/research/SwarmNoveltyNetwork/out/NS5_s0_t1686683208_b__1686697837.csv",
-        geno_file="/home/connor/Desktop/research/SwarmNoveltyNetwork/out/NS5_s0_t1686683208_g__1686697837.csv",
+        pheno_file="/home/connor/Downloads/MRS_RESULTS/s1/NS6/NS6_s1_t1687461003_b__1687504387.csv",
+        geno_file="/home/connor/Downloads/MRS_RESULTS/s1/NS6/NS6_s1_t1687461003_g__1687504387.csv",
+        # pheno_file="/home/connor/Desktop/research/SwarmNoveltyNetwork/out/NS5_s0_t1686683208_b__1686697837.csv",
+        # geno_file="/home/connor/Desktop/research/SwarmNoveltyNetwork/out/NS5_s0_t1686683208_g__1686697837.csv",
+        # pheno_file="/home/connor/Desktop/research/SwarmNoveltyNetwork/src/z-experiments/MRS-notebooks/out/R-s0_repr_8__b_1687332766.csv",
+        # geno_file="/home/connor/Desktop/research/SwarmNoveltyNetwork/src/z-experiments/MRS-notebooks/out/R-s0_repr_8__g_1687332766.csv",
         absolute=True
     )
+
+    print(archive.archive.shape)
 
     results_config = ConfigurationDefaults.RESULTS
     results_config.world = world_config
     results_config.archive = archive
-    results_config.early_exaggeration = 5
-    results_config.perplexity = 50
-    results_config.k = 18
+    results_config.early_exaggeration = 2
+    results_config.perplexity = 20
+    results_config.k = 20
+    results_config.clustering_type = "hierarchical"
+    # results_config.eps = 2.0
 
     # Cluster and Explore Reduced Behavior Space
-    report(config=results_config, heterogeneous=True)
+    report(config=results_config, heterogeneous=True, dim_reduction=False)

@@ -4,8 +4,9 @@ import time
 from PIL import Image
 
 class World2Gif:
-    def __init__(self, duration=800, every_ith_frame=10):
+    def __init__(self, duration=800, every_ith_frame=10, time_per_frame=150):
         self.duration = duration
+        self.time_per_frame = time_per_frame
         self.every_ith_frame = every_ith_frame
         self.snips = []
         self.total_steps = 0
@@ -34,5 +35,5 @@ class World2Gif:
         first_frame = self.snips[0]
         name = f'{int(time.time())}.gif'
         first_frame.save(name, format="GIF", append_images=self.snips, save_all=True,
-                         duration=150, loop=0)
+                         duration=self.time_per_frame, loop=0)
         print(f"Gif saved as {name}. You may now exit the window.")
