@@ -49,3 +49,20 @@ class ConfigurationDefaults:
         display_trends=False
     )
 
+    FLOCKBOT_SENSOR_SET = SensorSet([
+        BinaryFOVSensor(
+            theta=14 / 2,
+            distance=(15.1 * 13.25),
+            bias=4,
+            degrees=True,
+            false_positive=0.1,
+            false_negative=0.05,
+            # Rectangle Representing Environment Boundaries
+            walls=None,
+            wall_sensing_range=(15.1 * 4),
+            time_step_between_sensing=1,
+            goal_sensing_range=(15.1 * 29.13),
+            detect_goal_with_added_state=True,
+        )
+    ],
+        custom_state_decision="Linear")

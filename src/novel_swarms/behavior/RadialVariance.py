@@ -5,7 +5,7 @@ from .AbstractBehavior import AbstractBehavior
 
 class RadialVarianceBehavior(AbstractBehavior):
     def __init__(self, history=100, regularize=True):
-        super().__init__(name="Radial Variance", history_size=history)
+        super().__init__(name="Radial_Variance", history_size=history)
         self.population = None
         self.world_radius = 0
         self.regularize = regularize

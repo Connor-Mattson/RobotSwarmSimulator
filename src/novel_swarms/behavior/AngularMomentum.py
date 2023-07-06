@@ -4,7 +4,7 @@ from .AbstractBehavior import AbstractBehavior
 
 class AngularMomentumBehavior(AbstractBehavior):
     def __init__(self, history=100):
-        super().__init__(name="Angular Momentum", history_size=history)
+        super().__init__(name="Angular_Momentum", history_size=history)
         self.population = None
         self.world_radius = 0
 

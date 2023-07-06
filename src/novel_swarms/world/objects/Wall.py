@@ -1,5 +1,6 @@
 import pygame
-from ..WorldObject import WorldObject
+from ...world.objects.WorldObject import WorldObject
+
 
 class Wall(WorldObject):
     def __init__(self, world, x, y, w, h, angle=0, color=(255, 255, 255), detectable=True):
@@ -36,3 +37,14 @@ class Wall(WorldObject):
 
     def __repr__(self):
         return f"Wall(None, {self.x}, {self.y}, {self.w}, {self.h})"
+
+    def as_config_dict(self):
+        return {
+            "type": "Wall",
+            "x": self.x,
+            "y": self.y,
+            "w": self.w,
+            "h": self.h,
+            "angle": self.angle,
+            "color": self.color,
+        }

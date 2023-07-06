@@ -5,7 +5,7 @@ from .AbstractBehavior import AbstractBehavior
 
 class TotalCollisionsBehavior(AbstractBehavior):
     def __init__(self, history=1):
-        super().__init__(name="Total Collisions", history_size=history)
+        super().__init__(name="Total_Collisions", history_size=history)
         self.population = None
         self.total_collisions = 0
 

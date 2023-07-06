@@ -8,7 +8,7 @@ from .AbstractBehavior import AbstractBehavior
 class GeneElementDifference(AbstractBehavior):
 
     def __init__(self, genome_a_index, genome_b_index, history=100):
-        super().__init__(name="SensorOffset", history_size=history)
+        super().__init__(name="Sensor_Offset", history_size=history)
         self.population = 0
         self.a = genome_a_index
         self.b = genome_b_index

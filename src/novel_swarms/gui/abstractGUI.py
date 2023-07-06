@@ -16,8 +16,8 @@ class AbstractGUI:
     def draw(self, screen):
         pygame.draw.rect(screen, color=(10,10,10), rect=Rect((self.x, self.y),(self.w, self.h)))
 
-    def step():
+    def step(self):
         pass
 
-    def pass_key_events(events):
+    def pass_key_events(self, events):
         pass
