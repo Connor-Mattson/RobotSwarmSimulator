@@ -90,7 +90,7 @@ class Cluster:
         elif implementation == "dbscan":
             dbscan_model = None
             if self.dim_reduction:
-                dbscan_model = DBSCAN(eps=4.5, min_samples=10)
+                dbscan_model = DBSCAN(eps=3.8, min_samples=10)
             else:
                 dbscan_model = DBSCAN(eps=0.5, min_samples=10)
             dbscan_model.fit(dataset)

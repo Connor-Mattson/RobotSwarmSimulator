@@ -36,8 +36,8 @@ if __name__ == "__main__":
     results_config = ConfigurationDefaults.RESULTS
     results_config.world = world_config
     results_config.archive = archive
-    results_config.clustering_type = "dbscan"
-    results_config.k = 6
+    results_config.clustering_type = "spectral"
+    results_config.k = 15
 
     # Cluster and Explore Reduced Behavior Space
     report(config=results_config)
