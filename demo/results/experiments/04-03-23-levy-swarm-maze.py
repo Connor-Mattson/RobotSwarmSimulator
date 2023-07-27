@@ -3,7 +3,7 @@ from src.novel_swarms.behavior.DistanceToGoal import DistanceToGoal
 from src.novel_swarms.sensors.BinaryFOVSensor import BinaryFOVSensor
 from src.novel_swarms.util import MultiWorldSimulation
 from src.novel_swarms.world.goals.Goal import AreaGoal
-from src.novel_swarms.world.obstacles.Wall import Wall
+from src.novel_swarms.world.objects.Wall import Wall
 from src.novel_swarms.world.simulate import main as sim
 from src.novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
 from src.novel_swarms.behavior.AverageSpeed import AverageSpeedBehavior

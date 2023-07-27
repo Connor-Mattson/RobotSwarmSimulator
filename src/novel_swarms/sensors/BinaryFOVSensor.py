@@ -23,6 +23,7 @@ class BinaryFOVSensor(AbstractSensor):
                  time_step_between_sensing=1,
                  store_history=False,
                  detect_goal_with_added_state=False,
+                 show=True
                  ):
         super(BinaryFOVSensor, self).__init__(parent=parent)
         self.current_state = 0
@@ -39,6 +40,7 @@ class BinaryFOVSensor(AbstractSensor):
         self.store_history = store_history
         self.use_goal_state = detect_goal_with_added_state
         self.goal_sensing_range = goal_sensing_range
+        self.show = show
 
         if degrees:
             self.theta = np.deg2rad(self.theta)
@@ -208,31 +210,31 @@ class BinaryFOVSensor(AbstractSensor):
 
     def draw(self, screen):
         super(BinaryFOVSensor, self).draw(screen)
+        if self.show:
+            # Draw Sensory Vector (Vision Vector)
+            sight_color = (255, 0, 0)
+            if self.current_state == 1:
+                sight_color = (0, 255, 0)
+            if self.current_state == 2:
+                sight_color = (255, 255, 0)
 
-        # Draw Sensory Vector (Vision Vector)
-        sight_color = (255, 0, 0)
-        if self.current_state == 1:
-            sight_color = (0, 255, 0)
-        if self.current_state == 2:
-            sight_color = (255, 255, 0)
+            magnitude = self.r if self.parent.is_highlighted else self.parent.radius * 5
 
-        magnitude = self.r if self.parent.is_highlighted else self.parent.radius * 5
+            head = (self.parent.x_pos, self.parent.y_pos)
+            e_left, e_right = self.getSectorVectors()
 
-        head = (self.parent.x_pos, self.parent.y_pos)
-        e_left, e_right = self.getSectorVectors()
+            tail_l = (self.parent.x_pos + (magnitude * e_left[0]),
+                    self.parent.y_pos + (magnitude * e_left[1]))
 
-        tail_l = (self.parent.x_pos + (magnitude * e_left[0]),
-                  self.parent.y_pos + (magnitude * e_left[1]))
+            tail_r = (self.parent.x_pos + (magnitude * e_right[0]),
+                    self.parent.y_pos + (magnitude * e_right[1]))
 
-        tail_r = (self.parent.x_pos + (magnitude * e_right[0]),
-                  self.parent.y_pos + (magnitude * e_right[1]))
-
-        pygame.draw.line(screen, sight_color, head, tail_l)
-        pygame.draw.line(screen, sight_color, head, tail_r)
-        if self.parent.is_highlighted:
-            pygame.draw.circle(screen, sight_color, self.parent.getPosition(), self.r, 3)
-            if self.wall_sensing_range:
-                pygame.draw.circle(screen, (150, 150, 150), self.parent.getPosition(), self.wall_sensing_range, 3)
+            pygame.draw.line(screen, sight_color, head, tail_l)
+            pygame.draw.line(screen, sight_color, head, tail_r)
+            if self.parent.is_highlighted:
+                pygame.draw.circle(screen, sight_color, self.parent.getPosition(), self.r, 3)
+                if self.wall_sensing_range:
+                    pygame.draw.circle(screen, (150, 150, 150), self.parent.getPosition(), self.wall_sensing_range, 3)
 
     def circle_interesect_sensing_cone(self, u, r):
         e_left, e_right = self.getSectorVectors()

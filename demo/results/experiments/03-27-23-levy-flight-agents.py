@@ -18,7 +18,7 @@ from src.novel_swarms.sensors.SensorSet import SensorSet
 from src.novel_swarms.config.AgentConfig import DiffDriveAgentConfig, StaticAgentConfig, UnicycleAgentConfig, LevyAgentConfig
 from src.novel_swarms.config.WorldConfig import RectangularWorldConfig
 from src.novel_swarms.config.HeterogenSwarmConfig import HeterogeneousSwarmConfig
-from src.novel_swarms.world.obstacles.Wall import Wall
+from src.novel_swarms.world.objects.Wall import Wall
 import numpy as np
 
 if __name__ == "__main__":
