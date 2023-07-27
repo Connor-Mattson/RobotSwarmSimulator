@@ -133,7 +133,7 @@ def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_e
             screen.fill(world_config.background_color)
             if draw_world:
                 world.draw(screen)
-            gui.step()
+            # gui.step()
             gui.draw(screen)
 
         # Limit the FPS of the simulation to FRAMERATE
