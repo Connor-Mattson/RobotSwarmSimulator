@@ -5,7 +5,7 @@ from .AbstractBehavior import AbstractBehavior
 
 class AlgebraicConn(AbstractBehavior):
     def __init__(self, history=100, r_disk_size=10):
-        super().__init__(name="Alg. Connectivity", history_size=history)
+        super().__init__(name="Alg_Connectivity", history_size=history)
         self.population = None
         self.r_disk_size = r_disk_size
 

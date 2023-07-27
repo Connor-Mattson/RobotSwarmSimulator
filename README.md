@@ -1,5 +1,5 @@
 # Novel Behavior Discovery in Computation Free Swarms
-Contributors: Connor Mattson, Daniel S. Brown
+Contributors: Connor Mattson, Jeremy Clark, Daniel S. Brown
 
 ## Required Software
 - Python & Pip

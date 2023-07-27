@@ -35,6 +35,12 @@ class World():
     def attach_gui(self, gui: AbstractGUI):
         self.gui = gui
 
+    def as_dict(self):
+        pass
+
+    def as_config_dict(self):
+        pass
+
     def evaluate(self, steps: int, output_capture: OutputTensorConfig = None, screen=None):
         frame_markers = []
         output = None

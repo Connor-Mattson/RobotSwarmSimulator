@@ -6,12 +6,14 @@ from typing import List
 
 
 class BinaryLOSSensor(AbstractSensor):
-    def __init__(self, parent=None, angle=None, draw=True, history_length=50):
-        super(BinaryLOSSensor, self).__init__(parent=parent, draw=draw)
+    def __init__(self, parent=None, angle=None, draw=True, history_length=50, width=1):
+        super().__init__(parent=parent, draw=draw)
         self.current_state = 0
         self.angle = angle
         self.history = []
         self.hist_len = history_length
+        self.width = width
+        self.show = draw
 
     def checkForLOSCollisions(self, world) -> None:
         sensor_position = self.parent.getPosition()
@@ -87,7 +89,7 @@ class BinaryLOSSensor(AbstractSensor):
             tail = (self.parent.x_pos + (magnitude * math.cos(self.angle + self.parent.angle)),
                     self.parent.y_pos + (magnitude * math.sin(self.angle + self.parent.angle)))
 
-        pygame.draw.line(screen, sight_color, head, tail)
+        pygame.draw.line(screen, sight_color, head, tail, width=self.width)
 
     def getLOSVector(self) -> List:
         head = self.parent.getPosition()
@@ -103,3 +105,18 @@ class BinaryLOSSensor(AbstractSensor):
         if len(self.history) > self.hist_len:
             self.history = self.history[1:]
         self.history.append(value)
+
+    def as_config_dict(self):
+        return {
+            "type": "BinaryLOSSensor",
+            "angle": self.angle,
+            "history_length": self.hist_len,
+        }
+
+    @staticmethod
+    def from_dict(d):
+        return BinaryLOSSensor(
+            parent=None,
+            angle=d["angle"],
+            history_length=d["history_length"],
+        )

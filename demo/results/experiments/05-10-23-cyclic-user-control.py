@@ -27,7 +27,7 @@ def simulate_and_report():
 
     world_config = RectangularWorldConfig(
         size=(500, 500),
-        n_agents=12,
+        n_agents=20,
         seed=SEED,
         behavior=behavior,
         agentConfig=agent_config,
@@ -38,7 +38,7 @@ def simulate_and_report():
 
     gui = ControllerGUI(world_config.w, 0, 200, world_config.h)
 
-    simulate(world_config=world_config, gui=gui, world_key_events=False)
+    simulate(world_config=world_config, gui=gui, world_key_events=False, gui_key_events=True)
 
 
 if __name__ == "__main__":

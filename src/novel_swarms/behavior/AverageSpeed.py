@@ -5,7 +5,7 @@ from .AbstractBehavior import AbstractBehavior
 
 class AverageSpeedBehavior(AbstractBehavior):
     def __init__(self, history=100):
-        super().__init__(name="Average Speed", history_size=history)
+        super().__init__(name="Average_Speed", history_size=history)
         self.population = None
 
     def attach_world(self, world):

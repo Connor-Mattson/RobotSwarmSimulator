@@ -6,7 +6,7 @@ from ..util.timer import Timer
 screen = None
 FRAMERATE = 200
 
-def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_events=False, step_size=1):
+def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_events=False, gui_key_events=False, step_size=1):
     # initialize the pygame module
     if show_gui:
         pygame.init()
@@ -27,6 +27,7 @@ def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_e
 
     # Create the simulation world
     world = WorldFactory.create(world_config)
+    world_subscribers = []
 
     # Create the GUI
     if show_gui and not gui:
@@ -52,7 +53,7 @@ def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_e
             for event in pygame.event.get():
                 # Cancel the game loop if user quits the GUI
                 if event.type == pygame.QUIT:
-                    running = False
+                    return world
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
                         paused = not paused
@@ -79,8 +80,16 @@ def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_e
                         steps_per_frame = round(steps_per_frame)
                     if event.key == pygame.K_w:
                         draw_world = not draw_world
+                    if event.key == pygame.K_F3:
+                        from .WorldIO import WorldIO
+                        WorldIO.save_world(world)
+                    if event.key == pygame.K_F4:
+                        from .subscribers.World2Gif import World2Gif
+                        world_subscribers.append(World2Gif(duration=1200, every_ith_frame=3, time_per_frame=50))
                     if world_key_events:
                         world.handle_key_press(event)
+                    if gui and gui_key_events:
+                        gui.pass_key_events(event)
                     if event.key in labels:
                         return event.key, steps_taken
 
@@ -110,6 +119,10 @@ def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_e
                     return world
 
             world.step()
+
+            # Broadcast to any world subscribers
+            _ = [sub.notify(screen) for sub in world_subscribers]
+
             steps_taken += 1
             # if steps_taken % 1000 == 0:
             # print(f"Total steps: {steps_taken}")
@@ -127,5 +140,3 @@ def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_e
         if gui:
             pygame.display.flip()
             pygame.time.Clock().tick(FRAMERATE)
-
-

@@ -61,16 +61,17 @@ if __name__ == "__main__":
         gene_rules=genotype,
         phenotype_config=phenotype,
         n_generations=10,
-        n_population=100,
+        n_population=4,
         crossover_rate=0.7,
         mutation_rate=0.15,
         world_config=world_config,
-        k_nn=15,
+        k_nn=3,
         simulation_lifespan=1200,
         display_novelty=True,
         save_archive=True,
         show_gui=True,
-        save_every=1
+        save_every=1,
+        seed=None
     )
 
     # Novelty Search through Genetic Evolution

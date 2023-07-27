@@ -5,15 +5,12 @@ If you do not plan to make commits to the GitHub repository or if you can ensure
 are not included in your commits, you may directly edit and run this file.
 
 """
+from src.novel_swarms.behavior.Centroid import Centroid
 from src.novel_swarms.sensors.AbstractSensor import AbstractSensor
 from src.novel_swarms.sensors.GenomeDependentSensor import GenomeBinarySensor
 from src.novel_swarms.sensors.StaticSensor import StaticSensor
 from src.novel_swarms.world.simulate import main as simulate
-from src.novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
-from src.novel_swarms.behavior.AverageSpeed import AverageSpeedBehavior
-from src.novel_swarms.behavior.GroupRotationBehavior import GroupRotationBehavior
-from src.novel_swarms.behavior.RadialVariance import RadialVarianceBehavior
-from src.novel_swarms.behavior.ScatterBehavior import ScatterBehavior
+from src.novel_swarms.behavior import *
 from src.novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
 from src.novel_swarms.sensors.BinaryFOVSensor import BinaryFOVSensor
 from src.novel_swarms.sensors.SensorSet import SensorSet
@@ -51,24 +48,26 @@ if __name__ == "__main__":
     # CUSTOM_CONTROLLER = [16.6, -0.4, 14.0, 0.5]  # Wall Following - Sweeping Version
     # CUSTOM_CONTROLLER = [-12.0, -0.6, -14.0, -0.5]  # Dispersal
     # CUSTOM_CONTROLLER = [8.0, -0.9, 15.0, 0.1]  # Milling/Cyclic
-    CUSTOM_CONTROLLER = [-1.7, 0.2, 0.0, 0.2]
+    # CUSTOM_CONTROLLER = [-1.7, 0.2, 0.0, 0.2]
+
+    CUSTOM_CONTROLLER = [7.5, 0.2, 7.5, -0.2]
 
     # CUSTOM_CONTROLLER = [20.0, -1.6, 20.0, 1.2]
 
     SEED = 1
     GUI_PADDING = 15
-    N_AGENTS = 9
+    N_AGENTS = 7
     WIDTH, HEIGHT = int(BL * 29.8), int(BL * 29.8)
 
     sensors = SensorSet([
         BinaryFOVSensor(
-            theta=50 / 2,
+            theta=14 / 2,
             distance=(BL * 12.5),
             # distance=(BL * 3),
             bias=-7,
             degrees=True,
-            false_positive=0.1,
-            false_negative=0.05,
+            false_positive=0.0,
+            false_negative=0.0,
             # Rectangle Representing Environment Boundaries
             # walls=[[GUI_PADDING, GUI_PADDING], [GUI_PADDING + WIDTH, GUI_PADDING + HEIGHT]],
             walls=None,
@@ -81,20 +80,16 @@ if __name__ == "__main__":
     agent_config = UnicycleAgentConfig(
         controller=CUSTOM_CONTROLLER,
         agent_radius=BL / 2,
-        wheel_radius=BL * 0.44,
         dt=0.13,  # 130ms sampling period
         sensors=sensors,
         seed=None,
-        idiosyncrasies=True
+        idiosyncrasies=False
     )
 
     behavior = [
-        AverageSpeedBehavior(),
-        AngularMomentumBehavior(),
-        RadialVarianceBehavior(),
-        ScatterBehavior(),
-        GroupRotationBehavior(),
-        AlgebraicConn(),
+        ScatterBehavior(history=1, regularize=False),
+        Centroid(),
+        # AlgebraicConn(),
     ]
 
     r = 80
@@ -118,7 +113,9 @@ if __name__ == "__main__":
     )
 
     # import matplotlib.pyplot as plot
+
     world = simulate(world_config=world_config)
+
     # neighbors_at = int(input("Time of Neighbor?"))
     # converged_at = int(input("Time of Convergence?"))
     # for i, agent in enumerate(world.population):

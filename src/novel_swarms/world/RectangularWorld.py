@@ -112,6 +112,7 @@ class RectangularWorld(World):
                 check_for_agent_collisions=self.preventAgentCollisions,
                 world=self
             )
+            self.handleGoalCollisions(agent)
         # agent_step_timer.check_watch()
 
         behavior_timer = Timer("Behavior Calculation Step")
@@ -193,7 +194,6 @@ class RectangularWorld(World):
 
         # agent.angle += (math.pi / 720)
         self.handleWallCollisions(agent)
-        self.handleGoalCollisions(agent)
 
         if agent.x_pos != old_x or agent.y_pos != old_y:
             return True
@@ -373,6 +373,10 @@ class RectangularWorld(World):
         return False
 
     def handle_key_press(self, event):
+
+        for a in self.population:
+            a.on_key_press(event)
+
         if self.selected is not None:
             if event.key == pygame.K_l:
                 self.selected.simulate_error("Death")
@@ -411,4 +415,7 @@ class RectangularWorld(World):
     def handle_held_keys(self, keys):
         for agent in self.human_controlled:
             agent.handle_key_press(keys)
+
+    def as_config_dict(self):
+        return self.config.as_dict()
 

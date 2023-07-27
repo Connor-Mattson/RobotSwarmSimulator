@@ -2,6 +2,7 @@ import math
 import random
 import numpy as np
 from .NoveltyArchive import NoveltyArchive
+from ..config.HeterogenSwarmConfig import HeterogeneousSwarmConfig
 from ..results.Trends import Trends
 from ..world.WorldFactory import WorldFactory
 from ..cache.ExternalSimulationArchive import ExternalSimulationArchive
@@ -16,7 +17,8 @@ class BehaviorDiscovery:
 
     def __init__(self, generations=10, population_size=20, crossover_rate=0.3, mutation_rate=0.1, genome_builder=None,
                  lifespan=200, world_config=None, behavior_config=None, k_neighbors=15, tournament_members=10,
-                 mutation_flip_chance = 0.2, allow_external_archive=False, genome_dependent_world=None):
+                 mutation_flip_chance = 0.2, allow_external_archive=False, genome_dependent_world=None, force_repeats=False,
+                 seed=None):
         self.population = np.array([])
         self.behavior = np.array([])
         self.scores = np.array([])
@@ -41,10 +43,14 @@ class BehaviorDiscovery:
         self.min_theta = []
         self.tournament_members = tournament_members
         self.allow_external_archive = allow_external_archive
-        self.force_repeats = False
+        self.force_repeats = force_repeats
         self.genome_dependent_world = genome_dependent_world
         if self.genome_dependent_world is None:
             self.genome_dependent_world = {}
+
+        if seed is not None:
+            np.random.seed(seed)
+            random.seed(seed)
 
         if genome_builder is None:
             raise Exception("BehaviorDiscovery must be initialized with a genotype ruleset.")
@@ -64,17 +70,29 @@ class BehaviorDiscovery:
         self.scores = np.array([0.0 for i in range(self.population_size)])
         self.behavior = np.array([[-1.0 for j in range(len(self.behavior_config))] for i in range(self.population_size)])
 
-    def runSinglePopulation(self, screen=None, i=0, save=True, genome=None, seed=None, output_config=None):
+    def runSinglePopulation(self, screen=None, i=0, save=True, genome=None, seed=None, output_config=None, heterogeneous=False):
         """
         Evaluates the Novelty of a Single Genome located at the ith index
         """
+        # print(f"Ratio Rule: {self.gene_builder.rules[-1].domain}")
         if genome is None:
             genome = self.population[i]
 
         self.status = "Simulation"
-        self.world_config.agentConfig.controller = genome
+        if seed is not None:
+            self.world_config.seed = seed
+
+        if not heterogeneous:
+            self.world_config.agentConfig.controller = genome
+            # self.world_config.agentConfig.controller = [0.0, 0.0, 0.0, 0.0]
+        else:
+            # Currently Assumes Two Species Only
+            self.world_config.agentConfig.from_n_species_controller(genome)
+            self.world_config.agentConfig = self.world_config.agentConfig.clone()
+            self.world_config.agentConfig.attach_world_config(self.world_config)
+
         for key in self.genome_dependent_world:
-            print("Setting Key!", key, " with Value: ", genome[self.genome_dependent_world[key]])
+            # print("Setting Key!", key, " with Value: ", genome[self.genome_dependent_world[key]])
             setattr(self.world_config, key, genome[self.genome_dependent_world[key]])
 
         behavior = None
@@ -91,9 +109,9 @@ class BehaviorDiscovery:
                     break
             if genome_index >= 0 and not output_config:
                 behavior = self.archive.archive[genome_index]
-                print("I've seen this genome before!")
-                print(genome_index, behavior)
-                print(f"Controller: {genome}")
+                # print("I've seen this genome before!")
+                # print(genome_index, behavior)
+                # print(f"Controller: {genome}")
                 if save:
                     self.behavior[i] = behavior
                     self.archive.addToArchive(behavior, genome)
@@ -105,7 +123,7 @@ class BehaviorDiscovery:
             r, _ = self.external_archive.retrieve_if_exists(rounded_genome, with_image=False)
             if r is not None:
                 behavior = r
-                print(f"We just utilized the archive: {rounded_genome}")
+                # print(f"We just utilized the archive: {rounded_genome}")
                 if save:
                     self.behavior[i] = behavior
                     self.archive.addToArchive(behavior, genome)
@@ -124,7 +142,7 @@ class BehaviorDiscovery:
             if self.allow_external_archive:
                 rounded_genome = self.round_genome(genome)
                 self.external_archive.save_if_empty(rounded_genome, behavior, image=output)
-                print(f"We just saved to the archive: {rounded_genome}")
+                # print(f"We just saved to the archive: {rounded_genome}")
 
             return output
 
@@ -163,7 +181,7 @@ class BehaviorDiscovery:
                     force_mutation = True
 
                 if force_mutation:
-                    print("Forcing Mutation!")
+                    # print("Forcing Mutation!")
                     a_mutated = False
                     while not a_mutated:
                         child_A, a_mutated = self.mutation(child_A)
@@ -232,7 +250,7 @@ class BehaviorDiscovery:
         if len(self.population) == 0:
             self.population = np.array([vector])
             return
-        print(vector)
+        # print(vector)
         self.population = np.concatenate((self.population, [vector]))
 
     def getBestScore(self):
