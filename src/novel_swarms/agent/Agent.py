@@ -44,3 +44,14 @@ class Agent:
 
     def get_aabb(self):
         pass
+
+    def set_pos_vec(self, vec):
+        """
+        Set the x, y, and angle of the agent.
+
+        @params
+        vec: An iterable of len 3, where vec[0] is the x_position, vec[1] is the y_position, and vec[2] is the angle heading
+
+        @return None
+        """
+        self.x_pos, self.y_pos, self.angle = vec[0], vec[1], vec[2]

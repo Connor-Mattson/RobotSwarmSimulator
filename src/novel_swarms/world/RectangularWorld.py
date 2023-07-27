@@ -53,31 +53,37 @@ class RectangularWorld(World):
             ]
 
         ac = config.agentConfig
-        if config.defined_start:
-            for i in range(len(config.agent_init)):
-                init = config.agent_init[i]
-                noise_x = ((np.random.random() * 2) - 1) * 20
-                noise_y = ((np.random.random() * 2) - 1) * 20
-                noise_theta = ((np.random.random() * 2) - 1) * (np.pi / 8)
-                # noise_x = 0
-                # noise_y = 0
-                # noise_theta = 0
-                self.population[i].x_pos = init[0] + noise_x
-                self.population[i].y_pos = init[1] + noise_y
-                if len(init) > 2:
-                    self.population[i].angle = init[2] + noise_theta
 
-        elif self.heterogeneous:
-            for agent in self.population:
-                agent.x_pos = random.uniform(math.floor(0 + agent.radius), math.floor(self.bounded_width - agent.radius))
-                agent.y_pos = random.uniform(math.ceil(0 + agent.radius), math.floor(self.bounded_height - agent.radius))
-                agent.angle = random.random() * 2 * math.pi
+        # Iniitalize the Agents
+        if config.init_type:
+            config.init_type.set_to_world(self)
+       
+        else:  # TODO: Deprecate defined_start
+            if config.defined_start:
+                for i in range(len(config.agent_init)):
+                    init = config.agent_init[i]
+                    noise_x = ((np.random.random() * 2) - 1) * 20
+                    noise_y = ((np.random.random() * 2) - 1) * 20
+                    noise_theta = ((np.random.random() * 2) - 1) * (np.pi / 8)
+                    # noise_x = 0
+                    # noise_y = 0
+                    # noise_theta = 0
+                    self.population[i].x_pos = init[0] + noise_x
+                    self.population[i].y_pos = init[1] + noise_y
+                    if len(init) > 2:
+                        self.population[i].angle = init[2] + noise_theta
 
-        elif ac.x is None and config.seed is not None:
-            for agent in self.population:
-                agent.x_pos = random.uniform(0 + ac.agent_radius, ac.world.w - ac.agent_radius)
-                agent.y_pos = random.uniform(0 + ac.agent_radius, ac.world.h - ac.agent_radius)
-                agent.angle = random.random() * 2 * math.pi
+            elif self.heterogeneous:
+                for agent in self.population:
+                    agent.x_pos = random.uniform(math.floor(0 + agent.radius), math.floor(self.bounded_width - agent.radius))
+                    agent.y_pos = random.uniform(math.ceil(0 + agent.radius), math.floor(self.bounded_height - agent.radius))
+                    agent.angle = random.random() * 2 * math.pi
+
+            elif ac.x is None and config.seed is not None:
+                for agent in self.population:
+                    agent.x_pos = random.uniform(0 + ac.agent_radius, ac.world.w - ac.agent_radius)
+                    agent.y_pos = random.uniform(0 + ac.agent_radius, ac.world.h - ac.agent_radius)
+                    agent.angle = random.random() * 2 * math.pi
 
         for i in range(len(self.objects)):
             self.objects[i].world = self

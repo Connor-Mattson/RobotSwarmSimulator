@@ -43,7 +43,6 @@ class UnicycleAgent(Agent):
             self.angle = config.angle
 
         self.radius = config.agent_radius
-        self.wheel_radius = config.wheel_radius
         self.dt = config.dt
         self.is_highlighted = False
         self.agent_in_sight = None

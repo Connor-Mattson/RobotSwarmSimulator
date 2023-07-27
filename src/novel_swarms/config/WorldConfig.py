@@ -1,6 +1,7 @@
 import warnings
 import numpy as np
-
+from src.novel_swarms.world.initialization.AbstractInit import AbstractInitialization
+from src.novel_swarms.world.initialization.RandomInit import RectRandomInitialization
 
 class RectangularWorldConfig:
     def __init__(self,
@@ -13,6 +14,7 @@ class RectangularWorldConfig:
                  collide_walls=True,
                  show_walls=True,
                  agent_initialization=None,
+                 init_type: AbstractInitialization = None,
                  stop_at=None,
                  objects=[],
                  goals=[],
@@ -24,12 +26,19 @@ class RectangularWorldConfig:
             behavior = []
 
         self.defined_start = False
+
+        # TODO: Deprecate Agent Initialization
         if agent_initialization is not None:
+            warnings.warn("The agent_initialization parameter (WorldConfig Class) will be deprecated in an upcoming version. Use Initialization Typing Instead (param init_type).")
             self.defined_start = True
             self.agent_init = agent_initialization
             if len(agent_initialization) != n_agents:
                 raise Exception(f"Length of Predefined Starting Locations ({len(agent_initialization)}) must equal number of agents ({n_agents})")
-
+        
+        elif init_type is None:
+            init_type = RectRandomInitialization(n_agents, ((0, 0), size))
+        
+        self.init_type = init_type
         self.behavior = behavior
         self.w = size[0]
         self.h = size[1]

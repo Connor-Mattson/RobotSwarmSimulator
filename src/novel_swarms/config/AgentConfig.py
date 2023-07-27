@@ -103,7 +103,6 @@ class UnicycleAgentConfig:
         self.seed = seed
         self.dt = dt
         self.agent_radius = agent_radius
-        self.wheel_radius = wheel_radius
         self.controller = controller
         self.sensors = sensors
         self.idiosyncrasies = idiosyncrasies
@@ -156,7 +155,9 @@ class MazeAgentConfig:
                  stop_on_collide=False,
                  stop_at_goal=True,
                  body_color=(255, 255, 255),
-                 body_filled=False
+                 body_filled=False,
+                 trace_length=None,
+                 trace_color=None,
                  ):
 
         self.x = x
@@ -173,6 +174,8 @@ class MazeAgentConfig:
         self.stop_at_goal = stop_at_goal
         self.body_color = body_color
         self.body_filled = body_filled
+        self.trace_length = trace_length
+        self.trace_color = trace_color
 
     def attach_world_config(self, world_config):
         self.world = world_config
