@@ -8,6 +8,8 @@ class AbstractGUI:
         self.y = y
         self.w = w
         self.h = h
+        self.track_all_events = False
+        self.track_all_mouse = False
 
     def set_selected(self, agent):
         #print("Attaching New Agent")
@@ -15,6 +17,15 @@ class AbstractGUI:
 
     def draw(self, screen):
         pygame.draw.rect(screen, color=(10,10,10), rect=Rect((self.x, self.y),(self.w, self.h)))
+
+    def recieve_events(self, events):
+        pass
+
+    def recieve_mouse(self, mouse_rel):
+        pass
+
+    def set_screen(self, screen):
+        self.screen = screen
 
     def step(self):
         pass

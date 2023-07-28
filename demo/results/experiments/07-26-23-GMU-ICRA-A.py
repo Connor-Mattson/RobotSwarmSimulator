@@ -15,8 +15,9 @@ if __name__ == "__main__":
     sensors = SensorSet([
         BinaryFOVSensor(
             theta=18,
+            degrees=True,
             distance=8.5,
-            show=False,
+            show=True,
         )
     ])
 
