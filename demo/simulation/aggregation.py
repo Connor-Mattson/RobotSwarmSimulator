@@ -2,22 +2,18 @@
 DO NOT ALTER THIS FILE.
 This file should remain a constant reference to a specific behavior.
 Please create your own file for simulating or alter 'demo/simulation/playground.py' instead.
-
-Connor Mattson
-University of Utah
-September 2022
 """
 
-from novel_swarms.world.simulate import main as simulate
-from novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
-from novel_swarms.behavior.AverageSpeed import AverageSpeedBehavior
-from novel_swarms.behavior.GroupRotationBehavior import GroupRotationBehavior
-from novel_swarms.behavior.RadialVariance import RadialVarianceBehavior
-from novel_swarms.behavior.ScatterBehavior import ScatterBehavior
-from novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
-from novel_swarms.sensors.SensorSet import SensorSet
-from novel_swarms.config.AgentConfig import DiffDriveAgentConfig
-from novel_swarms.config.WorldConfig import RectangularWorldConfig
+from src.novel_swarms.world.simulate import main as simulate
+from src.novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
+from src.novel_swarms.behavior.AverageSpeed import AverageSpeedBehavior
+from src.novel_swarms.behavior.GroupRotationBehavior import GroupRotationBehavior
+from src.novel_swarms.behavior.RadialVariance import RadialVarianceBehavior
+from src.novel_swarms.behavior.ScatterBehavior import ScatterBehavior
+from src.novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
+from src.novel_swarms.sensors.SensorSet import SensorSet
+from src.novel_swarms.config.AgentConfig import DiffDriveAgentConfig
+from src.novel_swarms.config.WorldConfig import RectangularWorldConfig
 
 if __name__ == "__main__":
 

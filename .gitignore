@@ -1,3 +1,9 @@
+# Ignore Experiment Files
+git.sh
+
+# Media
+*.gif
+
 # Distribution / packaging
 __pycache__
 *__pycache__

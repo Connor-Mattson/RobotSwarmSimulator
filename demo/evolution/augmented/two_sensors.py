@@ -3,37 +3,34 @@ Feel free to copy this file and explore configurations that lead to interesting 
 
 If you do not plan to make commits to the GitHub repository or if you can ensure that changes to this file
 are not included in your commits, you may directly edit and run this file.
-
-Connor Mattson
-University of Utah
-September 2022
 """
-from novel_swarms.config.defaults import ConfigurationDefaults
-from novel_swarms.novelty.GeneRule import GeneRule
-from novel_swarms.novelty.evolve import main as evolve
-from novel_swarms.results.results import main as report
-from novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
-from novel_swarms.behavior.AverageSpeed import AverageSpeedBehavior
-from novel_swarms.behavior.GroupRotationBehavior import GroupRotationBehavior
-from novel_swarms.behavior.RadialVariance import RadialVarianceBehavior
-from novel_swarms.behavior.ScatterBehavior import ScatterBehavior
-from novel_swarms.sensors.BinaryFOVSensor import BinaryFOVSensor
-from novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
-from novel_swarms.sensors.GenomeDependentSensor import GenomeBinarySensor
-from novel_swarms.sensors.SensorSet import SensorSet
-from novel_swarms.config.AgentConfig import DiffDriveAgentConfig
-from novel_swarms.config.WorldConfig import RectangularWorldConfig
-from novel_swarms.config.EvolutionaryConfig import GeneticEvolutionConfig
+from src.novel_swarms.config.defaults import ConfigurationDefaults
+from src.novel_swarms.novelty.GeneRule import GeneRule, GeneBuilder, GeneRuleContinuous
+from src.novel_swarms.novelty.evolve import main as evolve
+from src.novel_swarms.results.results import main as report
+from src.novel_swarms.behavior.AngularMomentum import AngularMomentumBehavior
+from src.novel_swarms.behavior.AverageSpeed import AverageSpeedBehavior
+from src.novel_swarms.behavior.GroupRotationBehavior import GroupRotationBehavior
+from src.novel_swarms.behavior.RadialVariance import RadialVarianceBehavior
+from src.novel_swarms.behavior.ScatterBehavior import ScatterBehavior
+from src.novel_swarms.sensors.BinaryFOVSensor import BinaryFOVSensor
+from src.novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
+from src.novel_swarms.sensors.GenomeDependentSensor import GenomeBinarySensor
+from src.novel_swarms.sensors.SensorSet import SensorSet
+from src.novel_swarms.config.AgentConfig import DiffDriveAgentConfig
+from src.novel_swarms.config.WorldConfig import RectangularWorldConfig
+from src.novel_swarms.config.EvolutionaryConfig import GeneticEvolutionConfig
 import numpy as np
-from novel_swarms.behavior.SensorOffset import GeneElementDifference
+from src.novel_swarms.behavior.SensorOffset import GeneElementDifference
 
 if __name__ == "__main__":
 
     SEED = None
 
     sensors = SensorSet([
-        GenomeBinarySensor(genome_id=8),
-        GenomeBinarySensor(genome_id=9)
+        BinaryLOSSensor(angle=0),
+        GenomeBinarySensor(genome_id=8)
+        # BinaryFOVSensor(theta=14 / 2, distance=125, degrees=True)
     ])
 
     agent_config = DiffDriveAgentConfig(
@@ -41,18 +38,21 @@ if __name__ == "__main__":
         seed=SEED,
     )
 
-    genotype = [
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.15, round_digits=4, exclude=[(-0.15, 0.15)]),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.15, round_digits=4, exclude=[(-0.15, 0.15)]),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.15, round_digits=4, exclude=[(-0.15, 0.15)]),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.15, round_digits=4, exclude=[(-0.15, 0.15)]),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.15, round_digits=4, exclude=[(-0.15, 0.15)]),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.15, round_digits=4, exclude=[(-0.15, 0.15)]),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.15, round_digits=4, exclude=[(-0.15, 0.15)]),
-        GeneRule(_max=1.0, _min=-1.0, mutation_step=0.15, round_digits=4, exclude=[(-0.15, 0.15)]),
-        GeneRule(_max=((1/3) * np.pi), _min=-((2/3) * np.pi), mutation_step=(np.pi/8), round_digits=4),
-        GeneRule(_max=((2/3) * np.pi), _min=-((1/3) * np.pi), mutation_step=(np.pi/8), round_digits=4),
-    ]
+    gene_specifications = GeneBuilder(
+        heuristic_validation=True,
+        round_to_digits=1,
+        rules=[
+            GeneRuleContinuous(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
+            GeneRuleContinuous(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
+            GeneRuleContinuous(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
+            GeneRuleContinuous(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
+            GeneRuleContinuous(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
+            GeneRuleContinuous(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
+            GeneRuleContinuous(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
+            GeneRuleContinuous(_max=1.0, _min=-1.0, mutation_step=0.4, round_digits=1),
+            GeneRuleContinuous(_max=((2 / 3) * np.pi), _min=-((2 / 3) * np.pi), mutation_step=(np.pi / 8), round_digits=4),
+        ]
+    )
 
     phenotype = [
         AverageSpeedBehavior(),
@@ -60,7 +60,7 @@ if __name__ == "__main__":
         RadialVarianceBehavior(),
         ScatterBehavior(),
         GroupRotationBehavior(),
-        GeneElementDifference(8, 9)
+        # GeneElementDifference(8, 9)
     ]
 
     world_config = RectangularWorldConfig(
@@ -73,15 +73,15 @@ if __name__ == "__main__":
     )
 
     novelty_config = GeneticEvolutionConfig(
-        gene_rules=genotype,
+        gene_builder=gene_specifications,
         phenotype_config=phenotype,
-        n_generations=100,
+        n_generations=15,
         n_population=100,
         crossover_rate=0.7,
         mutation_rate=0.15,
         world_config=world_config,
         k_nn=15,
-        simulation_lifespan=600,
+        simulation_lifespan=1200,
         display_novelty=True,
         save_archive=True,
         show_gui=True,
