@@ -38,10 +38,10 @@ def configure_robots():
 
     goal_seeking_robot = MazeAgentConfig(
         sensors=sensors, # Attach the previously defined sensors to the agent
-        # Here, the controller is of the form [v_0, omega_0, v_1, omega_0, ...]
-        controller = [0.5, 0.5, 0.5, 0.5], # Assign a homogeneous controller to the agents (This can be changed at runtime)
+        # Here, the controller is of the form [v_0, omega_0, v_1, omega_1, ...]
+        controller = [1.5, 0.5, 1.5, -0.5], # Assign a homogeneous controller to the agents (This can be changed at runtime)
         agent_radius=4, # Body radius, in pixels
-        stop_at_goal=False, # Don't automatically stop this robot when within goal region
+        stop_at_goal=True, # Don't automatically stop this robot when within goal region
         dt=0.13, # Timestep value
         body_filled=True  # Color in the body
     )
@@ -117,8 +117,8 @@ def callback(world, screen):
     # print(num_at_goal)
 
     # Example: WRITE random controllers to all agents every frame
-    for agent in world.population:
-        agent.controller = get_random_controller()
+    # for agent in world.population:
+    #     agent.controller = get_random_controller()
 
     # Example: WRITE (Change) all agents to be a new shade of red every frame
     new_color = (int((random.random() * 200) + 55), 0, 0)
