@@ -7,8 +7,10 @@ from src.novel_swarms.config.WorldConfig import RectangularWorldConfig
 from src.novel_swarms.gui.controllerGUI import ControllerGUI
 
 def simulate_and_report():
-    CYCLIC_PURSUIT_CONTROLLER = [-0.7, 0.3, 1.0, 1.0]
+    # CYCLIC_PURSUIT_CONTROLLER = [-0.7, 0.3, 1.0, 1.0]
+    CYCLIC_PURSUIT_CONTROLLER = [0.7, 1.0, 0.4, 0.5]
     SEED = 3
+
 
     sensors = SensorSet([
         BinaryLOSSensor(angle=0),

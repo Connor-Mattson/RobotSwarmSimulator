@@ -70,5 +70,5 @@ def display_random_behaviors(n, seed=0):
         display_subgroup_behaviors(c)
 
 if __name__ == "__main__":
-    display_subgroup_behaviors()
-    # display_random_behaviors(20, seed=4)
+    # display_subgroup_behaviors()
+    display_random_behaviors(150, seed=0)

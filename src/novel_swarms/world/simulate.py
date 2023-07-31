@@ -6,7 +6,7 @@ from ..util.timer import Timer
 screen = None
 FRAMERATE = 200
 
-def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_events=False, gui_key_events=False, step_size=1):
+def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_events=False, gui_key_events=False, step_size=1, save_duration=1200, save_every_ith_frame=3, save_time_per_frame=50):
     # initialize the pygame module
     if show_gui:
         pygame.init()
@@ -85,7 +85,7 @@ def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_e
                         WorldIO.save_world(world)
                     if event.key == pygame.K_F4:
                         from .subscribers.World2Gif import World2Gif
-                        world_subscribers.append(World2Gif(duration=1200, every_ith_frame=3, time_per_frame=50))
+                        world_subscribers.append(World2Gif(duration=save_duration, every_ith_frame=save_every_ith_frame, time_per_frame=save_time_per_frame))
                     if world_key_events:
                         world.handle_key_press(event)
                     if gui and gui_key_events:

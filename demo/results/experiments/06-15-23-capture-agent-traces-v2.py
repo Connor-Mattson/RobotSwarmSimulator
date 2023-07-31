@@ -23,9 +23,32 @@ import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
 
-    c = [-0.12, -0.2, 1.0, -1.0, 0.8, 0.9, 0.5, 0.6, 0.3]
+    # c = [0.7, 1.0, 0.4, 0.5, -0.9, -0.4, -0.3, 0.6, 12/24]  # Flower s16
+    # c = [0.9, 1.0, 0.7, 0.7, 0.9, -0.7, 1.0, 0.8, 8/24]  # Eye s7
+    # c = [0.0, 0.5, 0.6, -0.1, 0.3, 0.7, 0.6, 0.0, 8/24] # N-Cycles s15
+    # c = [0.1, 0.5, 0.6, -0.1, 0.3, 0.7, 0.4, -0.4, 8/24]  # Spiral s5
+    # c = [0.5, -0.7, 0.9, -0.5, 0.7, 1.0, 1.0, 0.5, 8/24]  # Nucleus s9
+    # c = [-0.6, 1.0, 1.0, 0.4, 0.7, -0.6, 0.7, 1.0, 3/24]  # Flail s12
+    # c = [-0.9, -0.8, -0.8, -1., -0.6, -1., 0.9, -0.7, 6/24]  # Perimeter s15
+    # c = [0.2, 0.7, -0.3, -0.1, 0.1, 0.9, 1.0, 0.8, 4/24]  # Containment s12
+    # c = [-0.7, 0.7, -0.4, -0.8, 0.8, 0.1, 0.2, 0.5, 1/24]  # Snake s76
+    # c = [-0.1, -0.2, 1.0, -1.0, 0.8, 0.9, 0.9, 1.0, 6/24]  # Hurricane s76
+    # c = [1.0, -1.0, 0.7, 0.5, 0.9, 0.7, -1.0, -0.2, 12/24]  # Dipole s76
+    # c = [0.6, 1.0, 0.4, 0.5, 0.2, 0.7, -0.5, -0.1, 12/24]  # C+D s32
+    # c = [0.1, 1.0, 0.3, 0.7, 0.2, 0.7, -0.5, -0.1, 12 / 24]  # A+D s32
+    # c = [0.7, 1.0, 0.3, 0.4, 0.2, 0.7, -0.5, -0.1, 12 / 24]  # M+D s32
+    c = [-0.4, -1.0, -0.2, 0.9, -0.6, 0.7, 0.9, 1.0, 3 / 24]  # Geometric Warp s15
+    # c = [-0.3, 0.1,  -0.4, -0.3, -0.3, 0., -0.2, -0.1, 8/24]  # Dispersal s12
+    # c = [-0.9, 0.6, 0.9, 0.7, -0.4, 0.1, 0.6, 0.2, 12/24]  # Segments s16
+    # c = [0.4, -0.7, 0.9, -0.5, 0.9, -0.4, 1.0, 0.4, 8/24] # Aggregation s2
+    # c = [1.0, 0.9, 0.9, 0.5, 0.7, 0.5, 1.0, 1.0, 12/24]  # Mill-Followers s17
+    # c = [-0.9, 1.0, 1.0, 1.0, 0.1, -0.1, 0.0, 0.0, 12/24]  # Site Traversal s115
+    # c = [0.7, 1.0, 0.4, 0.5, 0.7, 0.9, 0.4, 0.5, 8/24]  # Milling s1
+    # c = [1.0, -0.1, -0.9, -1.0, 1.0, 0.6, -0.3, 0.9, 1/24]  # Wall-Following s2
+    # c = [-0.7, 0.3, 1.0, 1.0, -0.7, 0.3, 1.0, 1.0, 12/24] # Cyclic Pursuit s2
 
-    SEED = 3
+    SEED = 5
+    AGENT_RADIUS = 6
     random.seed(SEED)
 
     sensors = SensorSet([
@@ -34,21 +57,21 @@ if __name__ == "__main__":
 
     agent_config_A = DiffDriveAgentConfig(
         sensors=sensors,
-        trace_length=180,
-        agent_radius=12,
+        trace_length=0,
+        agent_radius=AGENT_RADIUS,
         wheel_radius=1,
-        body_color=(0, 0, 0),
-        trace_color=(0, 0, 0),
+        body_color=(255, 0, 0),
+        trace_color=(255, 0, 0),
         body_filled=True,
     )
 
     agent_config_B = DiffDriveAgentConfig(
         sensors=sensors,
-        trace_length=180,
-        agent_radius=12,
+        trace_length=0,
+        agent_radius=AGENT_RADIUS,
         wheel_radius=1,
-        body_color=(0, 0, 0),
-        trace_color=(0, 0, 0),
+        body_color=(0, 200, 0),
+        trace_color=(0, 200, 0),
         body_filled=True,
     )
 
