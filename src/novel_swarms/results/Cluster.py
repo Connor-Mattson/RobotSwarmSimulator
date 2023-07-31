@@ -41,6 +41,7 @@ class Cluster:
         self.cluster_medoids = []
         self.medoid_indices = []
         self.medoid_genomes = []
+        self.clicked_medoids = set()
         self.world_config = config.world
         self.world_metadata = world_metadata
         self.results_config = config
@@ -203,6 +204,7 @@ class Cluster:
                 from ..world.simulate import main
                 print(f"Display Controller (Medoid): {controller}")
 
+                self.clicked_medoids.add(i)
                 metadata = self.sync_metadata_with_controller(controller)
                 if self.heterogeneous:
                     self.world_config.agentConfig.from_n_species_controller(controller)
@@ -246,8 +248,8 @@ class Cluster:
             for cluster_point in self.point_population:
                 cluster_point.draw(screen)
 
-            for cluster_center in self.cluster_medoids:
-                pygame.draw.circle(screen, (255, 255, 255), (int(cluster_center[0]), int(cluster_center[1])),
+            for i, cluster_center in enumerate(self.cluster_medoids):
+                pygame.draw.circle(screen, (255, 255, 255) if i not in self.clicked_medoids else (255, 0, 0), (int(cluster_center[0]), int(cluster_center[1])),
                                    self.MEDOID_RADIUS, width=0)
 
             pygame.display.flip()
