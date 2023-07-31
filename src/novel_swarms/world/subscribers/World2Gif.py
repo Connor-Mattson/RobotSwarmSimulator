@@ -14,7 +14,7 @@ class World2Gif:
 
         print("Saving World Gif... Please do not close the window until prompted")
 
-    def notify(self, screen):
+    def notify(self, world, screen):
         if self.total_steps > self.duration:
             if self.saved:
                 return

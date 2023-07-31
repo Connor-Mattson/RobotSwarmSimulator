@@ -1,11 +1,6 @@
-from typing import Tuple
-import pygame
 import random
 import math
-import time
 import numpy as np
-from copy import deepcopy
-from .Agent import Agent
 from .UnicycleAgent import UnicycleAgent
 from ..config.AgentConfig import LevyAgentConfig
 
@@ -134,8 +129,8 @@ class LevyAgent(UnicycleAgent):
         return np.power((numer / denom), 1 / beta)
 
     def _gamma(self, z):
-        from scipy.special import gamma
-        return gamma(z)
-
+        # from scipy.special import gamma as g
+        return math.gamma(z)
+    
     def get_action(self):
         return np.array([self.dx * self.dt, self.dy, self.dt])

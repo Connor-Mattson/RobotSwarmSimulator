@@ -2,7 +2,7 @@
 Contributors: Connor Mattson, Jeremy Clark, Daniel S. Brown
 
 ## Required Software
-- Python & Pip
+- Python >3.9 & Pip
 - External Python Packages as defined in [requirements.txt](requirements.txt) 
 
 ## Setup

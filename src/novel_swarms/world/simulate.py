@@ -6,7 +6,8 @@ from ..util.timer import Timer
 screen = None
 FRAMERATE = 200
 
-def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_events=False, gui_key_events=False, step_size=1, save_duration=1200, save_every_ith_frame=3, save_time_per_frame=50):
+
+def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_events=False, gui_key_events=False, subscribers=None, save_duration=1200, save_every_ith_frame=3, save_time_per_frame=50, step_size=1):
     # initialize the pygame module
     if show_gui:
         pygame.init()
@@ -27,7 +28,11 @@ def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_e
 
     # Create the simulation world
     world = WorldFactory.create(world_config)
+    
+    # Attach any subscribers to the world
     world_subscribers = []
+    if subscribers:
+        world_subscribers = subscribers
 
     # Create the GUI
     if show_gui and not gui:
@@ -36,6 +41,7 @@ def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_e
     # Attach the world to the gui and vice versa
     if gui:
         gui.set_world(world)
+        gui.set_screen(screen)
         world.attach_gui(gui)
 
     total_allowed_steps = world_config.stop_at
@@ -121,7 +127,7 @@ def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_e
             world.step()
 
             # Broadcast to any world subscribers
-            _ = [sub.notify(screen) for sub in world_subscribers]
+            _ = [sub.notify(world, screen) for sub in world_subscribers]
 
             steps_taken += 1
             # if steps_taken % 1000 == 0:
@@ -134,6 +140,10 @@ def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_e
             if draw_world:
                 world.draw(screen)
             # gui.step()
+            if gui.track_all_mouse:
+                gui.recieve_mouse(pygame.mouse.get_rel())
+            if gui.track_all_events:
+                gui.recieve_events(pygame.event.get())
             gui.draw(screen)
 
         # Limit the FPS of the simulation to FRAMERATE
