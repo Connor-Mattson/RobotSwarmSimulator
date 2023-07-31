@@ -7,7 +7,7 @@ from .SensorRotation import SensorRotation
 from .ScatterBehavior import ScatterBehavior
 from .GroupRotationBehavior import GroupRotationBehavior
 from .DistanceToGoal import DistanceToGoal
-from .AgentsAtGoal import AgentsAtGoal
+from .AgentsAtGoal import AgentsAtGoal, PercentageAtGoal
 from .TotalCollisions import TotalCollisionsBehavior
 from .RadialVariance import RadialVarianceBehavior
 
@@ -21,6 +21,7 @@ __all__ = [
     "ScatterBehavior",
     "GroupRotationBehavior",
     "DistanceToGoal",
+    "PercentageAtGoal",
     "AgentsAtGoal",
     "TotalCollisionsBehavior",
     "RadialVarianceBehavior"

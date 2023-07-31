@@ -3,6 +3,7 @@ import math
 import copy
 import numpy as np
 from typing import List
+import warnings
 from .AbstractBehavior import AbstractBehavior
 from ..agent.MazeAgent import MazeAgent
 
@@ -21,19 +22,19 @@ class AgentsAtGoal(AbstractBehavior):
     def calculate(self):
         if not self.goals or not self.population:
             self.set_value(0.0)
+            warnings.warn("Agents at Goal behavior was assigned but no goal was detected for this world!")
 
-        if self.population and isinstance(self.population[0], MazeAgent):
-            count = 0
-            for agent in self.population:
-                if agent.detection_id == 2:
+        count = 0
+        for agent in self.population:
+            for goal in self.goals:
+                if goal.agent_achieved_goal(agent):
                     count += 1
-            self.set_value(count)
-            return
+        self.set_value(count)
 
-        total_agents = 0
-        for goal in self.goals:
-            total_agents += goal.get_count()
-        self.set_value(total_agents)
+        # total_agents = 0
+        # for goal in self.goals:
+        #     total_agents += goal.get_count()
+        # self.set_value(total_agents)
 
 class PercentageAtGoal(AgentsAtGoal):
     def __init__(self, percentage, history=100):
@@ -50,21 +51,15 @@ class PercentageAtGoal(AgentsAtGoal):
             self.set_value(self.found)
             return
 
-        if self.population and isinstance(self.population[0], MazeAgent):
-            count = 0
-            for agent in self.population:
-                if agent.detection_id == 2:
-                    count += 1
-            v = count
-
-        else:
-            total_agents = 0
+        count = 0
+        for agent in self.population:
             for goal in self.goals:
-                total_agents += goal.get_count()
-            v = total_agents
+                if goal.agent_achieved_goal(agent):
+                    count += 1
+        v = count
 
         if v / self.world.population_size >= self.percentage:
             self.found = float(self.world.total_steps)
             self.set_value(self.found)
         else:
-            self.set_value(-1)
+            self.set_value(int(self.world.total_steps))

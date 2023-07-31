@@ -17,6 +17,7 @@ class AbstractSensor:
         self.n_possible_states = n_possible_states
         self.current_state = 0
         self.detection_id = 0
+        self.goal_detected = False
 
     def step(self, world):
         if self.parent is None and self.static_position is None:

@@ -7,7 +7,7 @@ class RectRandomInitialization(AbstractInitialization):
     """
     RandomInitialization: A random initialization of the agents in the environment.
     """
-    def __init__(self, num_agents: int, bb:Tuple[Tuple]=None):
+    def __init__(self, num_agents: int, bb:Tuple[Tuple, Tuple]=None, seed=None):
         """
         Initialize the RandomInitialization Class
         @params
@@ -18,6 +18,10 @@ class RectRandomInitialization(AbstractInitialization):
         super().__init__()
         self.num_agents = num_agents
         self.bb = bb
+        self.seed = seed
+
+        if self.seed is not None:
+            np.random.seed(self.seed)
 
         # Store the initialization information in an iterable
         self.positions = []

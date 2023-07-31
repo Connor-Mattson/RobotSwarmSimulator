@@ -177,7 +177,6 @@ class UnicycleAgentConfig:
             "seed": self.seed,
             "dt": self.dt,
             "agent_radius": self.agent_radius,
-            "wheel_radius": self.wheel_radius,
             "body_color": self.body_color,
             "body_filled": self.body_filled,
             "controller": self.controller,
@@ -205,8 +204,13 @@ class LevyAgentConfig:
                  levy_constant='Random',
                  forward_rate=1.0,
                  turning_rate=1.0,
-                 step_scale=1.0,
+                 step_scale=50.0,
+                 body_color=(255, 255, 255),
+                 body_filled=False,
+                 stop_at_goal=False,
+                 stop_on_goal_detect=False,
                  seed=None,
+                 curve_based=False
                  ):
         self.x = config.x
         self.y = config.y
@@ -218,6 +222,11 @@ class LevyAgentConfig:
         self.turning_rate = turning_rate
         self.step_scale = step_scale
         self.seed = seed
+        self.body_color = body_color
+        self.body_filled = body_filled
+        self.stop_at_goal = stop_at_goal
+        self.stop_on_goal_detect = stop_on_goal_detect
+        self.curve_based = curve_based
 
     def attach_world_config(self, world_config):
         self.world = world_config
