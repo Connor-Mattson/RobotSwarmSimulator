@@ -5,14 +5,9 @@ import math
 import time
 import numpy as np
 from copy import deepcopy
-
 from .Agent import Agent
 from .UnicycleAgent import UnicycleAgent
-from ..config.AgentConfig import UnicycleAgentConfig, LevyAgentConfig
-from ..sensors.GenomeDependentSensor import GenomeBinarySensor, GenomeFOVSensor
-from ..util.timer import Timer
-from ..util.collider.AABB import AABB
-from ..util.collider.AngleSensitiveCC import AngleSensitiveCC
+from ..config.AgentConfig import LevyAgentConfig
 
 
 class LevyAgent(UnicycleAgent):
