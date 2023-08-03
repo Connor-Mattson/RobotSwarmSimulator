@@ -20,7 +20,8 @@ class MazeAgent(Agent):
 
         if isinstance(config.controller, list):
             self.controller = Controller(config.controller)
-        self.controller = config.controller
+        else:
+            self.controller = config.controller
 
         self.seed = config.seed
         if config.seed is not None:

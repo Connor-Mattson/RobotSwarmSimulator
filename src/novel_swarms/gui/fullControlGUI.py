@@ -47,7 +47,7 @@ class FullControlGUI(AbstractGUI):
 
         # Declare a subsurface where the drawing will take place
         self.subsurf = self.screen.subsurface(self.rec)
-        tp.init(self.screen, tp.theme_human) #bind screen to gui elements and set theme
+        tp.init(self.screen, tp.theme_human)  # bind screen to gui elements and set theme
         tp.set_default_font(("arialrounded", "arial", "calibri", "century"), font_size=9)
         tp.set_style_attr("font_size", 12)
         self.init_gui_elements()
@@ -56,7 +56,7 @@ class FullControlGUI(AbstractGUI):
     def emit(event_name):
         pass
 
-    def click_play():
+    def click_play(self):
         pass
 
     def init_gui_elements(self):

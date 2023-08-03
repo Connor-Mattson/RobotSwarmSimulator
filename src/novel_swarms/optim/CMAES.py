@@ -38,13 +38,14 @@ class CMAES:
             es.disp()
             print(f"Current Best: {es.best.x}")
             if self.show_steps:
-                sim(self.g_to_w(es.best.x)[0], show_gui=True, stop_detection=self.w_stop_method, step_size=10)
+                sim(world_config=self.g_to_w(es.best.x)[0], show_gui=True, stop_detection=self.w_stop_method, step_size=10)
 
         es.result_pretty()
         return es.result, es
 
     def ask_for_genomes(self, es):
         parameters = es.ask()
+        print(parameters)
         configs = [self.g_to_w(parameter) for parameter in parameters]
         processor = MultiWorldSimulation(pool_size=self.n_processes, single_step=False, with_gui=False)
 
@@ -184,3 +185,5 @@ def example_B():
 
 if __name__ == "__main__":
     print(example_B())
+
+

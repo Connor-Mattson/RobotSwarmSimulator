@@ -49,8 +49,6 @@ class LevyAgent(UnicycleAgent):
         self.collider = None
 
         self.steps_left -= 1
-        if self.name == "0":
-            print(self.v, self.omega)
 
         if self.steps_left <= 0:
             if self.omega > 0:
@@ -139,9 +137,7 @@ class LevyAgent(UnicycleAgent):
             self.v = 0
 
     def levy_sample(self):
-        self.X_from_levy = min(int(levy.rvs(loc=0, scale=0.2)), 1000)
-        if self.name == "0":
-            print("New LEVY SAMPLE:", self.X_from_levy)
+        self.X_from_levy = min(int(levy.rvs(loc=0, scale=1.0)), 1000)
 
     def new_foward_steps(self):
         if self.curve_based:
