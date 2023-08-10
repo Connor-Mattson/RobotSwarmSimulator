@@ -1,14 +1,15 @@
 import random
 import math
 import numpy as np
-from scipy.stats import levy
+from scipy.stats import levy, gamma
 from .UnicycleAgent import UnicycleAgent
 from ..config.AgentConfig import LevyAgentConfig
 
 
 class LevyAgent(UnicycleAgent):
     def __init__(self, config: LevyAgentConfig = None, name=None) -> None:
-        super().__init__(config.unicycle_config)
+        super().__init__(config.unicycle_config, name=name)
+        print(f"NAME INIT: {name}")
 
         if config.seed is not None:
             random.seed(config.seed)
@@ -88,9 +89,9 @@ class LevyAgent(UnicycleAgent):
             self.stopped_duration -= 1
 
         else:
-            self.x_pos += self.dx * self.dt
-            self.y_pos += self.dy * self.dt
-            self.angle += dw * self.dt
+            self.set_x_pos(self.get_x_pos() + (self.dx * self.dt))
+            self.set_y_pos(self.get_y_pos() + (self.dy * self.dt))
+            self.set_heading(self.get_heading() + (dw * self.dt))
 
         if check_for_world_boundaries is not None:
             collisions = check_for_world_boundaries(self)
@@ -137,7 +138,12 @@ class LevyAgent(UnicycleAgent):
             self.v = 0
 
     def levy_sample(self):
-        self.X_from_levy = min(int(levy.rvs(loc=0, scale=1.0)), 1000)
+        # self.X_from_levy = min(int(levy.rvs(loc=0, scale=1.0)), 1000)
+        l_sample = 501
+        while l_sample > 500:
+            l_sample = round(100 * (1 / (gamma.rvs(a=0.5, scale=2))))
+        self.X_from_levy = l_sample
+
 
     def new_foward_steps(self):
         if self.curve_based:

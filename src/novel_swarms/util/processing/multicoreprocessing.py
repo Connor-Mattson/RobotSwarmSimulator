@@ -36,12 +36,12 @@ class MultiWorldSimulation:
         if not self.single_step:
             with Pool(self.pool_size) as pool:
                 ret = pool.starmap(simulate_batch if batched else simulate, zip(world_setup, [world_stop_condition for _ in world_setup]))
+                print([r.seed for r in ret])
         else:
             for w in world_setup:
                 if batched:
                     ret.append(simulate_batch(w, world_stop_condition, show_gui=self.with_gui))
                 else:
-                    print(w.agentConfig.controller)
                     ret.append(simulate(w, world_stop_condition, show_gui=self.with_gui))
         return ret
 

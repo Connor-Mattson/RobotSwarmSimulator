@@ -36,7 +36,7 @@ class DistanceToGoal(AbstractBehavior):
         if goal.agent_achieved_goal(agent):
             return 0.0
         if isinstance(goal, AreaGoal):
-            a_pos = [agent.x_pos, agent.y_pos]
+            a_pos = [agent.get_x_pos(), agent.get_y_pos()]
             goal_positions = [goal.rect.topleft, goal.rect.topright, goal.rect.bottomleft, goal.rect.bottomright]
             dist_squared = []
             for x, y in goal_positions:

@@ -25,7 +25,7 @@ class Point:
 
     @staticmethod
     def from_agent(agent):
-        return Point(agent.x_pos, agent.y_pos)
+        return Point(agent.get_x_pos(), agent.get_y_pos())
 
     @staticmethod
     def from_vector(vector):

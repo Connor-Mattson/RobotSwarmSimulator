@@ -16,3 +16,4 @@ class AbstractInitialization(ABC):
 
         for i in range(len(world.population)):
             world.population[i].set_pos_vec(self.positions[i])
+            world.population[i].name = str(i)

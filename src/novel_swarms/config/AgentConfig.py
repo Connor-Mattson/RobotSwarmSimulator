@@ -198,35 +198,23 @@ class UnicycleAgentConfig:
 
 
 class LevyAgentConfig:
-    def __init__(self,
-                 config=None,
-                 world_config: RectangularWorldConfig = None,
-                 levy_constant='Random',
-                 forward_rate=1.0,
-                 turning_rate=1.0,
-                 step_scale=50.0,
-                 body_color=(255, 255, 255),
-                 body_filled=False,
-                 stop_at_goal=False,
-                 stop_on_goal_detect=False,
-                 seed=None,
-                 curve_based=False
-                 ):
-        self.x = config.x
-        self.y = config.y
-        self.agent_radius = config.agent_radius
-        self.unicycle_config = config
-        self.world = world_config
-        self.levy_constant = levy_constant
-        self.forward_rate = forward_rate
-        self.turning_rate = turning_rate
-        self.step_scale = step_scale
-        self.seed = seed
-        self.body_color = body_color
-        self.body_filled = body_filled
-        self.stop_at_goal = stop_at_goal
-        self.stop_on_goal_detect = stop_on_goal_detect
-        self.curve_based = curve_based
+    def __init__(self, **kwargs):
+        self.x = kwargs["config"].x
+        self.y = kwargs["config"].y
+        self.agent_radius = kwargs["config"].agent_radius
+        self.unicycle_config = kwargs["config"]
+        self.world = kwargs.get("world_config", None)
+        self.levy_constant = kwargs.get("levy_constant", 1.0)
+        self.forward_rate = kwargs["forward_rate"]
+        self.turning_rate = kwargs["turning_rate"]
+        self.step_scale = kwargs.get("step_scale", 1.0)
+
+        self.seed = kwargs.get("seed", None)
+        self.body_color = kwargs.get("body_color", (255, 255, 255))
+        self.body_filled = kwargs.get("body_filled", True)
+        self.stop_at_goal = kwargs.get("stop_at_goal", False)
+        self.stop_on_goal_detect = kwargs.get("stop_on_goal_detect", False)
+        self.curve_based = kwargs.get("curve_based", True)
 
     def attach_world_config(self, world_config):
         self.world = world_config
@@ -327,43 +315,21 @@ class MazeAgentConfig:
 
 class ModeSwitchingAgentConfig():
     def __init__(self,
-                 parent_config: MazeAgentConfig,
-                 controllers,
+                 configs=None,
                  switch_mode="Keyboard"  # Elem in ["Keyboard", "Time", "Distribution"]
                  ):
-        self.copy_config(parent_config)
-        self.world = parent_config.world
-        self.parent_config = parent_config
-        self.controllers = controllers
-        self.switch_mode = switch_mode
 
-    def copy_config(self, config):
-        self.x = config.x
-        self.y = config.y
-        self.angle = config.angle
-        self.world = config.world
-        self.seed = config.seed
-        self.dt = config.dt
-        self.agent_radius = config.agent_radius
-        self.controller = config.controller
-        self.sensors = config.sensors
-        self.idiosyncrasies = config.idiosyncrasies
-        self.stop_on_collision = config.stop_on_collision
-        self.stop_at_goal = config.stop_at_goal
-        self.body_color = config.body_color
-        self.body_filled = config.body_filled
+        self.world = configs[0].world
+        self.configs = configs
+        self.switch_mode = switch_mode
 
     def attach_world_config(self, world_config):
         self.world = world_config
-        self.parent_config.attach_world_config(world_config)
+        for config in self.configs:
+            config.attach_world_config(world_config)
 
     def as_dict(self):
-        return {
-            "type": "ModeSwitchingAgentConfig",
-            "parent_config": self.parent_config.as_dict(),
-            "controllers": self.controllers,
-            "switch_mode": self.switch_mode
-        }
+        raise NotImplementedError
 
     @staticmethod
     def from_dict(d):
@@ -445,3 +411,19 @@ class AgentConfigFactory:
             return HeterogeneousSwarmConfig.from_dict(d)
         else:
             raise Exception(f"Cannot instantiate a config of type: {d['type']}")
+
+class AgentYAMLFactory:
+    @staticmethod
+    def from_yaml(file_name):
+        import yaml
+        config = None
+        with open(file_name, "r") as stream:
+            config = yaml.safe_load(stream)
+
+        a_type = config["type"]
+        if a_type == "Levy":
+            return LevyAgentConfig(**config)
+        else:
+            raise Exception(f"Unknown Agent type: {config['type']}")
+
+

@@ -24,14 +24,14 @@ class DifferentialDriveAgent(Agent):
             self.seed(config.seed)
 
         if config.x is None:
-            self.x_pos = random.randint(0 + config.agent_radius, config.world.w - config.agent_radius)
+            self.set_x_pos(random.randint(0 + config.agent_radius, config.world.w - config.agent_radius))
         else:
-            self.x_pos = config.x
+            self.set_x_pos(config.x)
 
         if config.y is None:
-            self.y_pos = random.randint(0 + config.agent_radius, config.world.h - config.agent_radius)
+            self.set_y_pos(random.randint(0 + config.agent_radius, config.world.h - config.agent_radius))
         else:
-            self.y_pos = config.y
+            self.set_y_pos(config.y)
 
         super().__init__(self.x_pos, self.y_pos, name="None")
 
@@ -94,8 +94,8 @@ class DifferentialDriveAgent(Agent):
         self.dy = (self.wheel_radius / 2) * (vl + vr) * math.sin(self.angle)
         heading = (vl - vr) / (self.radius * 2)
 
-        old_x_pos = self.x_pos
-        old_y_pos = self.y_pos
+        old_x_pos = self.get_x_pos()
+        old_y_pos = self.get_y_pos()
 
         self.x_pos += self.dx * self.dt
         self.y_pos += self.dy * self.dt
@@ -112,7 +112,7 @@ class DifferentialDriveAgent(Agent):
         self.dy = self.y_pos - old_y_pos
         # timer = timer.check_watch()
 
-        self.add_to_trace(self.x_pos, self.y_pos)
+        self.add_to_trace(self.get_x_pos(), self.get_y_pos())
 
         # timer = Timer("Sensors")
         for sensor in self.sensors:

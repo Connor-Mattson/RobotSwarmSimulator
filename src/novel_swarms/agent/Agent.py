@@ -27,8 +27,11 @@ class Agent:
     def draw(self, screen) -> None:
         pass
 
+    def get_sensors(self):
+        return self.sensors
+
     def getPosition(self):
-        return array([self.x_pos, self.y_pos])
+        return array([self.get_x_pos(), self.get_y_pos()])
 
     def getVelocity(self):
         return array([self.dx, self.dy])
@@ -37,7 +40,7 @@ class Agent:
         """
         Returns the location on the circumference that represents the "front" of the robot
         """
-        return self.x_pos + math.cos(self.angle), self.y_pos + math.sin(self.angle)
+        return self.get_x_pos() + math.cos(self.get_heading()), self.get_y_pos() + math.sin(self.get_heading())
 
     def attach_agent_to_sensors(self):
         for sensor in self.sensors:
@@ -46,9 +49,32 @@ class Agent:
     def get_aabb(self):
         pass
 
+    def get_x_pos(self):
+        return self.x_pos
+
+    def get_y_pos(self):
+        return self.y_pos
+
+    def set_x_pos(self, new_x):
+        self.x_pos = new_x
+
+    def set_y_pos(self, new_y):
+        self.y_pos = new_y
+
+    def get_heading(self):
+        return self.angle
+
+    def set_heading(self, new_heading):
+        self.angle = new_heading
 
     def on_key_press(self, event):
         pass
+
+    def get_name(self):
+        return self.name
+
+    def set_name(self, new_name):
+        self.name = new_name
 
     def set_pos_vec(self, vec):
         """
@@ -59,4 +85,6 @@ class Agent:
 
         @return None
         """
-        self.x_pos, self.y_pos, self.angle = vec[0], vec[1], vec[2]
+        self.set_x_pos(vec[0])
+        self.set_y_pos(vec[1])
+        self.set_heading(vec[2])

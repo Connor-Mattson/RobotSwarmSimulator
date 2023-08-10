@@ -32,7 +32,7 @@ class SensorSignalBehavior(AbstractBehavior):
             plt.ion()
             plt.clf()
             for i, agent in enumerate(self.world.highlighted_set):
-                history = agent.sensors.sensors[self.index].history
+                history = agent.get_sensors().sensors[self.index].history
                 plt.subplot(len(self.world.highlighted_set), 1, i + 1)
                 x = [self.world.total_steps - len(history) + i for i in range(len(history))]
                 plt.plot(x, history, color=tuple([c / 255 for c in agent.body_color]))
