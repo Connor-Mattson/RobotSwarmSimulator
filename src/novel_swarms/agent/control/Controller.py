@@ -35,3 +35,23 @@ class Controller:
         else:
             return self.controller_as_method(agent)
 
+
+    @staticmethod
+    def homogeneous_from_genome(genome):
+        def custom_controller(agent):
+            """
+            An example of a "from scratch" controller that you can code with any information contained within the agent class
+            """
+            sigma = agent.goal_seen  # Whether the goal has been detected previously by this agent
+            gamma = agent.agent_in_sight is not None  # Whether the agent detects another agent
+
+            u_1, u_2 = 0.0, 0.0  # Set these by default
+            if not sigma:
+                if not gamma:
+                    u_1, u_2 = genome[0], genome[1]  # u_1 in pixels/second (see b2p func), u_2 in rad/s
+                else:
+                    u_1, u_2 = genome[2], genome[3]  # u_1 in pixels/second (see b2p func), u_2 in rad/s
+            else:
+                u_1, u_2 = 0.0, 0.0  # u_1 in pixels/second (see b2p func), u_2 in rad/s
+            return u_1, u_2
+        return custom_controller

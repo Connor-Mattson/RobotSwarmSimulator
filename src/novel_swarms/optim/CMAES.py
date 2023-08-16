@@ -58,7 +58,7 @@ class CMAES:
 
 
     def minimize(self):
-        opts = {'popsize': self.pop, 'bounds': self.bounds, 'ftarget': self.target, }
+        opts = {'seed': 1, 'popsize': self.pop, 'bounds': self.bounds, 'ftarget': self.target}
         es = cma.CMAEvolutionStrategy(self.x0, self.s0, opts)
         while not es.stop():
             try:
@@ -142,7 +142,7 @@ class CMAES:
             return retrieval
 
     def average_behaviors(self, world_set):
-        behaviors = np.zeros(len(world_set[0].behavior), dtype=np.float)
+        behaviors = np.zeros(len(world_set[0].behavior), dtype=float)
         for world in world_set:
             behaviors += np.array([world.behavior[i].out_average()[1] for i in range(len(world.behavior))])
         return behaviors / len(world_set)
