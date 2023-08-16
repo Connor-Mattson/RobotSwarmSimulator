@@ -2,7 +2,7 @@ import pandas
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-CMAES_DATA_PATH = "../../out/Homogeneous-Sweep-11/CMAES/genomes.csv"
+CMAES_DATA_PATH = "../../out/Homogeneous-Sweep-16/CMAES/genomes.csv"
 if __name__ == "__main__":
     df = pandas.read_csv(CMAES_DATA_PATH)
 

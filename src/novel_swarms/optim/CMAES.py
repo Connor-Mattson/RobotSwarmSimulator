@@ -58,7 +58,7 @@ class CMAES:
 
 
     def minimize(self):
-        opts = {'seed': 1, 'popsize': self.pop, 'bounds': self.bounds, 'ftarget': self.target}
+        opts = {'seed': 1, 'popsize': self.pop, 'bounds': self.bounds, 'ftarget': self.target, "tolfun": 0}
         es = cma.CMAEvolutionStrategy(self.x0, self.s0, opts)
         while not es.stop():
             try:
