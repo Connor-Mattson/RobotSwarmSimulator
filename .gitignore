@@ -29,6 +29,8 @@ share/python-wheels/
 *.egg
 MANIFEST
 
+demo/results/out
+
 # Unit test / coverage reports
 htmlcov/
 .tox/

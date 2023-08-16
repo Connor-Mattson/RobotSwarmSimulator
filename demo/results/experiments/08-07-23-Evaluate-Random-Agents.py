@@ -56,7 +56,7 @@ FALSE_POSITIVE_RATE = 0.10  # Rate of Sensor Erroneously Detecting an Agent
 FALSE_NEGATIVE_RATE = 0.05  # Rate of Sensor Failing to Detect an Agent
 
 NUM_AGENTS = 13  # Number of Agents to Simulate at Anytime.
-RATIO_LEVY = 0.2  # Fraction of Population that are Levy Agents
+RATIO_LEVY = 0.0  # Fraction of Population that are Levy Agents
 
 DT = 0.13  # Timestep in Seconds (Sensors, collisions, etc. are evaluated every DT seconds)
 
@@ -105,6 +105,7 @@ def configure_robots(controller=None, ratio=1.0, levy_turning_rate=0.2):
                 show=True,  # Whether to show the sensor in the simulator
                 goal_sensing_range=b2p(VISION_DISTANCE),  # Goal Detection Distance
                 detect_goal_with_added_state=True,
+                wall_sensing_range=b2p(VISION_DISTANCE),
                 false_negative=FALSE_NEGATIVE_RATE,
                 false_positive=FALSE_POSITIVE_RATE,
             ),

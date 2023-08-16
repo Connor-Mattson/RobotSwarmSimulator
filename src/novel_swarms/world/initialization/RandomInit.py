@@ -1,13 +1,14 @@
 from src.novel_swarms.world.initialization.AbstractInit import AbstractInitialization
 from src.novel_swarms.world.World import World
 import numpy as np
+import copy
 from typing import Tuple, Iterable
 
 class RectRandomInitialization(AbstractInitialization):
     """
     RandomInitialization: A random initialization of the agents in the environment.
     """
-    def __init__(self, num_agents: int, bb:Tuple[Tuple, Tuple]=None, seed=None):
+    def __init__(self, **dwargs):
         """
         Initialize the RandomInitialization Class
         @params
@@ -16,9 +17,10 @@ class RectRandomInitialization(AbstractInitialization):
             x2, y2 are the Bottom Right corner.
         """
         super().__init__()
-        self.num_agents = num_agents
-        self.bb = bb
-        self.seed = seed
+        self.num_agents = dwargs.get("num_agents")
+        self.original_bb = dwargs.get("bb")
+        self.bb = copy.deepcopy(dwargs.get("bb"))
+        self.seed = dwargs.get("seed", None)
 
         if self.seed is not None:
             np.random.seed(self.seed)
@@ -37,6 +39,12 @@ class RectRandomInitialization(AbstractInitialization):
         bounds = [(self.bb[0][0], self.bb[1][0]), (self.bb[0][1], self.bb[1][1]), (0, 2*np.pi)]
         self.positions = self.random_vec(bounds, n=self.num_agents, round_to=2)
 
+    def rescale(self, zoom_factor):
+        self.bb[0][0] *= zoom_factor
+        self.bb[1][0] *= zoom_factor
+        self.bb[0][1] *= zoom_factor
+        self.bb[1][1] *= zoom_factor
+        self._calculate_positions()
 
     def random_vec(self, bounding_set: Iterable[Tuple], n:int=1, round_to:int=5):
         """
@@ -95,3 +103,27 @@ class RectRandomInitialization(AbstractInitialization):
             return [i[0] for i in ret]
 
         return ret
+
+    def as_dict(self):
+        return {
+            "type": "RectRandomInit",
+            "bb": self.bb,
+            "num_agents": self.num_agents,
+            "seed": self.seed
+        }
+
+    @staticmethod
+    def from_dict(d):
+        return RectRandomInitialization(
+            bb=d.get("bb"),
+            seed=d.get("seed", None),
+            num_agents=d.get("num_agents")
+        )
+
+    def getShallowCopy(self):
+        return self.from_dict(self.as_dict())
+
+    def reseed(self, seed):
+        self.seed = seed
+        np.random.seed(self.seed)
+        self._calculate_positions()

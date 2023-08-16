@@ -7,7 +7,7 @@ screen = None
 FRAMERATE = 200
 
 
-def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_events=False, gui_key_events=False, subscribers=None, save_duration=1200, save_every_ith_frame=3, save_time_per_frame=50, step_size=1):
+def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_events=False, gui_key_events=False, subscribers=None, save_duration=1200, save_every_ith_frame=3, save_time_per_frame=50, step_size=1, start_paused=False):
     # initialize the pygame module
     if show_gui:
         pygame.init()
@@ -23,7 +23,7 @@ def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_e
 
     # define a variable to control the main loop
     running = True
-    paused = False
+    paused = start_paused
     draw_world = True
 
     # Create the simulation world

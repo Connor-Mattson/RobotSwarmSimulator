@@ -233,11 +233,14 @@ def callback(world, screen):
 if __name__ == "__main__":
     robot_conf = configure_robots()
     world_conf = configure_env(robot_config=robot_conf, num_agents=NUM_AGENTS, size=(b2p(WORLD_W), b2p(WORLD_H)))
+    world_conf.stop_at = 1000
     world_subscriber = WorldSubscriber(func=callback)
 
     # print(robot_config)
 
-    simulator(
+    world_output = simulator(
         world_config=world_conf,
-        subscribers=[world_subscriber]
+        subscribers=[world_subscriber],
+        show_gui=False,
     )
+    print(world_output.population[0].x_pos)

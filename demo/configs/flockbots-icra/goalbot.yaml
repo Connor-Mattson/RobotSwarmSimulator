@@ -1,0 +1,30 @@
+---
+type: "Goalbot"
+sensors:
+  custom_state_decision: "Linear"
+  sensors:
+    - type: "BinaryFOVSensor"
+      theta: 0.3141595   # Vision Angle / 2 (Radians)
+      degrees: false
+      agent_sensing_range: 17 # In Body Lengths
+      show: true
+      goal_sensing_range: 17
+      use_goal_state: true
+      wall_sensing_range: 0
+      fn: 0.10
+      fp: 0.05
+      bias: 0
+      store_history: false
+controller:
+  - 0
+  - 0
+  - 0
+  - 0
+agent_radius: 0.5
+stop_at_goal: false
+dt: 0.13
+body_color:
+  - 255
+  - 0
+  - 0
+body_filled: true

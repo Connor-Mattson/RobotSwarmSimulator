@@ -55,7 +55,7 @@ FALSE_POSITIVE_RATE = 0.10  # Rate of Sensor Erroneously Detecting an Agent
 FALSE_NEGATIVE_RATE = 0.05  # Rate of Sensor Failing to Detect an Agent
 
 NUM_AGENTS = 20  # Number of Agents to Simulate at Anytime.
-RATIO_LEVY = 0.2  # Fraction of Population that are Levy Agents
+RATIO_LEVY = 0.0  # Fraction of Population that are Levy Agents
 
 DT = 0.30  # Timestep in Seconds (Sensors, collisions, etc. are evaluated every DT seconds)
 
@@ -66,7 +66,7 @@ def b2p(x: float):
     """
     (Helper Func) Convert a measurement (param: x), given in Body Lengths, to the appropriate quantity in pixels
     """
-    PIXELS_PER_BL = 7
+    PIXELS_PER_BL = 10
     return x * PIXELS_PER_BL
 
 
@@ -82,7 +82,7 @@ def custom_controller(agent: MazeAgent):
         if not gamma:
             u_1, u_2 = b2p(1.0), np.radians(15)  # u_1 in pixels/second (see b2p func), u_2 in rad/s
         else:
-            u_1, u_2 = b2p(1.0), np.radians(-15)  # u_1 in pixels/second (see b2p func), u_2 in rad/s
+            u_1, u_2 = b2p(0.8), np.radians(-15)  # u_1 in pixels/second (see b2p func), u_2 in rad/s
     else:
         u_1, u_2 = 0.0, 0.0  # u_1 in pixels/second (see b2p func), u_2 in rad/s
     return u_1, u_2
@@ -102,6 +102,7 @@ def configure_robots(controller=None, ratio=1.0, levy_turning_rate=0.2):
                 show=True,  # Whether to show the sensor in the simulator
                 goal_sensing_range=b2p(VISION_DISTANCE),  # Goal Detection Distance
                 detect_goal_with_added_state=True,
+                wall_sensing_range=b2p(VISION_DISTANCE),
                 false_negative=FALSE_NEGATIVE_RATE,
                 false_positive=FALSE_POSITIVE_RATE,
             ),
@@ -133,12 +134,14 @@ def configure_robots(controller=None, ratio=1.0, levy_turning_rate=0.2):
         curve_based=True  # Indicate that agents should turn while moving forward, rather than just turn in-place
     )
 
-    # Create a Heterogeneous Swarm and add both agent types to it. Ratio of the subpopulations is determined by the value of RATIO_LEVY
-    heterogeneous_swarm = HeterogeneousSwarmConfig()
-    heterogeneous_swarm.add_sub_populuation(goal_seeking_robot, count=(NUM_AGENTS - int(ratio * NUM_AGENTS)))
-    heterogeneous_swarm.add_sub_populuation(levy_robot, count=int(ratio * NUM_AGENTS))
+    return goal_seeking_robot
 
-    return heterogeneous_swarm
+    # Create a Heterogeneous Swarm and add both agent types to it. Ratio of the subpopulations is determined by the value of RATIO_LEVY
+    # heterogeneous_swarm = HeterogeneousSwarmConfig()
+    # heterogeneous_swarm.add_sub_populuation(goal_seeking_robot, count=(NUM_AGENTS - int(ratio * NUM_AGENTS)))
+    # heterogeneous_swarm.add_sub_populuation(levy_robot, count=int(ratio * NUM_AGENTS))
+
+    # return heterogeneous_swarm
 
 
 def establish_metrics():
@@ -147,7 +150,7 @@ def establish_metrics():
     metric_B = PercentageAtGoal(0.75)  # Record the time (timesteps) at which 75% of the agents found the goal
     metric_C = PercentageAtGoal(0.90)  # Record the time (timesteps) at which 90% of the agents found the goal
     metric_D = PercentageAtGoal(1.00)  # Record the time (timesteps) at which 100% of the agents found the goal
-    metric_E = AgentsAtGoal()  # Record the number of Agents in the Goal Region
+    metric_E = AgentsAtGoal(as_percent=True)  # Record the number of Agents in the Goal Region
     return [metric_0, metric_A, metric_B, metric_C, metric_D, metric_E]
 
 
@@ -191,8 +194,10 @@ def configure_env(robot_config, size=(500, 500), num_agents=20, _hash=None, seed
         seed=seed,
         init_type=starting_region,  # A starting region where agents will spawn at t=0
         goals=[goal_region],  # A list of goals for the robots to find
-        collide_walls=False,  # Use No Environment Walls for this problem
-        show_walls=False,  # Hide Default Walls,
+        collide_walls=True,  # Use No Environment Walls for this problem
+        show_walls=True,  # Hide Default Walls,
+        detectable_walls=True,
+        padding=0,
         metadata={'hash': _hash},
         stop_at=stop_at,
     )
@@ -251,7 +256,7 @@ def evolve_goal_proximity():
     return c
 
 def test_world():
-    robot_conf = configure_robots()
+    robot_conf = configure_robots(controller=Controller(custom_controller))
     world_conf = configure_env(robot_config=robot_conf, num_agents=NUM_AGENTS, size=(b2p(WORLD_W), b2p(WORLD_H)))
 
     # print(robot_config)

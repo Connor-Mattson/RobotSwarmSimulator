@@ -13,6 +13,7 @@ from .World import World
 from ..util.timer import Timer
 from ..util.collider.AABB import AABB
 from .goals.Goal import CylinderGoal
+from .objects.Wall import Wall
 
 
 def distance(pointA, pointB) -> float:
@@ -41,6 +42,14 @@ class RectangularWorld(World):
             # print(f"World Instantiated with Seed: {config.seed}")
             # print(f"TESTING RAND: {random.random()}")
             random.seed(config.seed)
+
+        if config.detectable_walls:
+            self.objects += [
+                Wall(self, self.padding, self.padding, 1, self.config.h),
+                Wall(self, self.padding, self.padding, self.config.w, 1),
+                Wall(self, self.padding, self.padding + self.config.h, self.config.w, 1),
+                Wall(self, self.padding + self.config.h, self.padding, 1, self.config.h),
+            ]
 
         self.heterogeneous = False
         if isinstance(config.agentConfig, HeterogeneousSwarmConfig):

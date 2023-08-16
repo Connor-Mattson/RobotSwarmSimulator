@@ -1,9 +1,0 @@
-config: goal_seeking_robot,  # Copy most of the config from the robot above
-levy_constant: 0.6,
-forward_rate: b2p(MAX_FORWARD_SPEED),
-turning_rate: levy_turning_rate,
-body_color: (255, 255, 0),  # Set the body color to yellow
-body_filled: True,
-stop_at_goal: False,  # Don't stop when the agent is in the goal region...
-stop_on_goal_detect: True,  # ...stop when the agent DETECTS the goal
-curve_based: True

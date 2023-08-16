@@ -8,11 +8,12 @@ from .AbstractBehavior import AbstractBehavior
 from ..agent.MazeAgent import MazeAgent
 
 class AgentsAtGoal(AbstractBehavior):
-    def __init__(self, name="Goal_Agents", history=100):
+    def __init__(self, name="Goal_Agents", history=100, as_percent=False):
         super().__init__(name=name, history_size=history)
         self.population = None
         self.goals = None
         self.world = None
+        self.as_percent = as_percent
 
     def attach_world(self, world):
         self.population = world.population
@@ -29,6 +30,8 @@ class AgentsAtGoal(AbstractBehavior):
             for goal in self.goals:
                 if goal.agent_achieved_goal(agent):
                     count += 1
+        if self.as_percent:
+            count = round(count / len(self.population), 3)
         self.set_value(count)
 
         # total_agents = 0
@@ -36,9 +39,12 @@ class AgentsAtGoal(AbstractBehavior):
         #     total_agents += goal.get_count()
         # self.set_value(total_agents)
 
+    def as_config_dict(self):
+        return {"name": self.name, "history_size": self.history_size, "as_percent": self.as_percent}
+
 class PercentageAtGoal(AgentsAtGoal):
     def __init__(self, percentage, history=100):
-        super().__init__(name=f"{round(percentage * 100)}-At-Goal:", history=history)
+        super().__init__(name=f"p{round(percentage * 100)}_at_goal", history=history)
         self.percentage = percentage
         self.found = None
 
@@ -63,3 +69,6 @@ class PercentageAtGoal(AgentsAtGoal):
             self.set_value(self.found)
         else:
             self.set_value(int(self.world.total_steps))
+
+    def as_config_dict(self):
+        return {"name": self.name, "history_size": self.history_size, "percentage": self.percentage}

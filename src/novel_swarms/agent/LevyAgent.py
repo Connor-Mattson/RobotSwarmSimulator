@@ -9,7 +9,6 @@ from ..config.AgentConfig import LevyAgentConfig
 class LevyAgent(UnicycleAgent):
     def __init__(self, config: LevyAgentConfig = None, name=None) -> None:
         super().__init__(config.unicycle_config, name=name)
-        print(f"NAME INIT: {name}")
 
         if config.seed is not None:
             random.seed(config.seed)
@@ -30,7 +29,9 @@ class LevyAgent(UnicycleAgent):
         self.stop_at_goal = config.stop_at_goal
         self.stop_on_goal_detect = config.stop_on_goal_detect
         self.curve_based = config.curve_based
+        self.mode_max_time = config.mode_max_time
 
+        self.turning = True
         self.omega = self.turning_rate
         self.v = self.forward_rate
         self.X_from_levy = 0
@@ -52,7 +53,7 @@ class LevyAgent(UnicycleAgent):
         self.steps_left -= 1
 
         if self.steps_left <= 0:
-            if self.omega > 0:
+            if self.turning:
                 self.new_foward_steps()
             else:
                 self.levy_sample()
@@ -128,6 +129,7 @@ class LevyAgent(UnicycleAgent):
             self.steps_left = int(self.X_from_levy / 2)
             self.omega = self.turning_rate
             self.v = self.forward_rate
+            self.turning = True
         else:
             d_theta = (random.random() * 2 * np.pi) - np.pi
             self.steps_left = abs(d_theta // self.turning_rate) + 1
@@ -139,8 +141,8 @@ class LevyAgent(UnicycleAgent):
 
     def levy_sample(self):
         # self.X_from_levy = min(int(levy.rvs(loc=0, scale=1.0)), 1000)
-        l_sample = 501
-        while l_sample > 500:
+        l_sample = self.mode_max_time + 1
+        while l_sample > self.mode_max_time:
             l_sample = round(100 * (1 / (gamma.rvs(a=0.5, scale=2))))
         self.X_from_levy = l_sample
 
@@ -150,6 +152,7 @@ class LevyAgent(UnicycleAgent):
             self.steps_left = int(self.X_from_levy / 2)
             self.omega = 0
             self.v = self.forward_rate
+            self.turning = False
         else:
             step = self.sample_step_size() * self.step_scaling
             self.steps_left = (step // self.forward_rate) + 1

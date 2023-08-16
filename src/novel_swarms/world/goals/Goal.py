@@ -70,7 +70,7 @@ class CylinderGoal(AbstractGoal):
             "type": "CylinderGoal",
             "center": self.center,
             "r": self.r,
-            "color": self.color,
+            "color": list(self.color),
             "remove_at": self.remove_at,
             "range": self.range
         }

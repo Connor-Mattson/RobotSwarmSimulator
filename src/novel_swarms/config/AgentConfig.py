@@ -1,5 +1,5 @@
 import random
-
+import os
 from pygame import math
 
 from .WorldConfig import RectangularWorldConfig
@@ -52,7 +52,7 @@ class DiffDriveAgentConfig:
             "dt": self.dt,
             "agent_radius": self.agent_radius,
             "wheel_radius": self.wheel_radius,
-            "body_color": self.body_color,
+            "body_color": list(self.body_color),
             "body_filled": self.body_filled,
             "controller": self.controller,
             "sensors": self.sensors.as_config_dict(),
@@ -112,7 +112,7 @@ class DroneAgentConfig:
             "seed": self.seed,
             "dt": self.dt,
             "agent_radius": self.agent_radius,
-            "body_color": self.body_color,
+            "body_color": list(self.body_color),
             "body_filled": self.body_filled,
             "controller": self.controller,
             "sensors": self.sensors.as_config_dict(),
@@ -177,7 +177,7 @@ class UnicycleAgentConfig:
             "seed": self.seed,
             "dt": self.dt,
             "agent_radius": self.agent_radius,
-            "body_color": self.body_color,
+            "body_color": list(self.body_color),
             "body_filled": self.body_filled,
             "controller": self.controller,
             "sensors": self.sensors.as_config_dict(),
@@ -208,6 +208,7 @@ class LevyAgentConfig:
         self.forward_rate = kwargs["forward_rate"]
         self.turning_rate = kwargs["turning_rate"]
         self.step_scale = kwargs.get("step_scale", 1.0)
+        self.mode_max_time = kwargs.get("mode_max_time", 500)
 
         self.seed = kwargs.get("seed", None)
         self.body_color = kwargs.get("body_color", (255, 255, 255))
@@ -227,59 +228,47 @@ class LevyAgentConfig:
             "y": self.y,
             "seed": self.seed,
             "agent_radius": self.agent_radius,
-            "unicycle_config": self.unicycle_config.as_dict(),
+            "config": self.unicycle_config.as_dict(),
             "levy_constant": self.levy_constant,
             "forward_rate": self.forward_rate,
             "turning_rate": self.turning_rate,
             "step_scale": self.step_scale,
+            "body_color": list(self.body_color),
+            "body_filled": self.body_filled,
+            "stop_on_goal" : self.stop_at_goal,
+            "stop_on_goal_detect":self.stop_on_goal_detect
         }
 
     @staticmethod
     def from_dict(d):
-        ret = LevyAgentConfig()
-        for k, v in d.items():
-            if k != "type":
-                setattr(ret, k, v)
-        return ret
+        if isinstance(d["config"], dict):
+            d["config"] = AgentConfigFactory.create(d["config"])
+        return LevyAgentConfig(**d)
+
+    def rescale(self, zoom):
+        self.forward_rate *= zoom
+        self.unicycle_config.rescale(zoom)
 
 
 class MazeAgentConfig:
-    def __init__(self,
-                 x=None,
-                 y=None,
-                 controller=None,
-                 angle=None,
-                 world_config: RectangularWorldConfig = None,
-                 seed=None,
-                 agent_radius=5,
-                 dt=1.0,
-                 sensors: SensorSet = None,
-                 idiosyncrasies=False,
-                 stop_on_collide=False,
-                 stop_at_goal=True,
-                 body_color=(255, 255, 255),
-                 body_filled=False,
-                 catastrophic_collisions=False,
-                 trace_length=None,
-                 trace_color=None,
-                 ):
-        self.x = x
-        self.y = y
-        self.angle = angle
-        self.world = world_config
-        self.seed = seed
-        self.dt = dt
-        self.agent_radius = agent_radius
-        self.controller = controller
-        self.sensors = sensors
-        self.idiosyncrasies = idiosyncrasies
-        self.stop_on_collision = stop_on_collide
-        self.stop_at_goal = stop_at_goal
-        self.body_color = body_color
-        self.body_filled = body_filled
-        self.catastophic_collisions = catastrophic_collisions
-        self.trace_length = trace_length
-        self.trace_color = trace_color
+    def __init__(self, **kwargs):
+        self.x = kwargs.get("x", None)
+        self.y = kwargs.get("y", None)
+        self.angle = kwargs.get("angle", None)
+        self.world = kwargs.get("world_config", None)
+        self.seed = kwargs.get("seed", None)
+        self.dt = kwargs.get("dt", 1.0)
+        self.agent_radius = kwargs.get("agent_radius", 5)
+        self.controller = kwargs.get("controller", None)
+        self.sensors = kwargs.get("sensors", None)
+        self.idiosyncrasies = kwargs.get("idiosyncrasies", False)
+        self.stop_on_collision = kwargs.get("stop_on_collide", False)
+        self.stop_at_goal = kwargs.get("stop_at_goal", True)
+        self.body_color = kwargs.get("body_color", (255, 255, 255))
+        self.body_filled = kwargs.get("body_filled", False)
+        self.catastophic_collisions = kwargs.get("catastrophic_collisions", False)
+        self.trace_length = kwargs.get("trace_length", None)
+        self.trace_color = kwargs.get("trace_color", None)
 
     def attach_world_config(self, world_config):
         self.world = world_config
@@ -293,7 +282,7 @@ class MazeAgentConfig:
             "seed": self.seed,
             "dt": self.dt,
             "agent_radius": self.agent_radius,
-            "body_color": self.body_color,
+            "body_color": list(self.body_color),
             "body_filled": self.body_filled,
             "controller": self.controller,
             "sensors": self.sensors.as_config_dict(),
@@ -305,12 +294,16 @@ class MazeAgentConfig:
 
     @staticmethod
     def from_dict(d):
-        ret = MazeAgentConfig()
-        for k, v in d.items():
-            if k != "type":
-                setattr(ret, k, v)
-        ret.sensors = SensorFactory.create(ret.sensors)
-        return ret
+        if isinstance(d["sensors"], dict):
+            d["sensors"] = SensorFactory.create(d["sensors"])
+        return MazeAgentConfig(**d)
+
+    def rescale(self, zoom):
+        self.agent_radius *= zoom
+        if hasattr(self, "sensors"):
+            for s in self.sensors:
+                s.r *= zoom
+                s.goal_sensing_range *= zoom
 
 
 class ModeSwitchingAgentConfig():
@@ -333,14 +326,7 @@ class ModeSwitchingAgentConfig():
 
     @staticmethod
     def from_dict(d):
-        parent_config = AgentConfigFactory.create(d["parent_config"])
-        controllers = d["controllers"]
-        switch_mode = d["switch_mode"]
-        return ModeSwitchingAgentConfig(
-            parent_config=parent_config,
-            controllers=controllers,
-            switch_mode=switch_mode
-        )
+        raise NotImplementedError
 
 
 class StaticAgentConfig:
@@ -377,7 +363,7 @@ class StaticAgentConfig:
             "seed": self.seed,
             "dt": self.dt,
             "agent_radius": self.agent_radius,
-            "body_color": self.body_color,
+            "body_color": list(self.body_color),
             "body_filled": self.body_filled
         }
 
@@ -422,7 +408,13 @@ class AgentYAMLFactory:
 
         a_type = config["type"]
         if a_type == "Levy":
+            base = AgentYAMLFactory.from_yaml(os.path.join(os.path.dirname(file_name), config["base"]))
+            config["config"] = base
             return LevyAgentConfig(**config)
+        elif a_type == "Goalbot":
+            sensors = SensorFactory.create(config["sensors"])
+            config["sensors"] = sensors
+            return MazeAgentConfig(**config)
         else:
             raise Exception(f"Unknown Agent type: {config['type']}")
 
