@@ -2,7 +2,7 @@ import pandas
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-CMAES_DATA_PATH = "../../out/Homogeneous-Sweep-16/CMAES/genomes.csv"
+CMAES_DATA_PATH = "../../out/LMMix-4/CMAES/genomes.csv"
 if __name__ == "__main__":
     df = pandas.read_csv(CMAES_DATA_PATH)
 
@@ -13,7 +13,7 @@ if __name__ == "__main__":
     # sns.kdeplot(data=df, x="turning_rate", y="levy_scaler", fill=True)
     # sns.scatterplot(data=df, x="forward_rate", y="turning_rate", hue="P_g", size="P_g")
     # sns.scatterplot(data=df, x="turning_rate", y="P_g", hue="P_g")
-    sns.pairplot(data=df, hue="P_g", vars=["forward_rate_0", "turning_rate_0", "forward_rate_1", "turning_rate_1"])
+    sns.pairplot(data=df, hue="P_g", vars=["population_ratio", "forward_rate_levy", "turning_rate_levy", "forward_rate_0", "turning_rate_0", "forward_rate_1", "turning_rate_1"])
 
     # plt.title("Goal Finding CMAES for Random Levy Agents")
     # plt.xlim(150, 1000)
