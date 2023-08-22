@@ -16,6 +16,7 @@ if __name__ == "__main__":
     parser.add_argument("--python-script", type=str, help="The parameter after python -m that you want to run, a script")
     parser.add_argument("--fixed-config", action="store_true", help="Use the predefined init")
     parser.add_argument("--processes", type=int, default=1, help="Number of running concurrent processes")
+    parser.add_argument("--n", type=int, default=-1, help="Number of Agents to Sweep over")
     parser.add_argument("--iters", type=int, default=100, help="Number of Evolutions to consider")
     parser.add_argument("--no-walls", action="store_true", help="Whether to include detectable walls")
     parser.add_argument("--sweep", action="store_true", help="Whether to sweep instead of search")
@@ -36,6 +37,9 @@ if __name__ == "__main__":
 
     n_set = N_SET if not args.test else N_SET_TEST_ONLY
     t_set = T_SET if not args.test else T_SET_TEST_ONLY
+
+    if args.n > 0:
+        n_set = [args.n]
 
     def get_cmd(n, t):
         cmd = [
