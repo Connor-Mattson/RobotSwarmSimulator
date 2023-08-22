@@ -13,10 +13,11 @@ class HomogeneousController(Controller):
         """
         sigma = agent.goal_seen  # Whether the goal has been detected previously by this agent
         gamma = agent.agent_in_sight is not None  # Whether the agent detects another agent
+        wall_detected = not gamma and agent.sensors.sensors[0].current_state == 1
 
         u_1, u_2 = 0.0, 0.0  # Set these by default
         if not sigma:
-            if not gamma:
+            if not gamma and not wall_detected:
                 u_1, u_2 = self.genome[0], self.genome[1]  # u_1 in pixels/second (see b2p func), u_2 in rad/s
             else:
                 u_1, u_2 = self.genome[2], self.genome[3]  # u_1 in pixels/second (see b2p func), u_2 in rad/s

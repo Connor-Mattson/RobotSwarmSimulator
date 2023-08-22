@@ -43,15 +43,8 @@ class RectangularWorld(World):
             # print(f"TESTING RAND: {random.random()}")
             random.seed(config.seed)
 
-        if config.detectable_walls:
-            self.objects += [
-                Wall(self, self.padding, self.padding, 1, self.config.h),
-                Wall(self, self.padding, self.padding, self.config.w, 1),
-                Wall(self, self.padding, self.padding + self.config.h, self.config.w, 1),
-                Wall(self, self.padding + self.config.h, self.padding, 1, self.config.h),
-            ]
-
         self.heterogeneous = False
+
         if isinstance(config.agentConfig, HeterogeneousSwarmConfig):
             self.population = config.agentConfig.build_agent_population()
             self.heterogeneous = True
@@ -59,6 +52,18 @@ class RectangularWorld(World):
         else:
             self.population = [
                 AgentFactory.create(config.agentConfig, name=f"{i}") for i in range(int(self.population_size))
+            ]
+
+        # Attach Walls to sensors
+        # TODO: Better software engineering here
+        if config.detectable_walls:
+            from ..sensors.BinaryFOVSensor import BinaryFOVSensor
+
+            self.objects += [
+                Wall(self, self.padding - 1, self.padding - 1, 1, self.config.h),
+                Wall(self, self.padding - 1, self.padding - 1, self.config.w, 1),
+                Wall(self, self.padding - 1, self.padding + self.config.h + 1, self.config.w, 1),
+                Wall(self, self.padding + self.config.h + 1, self.padding - 1, 1, self.config.h),
             ]
 
         ac = config.agentConfig

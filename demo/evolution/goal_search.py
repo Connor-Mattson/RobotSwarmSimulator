@@ -10,6 +10,7 @@ from src.novel_swarms.config.AgentConfig import AgentYAMLFactory
 from src.novel_swarms.config.WorldConfig import WorldYAMLFactory
 from src.novel_swarms.world.initialization.FixedInit import FixedInitialization
 from src.novel_swarms.behavior import *
+from src.novel_swarms.world.simulate import main as sim
 
 DECISION_VARS = CMAESVarSet(
     {
@@ -67,10 +68,13 @@ def get_world_generator(n_agents, horizon, init=None, walls=True):
 
         # Otherwise, we'll attempt to find a general solution, invariant to starting position.
         else:
-            for seed in range(3):
+            files = [f"demo/configs/flockbots-icra/position_data/s{i}.csv" for i in range(1, 4)]
+            for i, file in enumerate(files):
                 world_config = world.getDeepCopy()
-                world_config.seed = seed
-                world_config.init_type.reseed(seed)
+                world_config.seed = i
+                world_config.init_type = FixedInitialization(file)
+                world_config.init_type.rescale(SCALE)
+                world_config.population_size = n_agents
                 world_config.behavior = [
                     AgentsAtGoal(as_percent=True, history=1),
                     PercentageAtGoal(0.5),
@@ -109,8 +113,13 @@ if __name__ == "__main__":
         init = FixedInitialization("demo/configs/flockbots-icra/init_translated.csv")
 
     # Save World Config by sampling from generator
-    world_gen_example = get_world_generator(-1, -1, init=init, walls=(not args.no_walls))
-    sample_worlds = world_gen_example([-1, -1, -1, -1], [-1, -1, -1, -1])
+    world_gen_example = get_world_generator(args.n, args.t, init=init, walls=(not args.no_walls))
+    sample_worlds = world_gen_example([0.9708476168273128, -0.055501622625187874], [-1, -1, -1, -1])
+    sample_worlds[0].stop_at = None
+
+    # for world in sample_worlds:
+    #     sim(world_config=world, save_every_ith_frame=8, save_duration=4000)
+
     sample_worlds[0].save_yaml(exp)
 
     cmaes = CMAES(

@@ -304,7 +304,7 @@ class MazeAgentConfig:
             for s in self.sensors:
                 s.r *= zoom
                 s.goal_sensing_range *= zoom
-
+                s.wall_sensing_range *= zoom
 
 class ModeSwitchingAgentConfig():
     def __init__(self,

@@ -90,10 +90,13 @@ def get_world_generator(n_agents, horizon, init=None, walls=True):
 
         # Otherwise, we'll attempt to find a general solution, invariant to starting position.
         else:
-            for seed in range(3):
+            files = [f"demo/configs/flockbots-icra/position_data/s{i}.csv" for i in range(1, 4)]
+            for i, file in enumerate(files):
                 world_config = world.getDeepCopy()
-                world_config.seed = seed
-                world_config.init_type.reseed(seed)
+                world_config.seed = i
+                world_config.init_type = FixedInitialization(file)
+                world_config.init_type.rescale(SCALE)
+                world_config.population_size = n_agents
                 world_config.behavior = [
                     AgentsAtGoal(as_percent=True, history=1),
                     PercentageAtGoal(0.5),
@@ -131,9 +134,14 @@ if __name__ == "__main__":
 
     # Save World Config by sampling from generator
     world_gen_example = get_world_generator(args.n, args.t, init=init, walls=(not args.no_walls))
-    sample_worlds = world_gen_example([0.5, 0.5, 0.5, 0.5, 0.5, 1.0, 0.5, 0.5, 0.5, 0.5, 0.5], [-1, -1, -1, -1])
-    sample_worlds[0].stop_at = None
-    # sim(world_config=sample_worlds[0])
+    sample_worlds = world_gen_example(
+        [0.888250840408981,9.88897790833874,-0.6397486259929207,9.960740932935453,1.3083027225578698,9.259267068237731,-0.24190371710244718,3.2435859216076275,1.2711580035875931],
+        [-1, -1, -1, -1]
+    )
+    import time
+    start = time.time()
+    sample_worlds[0].stop_at = 5000
+    # sim(world_config=sample_worlds[0], save_every_ith_frame=8, save_duration=4000, show_gui=False)
 
     sample_worlds[0].save_yaml(exp)
 

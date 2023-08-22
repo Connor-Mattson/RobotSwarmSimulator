@@ -2,13 +2,13 @@ import subprocess
 import argparse
 import os
 
-N_SET = [1, 10, 20, 30, 50]
-T_SET = [1000, 2000, 3000, 4000, 5000]
-N_SET_TEST_ONLY = [1, 3, 5]
-T_SET_TEST_ONLY = [100, 500, 1000]
+N_SET = [10, 20, 30]
+T_SET = [3000, 5000]
+N_SET_TEST_ONLY = [2, 5]
+T_SET_TEST_ONLY = [100, 500]
 
 ROOT = "demo/results/out"
-POPULATION_SIZE = 15
+POPULATION_SIZE = 25
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -61,6 +61,12 @@ if __name__ == "__main__":
             cmd = get_cmd(n, t)
             cmd.append("--name")
             cmd.append(sub_exp_name)
+
+            print("========================================")
+            print(f"Experiment Start")
+            print(f"N: {n}, T: {t}")
+            print(f"Output name: {sub_exp_name}")
+            print("========================================")
 
             subprocess.call(cmd)
 

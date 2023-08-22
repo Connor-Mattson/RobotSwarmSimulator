@@ -10,11 +10,12 @@ sensors:
       show: true
       goal_sensing_range: 17
       use_goal_state: true
-      wall_sensing_range: 0
+      wall_sensing_range: 17
       fn: 0.10
       fp: 0.05
       bias: 0
       store_history: false
+      seed: 10
 controller:
   - 0
   - 0

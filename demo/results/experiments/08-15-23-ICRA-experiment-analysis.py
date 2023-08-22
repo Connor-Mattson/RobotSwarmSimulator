@@ -5,7 +5,7 @@ from src.novel_swarms.config.WorldConfig import RectangularWorldConfig
 
 if __name__ == "__main__":
     # Load env from yaml
-    with open("../out/Test-Runner-2/n5-t1000-test-fixed/env.yaml") as yaml_config:
+    with open("../out/Homoge-Fixed-1/n10-t4000-fixed/env.yaml") as yaml_config:
         env = yaml.safe_load(yaml_config)
 
     # Load Agent Config

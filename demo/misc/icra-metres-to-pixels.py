@@ -6,7 +6,7 @@ def coord_to_bl(coord):
 
 
 if __name__ == "__main__":
-    data = np.loadtxt('../configs/flockbots-icra/fixed_init.csv', delimiter=',')
+    data = np.loadtxt('../configs/flockbots-icra/position_data/seed5.csv', delimiter=',')
     for line in data:
         line[1] = coord_to_bl(line[1])
         line[2] = coord_to_bl(line[2])
@@ -27,4 +27,4 @@ if __name__ == "__main__":
     """
     Output Translation
     """
-    np.savetxt("../configs/flockbots-icra/init_translated.csv", data, delimiter=",", fmt="%10.5f")
+    np.savetxt("../configs/flockbots-icra/position_data/s5.csv", data, delimiter=",", fmt="%10.5f")

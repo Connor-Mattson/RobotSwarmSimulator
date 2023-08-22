@@ -31,6 +31,8 @@ DECISION_VARS = CMAESVarSet(
 )
 
 PERFECT_SCORE = -1.0
+
+
 def FITNESS(world_set):
     total = 0
     for w in world_set:
@@ -38,8 +40,8 @@ def FITNESS(world_set):
     avg = total / len(world_set)
     return avg
 
-def get_world_generator(n_agents, horizon, init=None, walls=True):
 
+def get_world_generator(n_agents, horizon, init=None, walls=True):
     def gene_to_world(genome, hash_val):
         levy_agent = AgentYAMLFactory.from_yaml("demo/configs/flockbots-icra/levy.yaml")
         levy_agent.seed = 0
@@ -88,10 +90,13 @@ def get_world_generator(n_agents, horizon, init=None, walls=True):
 
         # Otherwise, we'll attempt to find a general solution, invariant to starting position.
         else:
-            for seed in range(3):
+            files = [f"demo/configs/flockbots-icra/position_data/s{i}.csv" for i in range(1, 4)]
+            for i, file in enumerate(files):
                 world_config = world.getDeepCopy()
-                world_config.seed = seed
-                world_config.init_type.reseed(seed)
+                world_config.seed = i
+                world_config.init_type = FixedInitialization(file)
+                world_config.init_type.rescale(SCALE)
+                world_config.population_size = n_agents
                 world_config.behavior = [
                     AgentsAtGoal(as_percent=True, history=1),
                     PercentageAtGoal(0.5),
@@ -103,7 +108,6 @@ def get_world_generator(n_agents, horizon, init=None, walls=True):
         return worlds
 
     return gene_to_world
-
 
 
 if __name__ == "__main__":
@@ -131,9 +135,13 @@ if __name__ == "__main__":
 
     # Save World Config by sampling from generator
     world_gen_example = get_world_generator(args.n, args.t, init=init, walls=(not args.no_walls))
-    sample_worlds = world_gen_example([0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5], [-1, -1, -1, -1])
+    sample_worlds = world_gen_example(
+        [0.2253589491253961,0.9464191073976479,-0.4511355336171383,6.093949327202929,1.2877770127253285,9.700725109309605,-1.1798104524936779],
+        # [0.22869460347117554, 0.8977686418220499, 0.9621363671946179, 9.537854404597804, 0.8646485313281227, 9.993036925323299, -1.198048082239243],
+        [-1, -1, -1, -1]
+    )
     sample_worlds[0].stop_at = None
-    # sim(world_config=sample_worlds[0])
+    # sim(world_config=sample_worlds[0], save_every_ith_frame=8, save_duration=5000)
 
     sample_worlds[0].save_yaml(exp)
 

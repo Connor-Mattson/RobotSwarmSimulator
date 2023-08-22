@@ -23,7 +23,8 @@ class BinaryFOVSensor(AbstractSensor):
                  time_step_between_sensing=1,
                  store_history=False,
                  detect_goal_with_added_state=False,
-                 show=True
+                 show=True,
+                 seed=None
                  ):
         super(BinaryFOVSensor, self).__init__(parent=parent)
         self.current_state = 0
@@ -47,6 +48,10 @@ class BinaryFOVSensor(AbstractSensor):
             self.theta = np.deg2rad(self.theta)
             self.bias = np.deg2rad(self.bias)
         self.r = distance
+
+        self.seed = seed
+        if self.seed is not None:
+            np.random.seed(self.seed)
 
     def checkForLOSCollisions(self, world: World) -> None:
         # Mathematics obtained from Sundaram Ramaswamy
@@ -104,7 +109,6 @@ class BinaryFOVSensor(AbstractSensor):
                 if self.lines_segments_intersect(segment, r):
                     d_to_inter = np.linalg.norm(np.array(self.line_seg_int_point(segment, r)) - np.array(sensor_origin))
                     consideration_set.append((d_to_inter, None))
-
         # Detect Other Agents
         for agent in bag:
             u = agent.getPosition() - sensor_origin
@@ -113,13 +117,13 @@ class BinaryFOVSensor(AbstractSensor):
                 consideration_set.append((d, agent))
 
         if not consideration_set:
-            self.determineState(False, None)
+            self.determineState(False, None, world)
             return
 
         # consideration_set.sort()
         # print(consideration_set)
         score, val = consideration_set.pop(0)
-        self.determineState(True, val)
+        self.determineState(True, val, world)
 
     def check_goals(self, world):
         # Add this to its own class later -- need to separate the binary from the trinary sensors
@@ -181,7 +185,7 @@ class BinaryFOVSensor(AbstractSensor):
             rot = -1
         return rot
 
-    def determineState(self, real_value, agent):
+    def determineState(self, real_value, agent, world=None):
         if real_value:
             # Consider Reporting False Negative
             if np.random.random_sample() < self.fn:
@@ -338,6 +342,7 @@ class BinaryFOVSensor(AbstractSensor):
             "wall_sensing_range": self.wall_sensing_range,
             "goal_sensing_range": self.goal_sensing_range,
             "agent_sensing_range": self.r,
+            "seed": self.seed,
         }
 
     @staticmethod
@@ -352,5 +357,6 @@ class BinaryFOVSensor(AbstractSensor):
             store_history=d["store_history"],
             detect_goal_with_added_state=d["use_goal_state"],
             wall_sensing_range=d["wall_sensing_range"],
-            goal_sensing_range=d["goal_sensing_range"]
+            goal_sensing_range=d["goal_sensing_range"],
+            seed=d["seed"] if "seed" in d else None,
         )
