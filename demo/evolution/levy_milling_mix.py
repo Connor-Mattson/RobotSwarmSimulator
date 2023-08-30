@@ -20,7 +20,7 @@ SCALE = 10
 
 DECISION_VARS = CMAESVarSet(
     {
-        "population_ratio": [0, 1],
+        "population_ratio": [0.1, 0.9],
         "forward_rate_levy": [0, 1],
         "turning_rate_levy": [-1.5, 1.5],
         "forward_rate_0": [0, 1 * SCALE],
@@ -50,6 +50,7 @@ def get_world_generator(n_agents, horizon, init=None, walls=True):
         levy_agent.rescale(SCALE)
 
         goal_agent = AgentYAMLFactory.from_yaml("demo/configs/flockbots-icra/goalbot.yaml")
+        goal_agent.seed = 0
         goal_agent.controller = HomogeneousController(genome[3:])
         goal_agent.rescale(SCALE)
 

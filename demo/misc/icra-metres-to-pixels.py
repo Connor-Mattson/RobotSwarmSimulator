@@ -5,8 +5,9 @@ def coord_to_bl(coord):
     return centimeters / 15.0    # Assuming 15 cm body length for agents (Flockbots + ICRA)
 
 
+SEED_NO = 20
 if __name__ == "__main__":
-    data = np.loadtxt('../configs/flockbots-icra/position_data/seed5.csv', delimiter=',')
+    data = np.loadtxt(f'../configs/flockbots-icra/position_data/seed{SEED_NO}.csv', delimiter=',')
     for line in data:
         line[1] = coord_to_bl(line[1])
         line[2] = coord_to_bl(line[2])
@@ -27,4 +28,4 @@ if __name__ == "__main__":
     """
     Output Translation
     """
-    np.savetxt("../configs/flockbots-icra/position_data/s5.csv", data, delimiter=",", fmt="%10.5f")
+    np.savetxt(f"../configs/flockbots-icra/position_data/s{SEED_NO}.csv", data, delimiter=",", fmt="%10.5f")

@@ -45,11 +45,13 @@ def get_world_generator(n_agents, horizon, init=None, walls=True):
     def gene_to_world(genome, hash_val):
         a_agent = AgentYAMLFactory.from_yaml("demo/configs/flockbots-icra/goalbot.yaml")
         a_agent.controller = HomogeneousController(genome[1:5])
+        a_agent.seed = 0
         a_agent.body_color = (255, 0, 0)
         a_agent.rescale(SCALE)
 
         b_agent = AgentYAMLFactory.from_yaml("demo/configs/flockbots-icra/goalbot.yaml")
         b_agent.controller = HomogeneousController(genome[5:])
+        b_agent.seed = 0
         a_agent.body_color = (0, 255, 0)
         b_agent.rescale(SCALE)
 
