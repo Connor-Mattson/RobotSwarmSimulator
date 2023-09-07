@@ -116,7 +116,8 @@ class RectangularWorldConfig:
         objects, a_config, behavior = None, None, []
         if "objects" in d:
             d["objects"] = [ObjectFactory.create(o) for o in d["objects"]]
-        d["goals"] = [GoalFactory.create(g) for g in d["goals"]]
+        if "goals" in d:
+            d["goals"] = [GoalFactory.create(g) for g in d["goals"]]
         if "behavior" in d:
             d["behavior"] = [BehaviorFactory.create(b) for b in d["behavior"]]
         if "agent_config" in d:

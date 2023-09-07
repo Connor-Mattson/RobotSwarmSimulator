@@ -8,12 +8,12 @@ sensors:
       degrees: false
       agent_sensing_range: 17 # In Body Lengths
       show: true
-      goal_sensing_range: 0 # No Goals in this experiment
-      use_goal_state: false
-      wall_sensing_range: 0 # No Walls in this experiment
+      goal_sensing_range: 17
+      use_goal_state: true
+      wall_sensing_range: 17
       fn: 0.10
       fp: 0.05
-      bias: 0 # Angle Bias for Sensor
+      bias: 0
       store_history: false
       seed: 10
 controller:

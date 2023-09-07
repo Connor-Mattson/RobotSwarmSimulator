@@ -1,0 +1,19 @@
+---
+type: "RectangularWorld"
+size:  # Defined in Agent Body Lengths
+  - 100
+  - 100
+n_agents: 20
+init_type:
+  type: "RectRandomInit"  # A starting region where agents will spawn at t=0
+  bb:
+    - - 45 # Upper Left Bounding Box Corner (Body Lengths) X
+      - 45 # Y
+    - - 55 # Lower Right Bounding Box Corner (Body Lengths) X
+      - 55 # Y
+padding: 0
+collide_walls: true  # Use No Environment Walls for this problem
+show_walls: true  # Hide Default Walls,
+metadata:
+  hash: _hash
+stop_at: 1000000 # Upper Simulation Limit
