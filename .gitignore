@@ -30,6 +30,7 @@ share/python-wheels/
 MANIFEST
 
 demo/results/out
+demo/evolution/noveltysearch/out
 
 # Unit test / coverage reports
 htmlcov/
