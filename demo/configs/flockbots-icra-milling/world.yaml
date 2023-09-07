@@ -1,4 +1,5 @@
 ---
+# ALL UNITS ARE IN AGENT BODY LENGTHS UNLESS OTHERWISE SPECIFIED
 type: "RectangularWorld"
 size:  # Defined in Agent Body Lengths
   - 100
@@ -12,8 +13,8 @@ init_type:
     - - 55 # Lower Right Bounding Box Corner (Body Lengths) X
       - 55 # Y
 padding: 0
-collide_walls: true  # Use No Environment Walls for this problem
-show_walls: true  # Hide Default Walls,
+collide_walls: false  # Use No Environment Walls for this problem
+show_walls: false  # Hide Default Walls,
 metadata:
   hash: _hash
-stop_at: 1000000 # Upper Simulation Limit
+stop_at: 1000000 # Upper Simulation Limit (timesteps)

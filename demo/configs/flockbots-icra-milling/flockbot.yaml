@@ -1,4 +1,5 @@
 ---
+# ALL UNITS ARE IN AGENT BODY LENGTHS UNLESS OTHERWISE SPECIFIED
 type: "Goalbot"
 sensors:
   custom_state_decision: "Linear"
