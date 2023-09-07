@@ -20,7 +20,7 @@ class BehaviorFactory:
         if d["name"] == "Goal_Agents":
             return AgentsAtGoal(history=d["history_size"])
         elif d["name"] == "Alg_Connectivity":
-            return AlgebraicConn(history=d["history_size"])
+            return AlgebraicConn(history=d["history_size"], r_disk_size=d["r_disk_size"])
         elif d["name"] == "Angular_Momentum":
             return AngularMomentumBehavior(history=d["history_size"])
         elif d["name"] == "Average_Speed":

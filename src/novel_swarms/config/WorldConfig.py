@@ -95,7 +95,7 @@ class RectangularWorldConfig:
             "objects": [o.as_config_dict() for o in self.objects],
             "goals": [g.as_config_dict() for g in self.goals],
             "background_color": list(self.background_color),
-            "metadata": self.metadata,
+            "metadata": self.metadata.copy(),
             "agent_init": self.agent_init if hasattr(self, "agent_init") else None,
             "init_type": self.init_type.as_dict()
         }
@@ -116,7 +116,7 @@ class RectangularWorldConfig:
         objects, a_config, behavior = None, None, []
         if "objects" in d:
             d["objects"] = [ObjectFactory.create(o) for o in d["objects"]]
-        d["goals"] = [GoalFactory.create(g) for g in d["goals"]]
+        d["goals"] = [GoalFactory.create(g) for g in d.get("goals", [])]
         if "behavior" in d:
             d["behavior"] = [BehaviorFactory.create(b) for b in d["behavior"]]
         if "agent_config" in d:

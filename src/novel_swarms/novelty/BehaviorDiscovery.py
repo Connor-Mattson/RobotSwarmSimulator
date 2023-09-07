@@ -7,6 +7,7 @@ from ..results.Trends import Trends
 from ..world.WorldFactory import WorldFactory
 from ..cache.ExternalSimulationArchive import ExternalSimulationArchive
 from ..util.timer import Timer
+from ..util.processing.multicoreprocessing import MultiWorldSimulation
 
 
 class BehaviorDiscovery:
@@ -69,6 +70,41 @@ class BehaviorDiscovery:
         ])
         self.scores = np.array([0.0 for i in range(self.population_size)])
         self.behavior = np.array([[-1.0 for j in range(len(self.behavior_config))] for i in range(self.population_size)])
+
+    def multithreadEntirePopulation(self, threads=12, seed=None, heterogeneous=False):
+        self.status = "Simulation"
+        if seed is not None:
+            self.world_config.seed = seed
+
+        world_executables = []
+        for i in range(self.population_size):
+            genome = self.population[i]
+            config = self.world_config.getDeepCopy()
+            if not heterogeneous:
+                config.agentConfig = config.agentConfig.getDeepCopy()
+                config.agentConfig.controller = genome
+                config.agentConfig.attach_world_config(config)
+                # self.world_config.agentConfig.controller = [0.0, 0.0, 0.0, 0.0]
+            else:
+                # Currently Assumes Two Species Only
+                config.agentConfig.from_n_species_controller(genome)
+                config.agentConfig = config.agentConfig.clone()
+                config.agentConfig.attach_world_config(config)
+            config.metadata["key"] = i
+            config.metadata["genome"] = genome
+            world_executables.append(config)
+
+        print([w.metadata["key"] for w in world_executables])
+
+        multi_sim = MultiWorldSimulation(pool_size=threads)
+        world_outs = multi_sim.execute(world_executables)
+
+        for w in world_outs:
+            print(f"Returned data for world {w.meta['key']}: {w.getBehaviorVector()}")
+            self.behavior[w.meta['key']] = w.getBehaviorVector()
+            self.archive.addToArchive(w.getBehaviorVector(), w.meta["genome"])
+
+        return None
 
     def runSinglePopulation(self, screen=None, i=0, save=True, genome=None, seed=None, output_config=None, heterogeneous=False):
         """

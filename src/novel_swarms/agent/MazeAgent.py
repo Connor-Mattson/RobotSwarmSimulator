@@ -18,8 +18,8 @@ class MazeAgent(Agent):
 
     def __init__(self, config: MazeAgentConfig = None, name=None) -> None:
 
-        if isinstance(config.controller, list):
-            self.controller = Controller(config.controller)
+        if isinstance(config.controller, list) or isinstance(config.controller, np.ndarray):
+            self.controller = Controller(list(config.controller))
         else:
             self.controller = config.controller
 

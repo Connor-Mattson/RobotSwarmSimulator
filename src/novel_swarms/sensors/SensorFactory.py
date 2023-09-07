@@ -15,4 +15,4 @@ class SensorFactory:
             else:
                 raise Exception(f"Parsing of Sensor {s['type']} not recognized.")
 
-        return SensorSet(sensors, custom_state_decision=d["custom_state_decision"])
+        return SensorSet(sensors, custom_state_decision=d.get("custom_state_decision", None))

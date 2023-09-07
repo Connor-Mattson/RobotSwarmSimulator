@@ -11,9 +11,9 @@ from src.novel_swarms.config.ResultsConfig import ResultsConfig
 
 
 class Cluster:
-    WORLD_PADDING = 15
-    GUI_WIDTH = 700
-    GUI_HEIGHT = 500
+    WORLD_PADDING = 0
+    GUI_WIDTH = 1000
+    GUI_HEIGHT = 1000
     MEDOID_RADIUS = 7
     COLORS = [
         (46, 134, 193),  # BLUE

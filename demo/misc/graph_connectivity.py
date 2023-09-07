@@ -53,7 +53,7 @@ if __name__ == "__main__":
             false_positive=0.1,
             false_negative=0.05,
             # Rectangle Representing Environment Boundaries
-            walls=[[GUI_PADDING, GUI_PADDING], [GUI_PADDING + WIDTH, GUI_PADDING + HEIGHT]],
+            # walls=[[GUI_PADDING, GUI_PADDING], [GUI_PADDING + WIDTH, GUI_PADDING + HEIGHT]],
             wall_sensing_range=(BL * 6),
             time_step_between_sensing=2,
             store_history=True
@@ -81,8 +81,8 @@ if __name__ == "__main__":
     r = [random.randint(30, 60) for t in range(0, N_AGENTS)]
     pi_slice = (2 * np.pi) / N_AGENTS
     center = (int(BL * 29.8) / 2, int(BL * 29.8) / 2)
-    init_positions = [(r[t]*np.cos(t * pi_slice), r[t]*np.sin(t * pi_slice), t * pi_slice) for t in range(0, N_AGENTS)]
-    init_positions = [(center[0] + x, center[1] + y, t) for x, y, t in init_positions]
+    # init_positions = [(r[t]*np.cos(t * pi_slice), r[t]*np.sin(t * pi_slice), t * pi_slice) for t in range(0, N_AGENTS)]
+    # init_positions = [(center[0] + x, center[1] + y, t) for x, y, t in init_positions]
 
     TIME_STOP = None
     world_config = RectangularWorldConfig(
@@ -92,8 +92,9 @@ if __name__ == "__main__":
         behavior=behavior,
         agentConfig=agent_config,
         padding=GUI_PADDING,
-        show_walls=True,
-        agent_initialization=init_positions,
+        show_walls=False,
+        collide_walls=False,
+        detectable_walls=False,
         stop_at=TIME_STOP
     )
 

@@ -10,6 +10,7 @@ class AlgebraicConn(AbstractBehavior):
         self.r_disk_size = r_disk_size
 
     def attach_world(self, world):
+        # print("key", world.meta)
         self.population = world.population
 
     def getLapacianMatrix(self):
@@ -29,9 +30,14 @@ class AlgebraicConn(AbstractBehavior):
 
     def calculate(self):
         m = self.getLapacianMatrix()
+        # print(m)
         eigen_values = np.linalg.eig(m)[0]
         eigen_values.sort()
         a_conn = eigen_values[1]
-        if a_conn != 0:
-            a_conn = 1
+        # print(a_conn)
+        if a_conn > 0:
+            a_conn = 1.0
         self.set_value(np.real(a_conn))
+
+    def as_config_dict(self):
+        return {"name": self.name, "history_size": self.history_size, "r_disk_size":self.r_disk_size}

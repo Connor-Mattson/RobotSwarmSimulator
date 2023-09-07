@@ -298,6 +298,9 @@ class MazeAgentConfig:
             d["sensors"] = SensorFactory.create(d["sensors"])
         return MazeAgentConfig(**d)
 
+    def getDeepCopy(self):
+        return self.from_dict(self.as_dict())
+
     def rescale(self, zoom):
         self.agent_radius *= zoom
         if hasattr(self, "sensors"):
