@@ -54,8 +54,8 @@ def predict_circle():
     gdf.columns = ["v0", "w0", "v1", "w1"]
     pdf.columns = ["AvgSpeed", "AngularMomentum", "RadialVariance", "Scatter", "GroupRotation", "Connectivity"]
 
-    rad0 = [gdf.loc[i]['v0'] / max(abs(gdf.loc[i]["w0"]), 0.0001) for i in range(len(gdf))]
-    rad1 = [gdf.loc[i]['v1'] / max(abs(gdf.loc[i]["w1"]), 0.0001) for i in range(len(gdf))]
+    rad0 = [gdf.loc[i]['v0'] / (abs(gdf.loc[i]["w0"]) if gdf.loc[i]["w0"] != 0 else 1000000) for i in range(len(gdf))]
+    rad1 = [gdf.loc[i]['v1'] / (abs(gdf.loc[i]["w1"]) if gdf.loc[i]["w1"] != 0 else 1000000) for i in range(len(gdf))]
 
     gdf['rad0'] = rad0
     gdf['rad1'] = rad1
