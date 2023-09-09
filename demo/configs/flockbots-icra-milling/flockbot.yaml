@@ -1,19 +1,18 @@
----
 # ALL UNITS ARE IN AGENT BODY LENGTHS UNLESS OTHERWISE SPECIFIED
 type: "Goalbot"
 sensors:
   custom_state_decision: "Linear"
   sensors:
     - type: "BinaryFOVSensor"
-      theta: 0.3141595   # Vision Angle / 2 (Radians)
+      theta: 0.2   # Vision Angle / 2 (Radians)
       degrees: false
-      agent_sensing_range: 17 # In Body Lengths
+      agent_sensing_range: 24 # In Body Lengths. previously 17
       show: true
-      goal_sensing_range: 17
+      goal_sensing_range: 24
       use_goal_state: true
-      wall_sensing_range: 17
-      fn: 0.10
-      fp: 0.05
+      wall_sensing_range: 24
+      fn: 0.00  # 0.10
+      fp: 0.00  # 0.05
       bias: 0
       store_history: false
       seed: 10

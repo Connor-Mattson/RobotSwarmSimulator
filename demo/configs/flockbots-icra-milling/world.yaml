@@ -8,10 +8,10 @@ n_agents: 20
 init_type:
   type: "RectRandomInit"  # A starting region where agents will spawn at t=0
   bb:
-    - - 45 # Upper Left Bounding Box Corner (Body Lengths) X
-      - 45 # Y
-    - - 55 # Lower Right Bounding Box Corner (Body Lengths) X
-      - 55 # Y
+    - - 46 # Upper Left Bounding Box Corner (Body Lengths) X
+      - 46 # Y
+    - - 54 # Lower Right Bounding Box Corner (Body Lengths) X
+      - 54 # Y
 padding: 0
 collide_walls: false  # Use No Environment Walls for this problem
 show_walls: false  # Hide Default Walls,

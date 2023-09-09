@@ -33,7 +33,7 @@ from src.novel_swarms.agent.control.Controller import Controller
 
 SEED = 1  # Seeding for initial Starting positions, FP/FN Readings.
 SCALE = 10  # Set the conversion factor for Body Lengths to pixels (all metrics will be scaled appropriately by this value)
-N, T = 13, 1000  # Number of agents, N, and timestep limit, T.
+N, T = 10, 1000  # Number of agents, N, and timestep limit, T.
 
 def custom_controller(agent: MazeAgent):
     """
@@ -84,7 +84,8 @@ def establish_goal_metrics():
 
 def establish_milling_metrics():
     # TODO: Update this value with Kevin's Formulation
-    circliness = RadialVarianceBehavior()
+    # circliness = RadialVarianceBehavior()
+    circliness = Circliness(history=450)
     return [circliness]
 
 def configure_env(robot_config, num_agents=20, seed=None):
@@ -141,7 +142,7 @@ def callback(world, screen):
 if __name__ == "__main__":
     robot_conf = configure_robots()
     world_conf = configure_env(robot_config=robot_conf, num_agents=N, seed=SEED)
-    world_conf.stop_at = 1000
+    world_conf.stop_at = 3000
     world_subscriber = WorldSubscriber(func=callback)
 
     # print(robot_config)
@@ -150,6 +151,8 @@ if __name__ == "__main__":
         world_config=world_conf,
         subscribers=[world_subscriber],
         show_gui=True,
+        save_every_ith_frame=6,
+        save_duration=2500
     )
     print(world_output.behavior[0].out_average())
     print(world_output.population[0].x_pos)
