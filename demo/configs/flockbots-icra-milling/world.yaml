@@ -12,6 +12,7 @@ init_type:
       - 46 # Y
     - - 54 # Lower Right Bounding Box Corner (Body Lengths) X
       - 54 # Y
+  seed: 2023 # ADD SEED HERE TO ENSURE SAME INITIALIZATION EVERY TIME
 padding: 0
 collide_walls: false  # Use No Environment Walls for this problem
 show_walls: false  # Hide Default Walls,

@@ -48,7 +48,7 @@ class CMAES:
             b_repr = [(b_name, float) for b_name in b_names]
             self.hist_point = make_dataclass(
                 "CMAESPoint",
-                [("gen", int), ("pop", int), ("fitness", float)] + dvar_repr + b_repr
+                [("time", int), ("gen", int), ("pop", int), ("fitness", float)] + dvar_repr + b_repr
              )
             self.history = []
             self.exp_path = self.experiment.add_sub("CMAES")
@@ -125,7 +125,7 @@ class CMAES:
             behavior = self.average_behaviors(world_set)
             self.solution_set[_key] = fitness
             if self.experiment is not None:
-                self.history.append(self.hist_point(self.generation, i, fitness, *parameters[i], *behavior))
+                self.history.append(self.hist_point(int(time.time()), self.generation, i, fitness, *parameters[i], *behavior))
 
         return out
     def pull_from_solution_set(self, x):

@@ -5,6 +5,7 @@ The SwarmSimulator allows control of the world and agents at every step within t
 import math
 import random
 import numpy as np
+import random
 
 # Import Agent embodiments
 from src.novel_swarms.config.AgentConfig import *
@@ -31,9 +32,16 @@ from src.novel_swarms.behavior import *
 # Import the custom Controller Class
 from src.novel_swarms.agent.control.Controller import Controller
 
-SEED = 1  # Seeding for initial Starting positions, FP/FN Readings.
+# import numpy as np
+SEED = 20
+# np.random.seed(SEED)
+# random.seed(SEED)
+
+
+# Seeding for initial Starting positions, FP/FN Readings.
 SCALE = 10  # Set the conversion factor for Body Lengths to pixels (all metrics will be scaled appropriately by this value)
 N, T = 10, 1000  # Number of agents, N, and timestep limit, T.
+
 
 def custom_controller(agent: MazeAgent):
     """
@@ -45,9 +53,9 @@ def custom_controller(agent: MazeAgent):
     u_1, u_2 = 0.0, 0.0  # Set these by default
     if not sigma:
         if not gamma:
-            u_1, u_2 = 1.0 * SCALE, np.radians(15)  # u_1 in pixels/second (BL/sec * SCALE), u_2 in rad/s
+            u_1, u_2 = 1.0 * SCALE, 1.0  # u_1 in pixels/second (BL/sec * SCALE), u_2 in rad/s
         else:
-            u_1, u_2 = 1.0 * SCALE, np.radians(-15)  # u_1 in pixels/second (BL/sec * SCALE), u_2 in rad/s
+            u_1, u_2 = 1.0 * SCALE, -1.0  # u_1 in pixels/second (BL/sec * SCALE), u_2 in rad/s
     else:
         u_1, u_2 = 0.0, 0.0  # u_1 in pixels/second (see b2p func), u_2 in rad/s
     return u_1, u_2
@@ -62,7 +70,8 @@ def configure_robots():
 
     # Import the flockbot data from YAML
     normal_flockbot = AgentYAMLFactory.from_yaml("../../demo/configs/flockbots-icra-milling/flockbot.yaml")
-    normal_flockbot.controller = Controller(custom_controller)
+    # normal_flockbot.controller = Controller(custom_controller)
+    normal_flockbot.controller = Controller([10.21016141691062,0.34394605572151926,9.90100680343106,0.10310121227494662])
     normal_flockbot.seed = SEED
 
     # Uncomment to remove FN/FP from agents (Testing)
@@ -85,21 +94,21 @@ def establish_goal_metrics():
 def establish_milling_metrics():
     # TODO: Update this value with Kevin's Formulation
     # circliness = RadialVarianceBehavior()
-    circliness = Circliness(history=450)
-    return [circliness]
+    # circliness = Circliness(history=450)
+    circliness = Circliness(avg_history_max=450)
+    return [circliness, TotalCollisionsBehavior()]
 
 def configure_env(robot_config, num_agents=20, seed=None):
     # search_and_rendezvous_world = WorldYAMLFactory.from_yaml("demo/configs/flockbots-icra/world.yaml")
 
     # Import the world data from YAML
     world = WorldYAMLFactory.from_yaml("../../demo/configs/flockbots-icra-milling/world.yaml")
+    # world.seed = seed
     world.addAgentConfig(robot_config)
     world.population_size = num_agents
     world.factor_zoom(SCALE)
-    world.seed = seed
     world.behavior = establish_milling_metrics()
     return world
-
 
 # Get a random controller
 def get_random_controller():
@@ -138,21 +147,25 @@ def callback(world, screen):
     #     agent.body_color = new_color
 
 
+def stop_on_collision(world):
+    if world.behavior[1].out_average()[1] > 20:
+        return True
+    return False
+
 # Main Function
 if __name__ == "__main__":
     robot_conf = configure_robots()
     world_conf = configure_env(robot_config=robot_conf, num_agents=N, seed=SEED)
-    world_conf.stop_at = 3000
-    world_subscriber = WorldSubscriber(func=callback)
+    world_conf.stop_at = 1000
+    # world_subscriber = WorldSubscriber(func=callback)
 
     # print(robot_config)
 
     world_output = simulator(
         world_config=world_conf,
-        subscribers=[world_subscriber],
+        # subscribers=[world_subscriber],
         show_gui=True,
-        save_every_ith_frame=6,
-        save_duration=2500
+        save_every_ith_frame=2,
+        save_duration=1000,
+        # stop_detection=stop_on_collision
     )
-    print(world_output.behavior[0].out_average())
-    print(world_output.population[0].x_pos)
