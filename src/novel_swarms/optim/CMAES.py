@@ -23,7 +23,8 @@ class CMAES:
                  num_processes=1,
                  stop_detection_method=None,
                  show_each_step=False,
-                 experiment=None):
+                 experiment=None,
+                 round_to_every=None):
         genome_size = len(dvars)
         self.f = f
         self.g_to_w = genome_to_world
@@ -40,6 +41,7 @@ class CMAES:
         self.experiment = experiment
         self.max_iters = max_iters
         self.generation = 0
+        self.round_to_every = round_to_every
 
         # Data collection
         if self.experiment is not None:
@@ -81,6 +83,9 @@ class CMAES:
         es.result_pretty()
         return es.result, es
 
+    def round_to_nearest(self, a, increment):
+        return [round(round(a_i / increment) * increment, 2) for a_i in a]
+
     def sweep_parameters(self, divisions: list[int]):
         if len(divisions) != len(self.x0):
             raise Exception(f"Divisions should be of size {len(self.x0)}. Not {len(divisions)}")
@@ -110,6 +115,8 @@ class CMAES:
     def ask_for_genomes(self, es):
         parameters = es.ask()
         out = parameters
+        if self.round_to_every is not None:
+            parameters = [self.round_to_nearest(p, increment=self.round_to_every) for p in parameters]
         if self.dvars:
             parameters = [self.dvars.from_normalized_to_scaled(p) for p in parameters]
         configs = [self.g_to_w(parameters[i], out[i]) for i in range(len(parameters))]

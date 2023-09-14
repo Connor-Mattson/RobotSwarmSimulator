@@ -35,7 +35,7 @@ def FITNESS(world_set):
     avg = total / len(world_set)
     return -avg
 
-def get_world_generator(n_agents, horizon):
+def get_world_generator(n_agents, horizon, round_genome=False):
 
     def gene_to_world(genome, hash_val):
 
@@ -73,7 +73,7 @@ if __name__ == "__main__":
     parser.add_argument("--processes", type=int, default=1, help="Number of running concurrent processes")
     parser.add_argument("--iters", type=int, default=None, help="Number of Evolutions to consider")
     parser.add_argument("--pop-size", type=int, default=15, help="The size of each generation's population")
-    parser.add_argument("--sweep", action="store_true", help="Whether to sweep instead of search")
+    parser.add_argument("--discrete-bins", default=None, help="How many bins to discretize the decision variables into")
 
     args = parser.parse_args()
 
@@ -90,6 +90,10 @@ if __name__ == "__main__":
     # sample_worlds[0].stop_at = 1003
     # sim(world_config=sample_worlds[0], save_every_ith_frame=2, save_duration=1000)
 
+    round_vars_to_nearest = None
+    if args.discrete_bins is not None:
+        round_vars_to_nearest = 1 / (int(args.discrete_bins) - 1)
+
     sample_worlds[0].save_yaml(exp)
 
     cmaes = CMAES(
@@ -102,11 +106,10 @@ if __name__ == "__main__":
         experiment=exp,
         max_iters=args.iters,
         pop_size=args.pop_size,
+        round_to_every=round_vars_to_nearest
     )
-    if args.sweep:
-        cmaes.sweep_parameters([7, 7, 7, 7])
-    else:
-        cmaes.minimize()
+
+    cmaes.minimize()
 
 
 
