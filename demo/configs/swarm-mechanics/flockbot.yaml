@@ -6,13 +6,13 @@ sensors:
     - type: "BinaryFOVSensor"
       theta: 0.2   # Vision Angle / 2 (Radians)
       degrees: false
-      agent_sensing_range: 24 # In Body Lengths. previously 17
+      agent_sensing_range: 10 # In Body Lengths. previously 17
       show: true
-      goal_sensing_range: 24
+      goal_sensing_range: 10
       use_goal_state: true
-      wall_sensing_range: 24
-      fn: 0.0  # 0.10
-      fp: 0.0  # 0.05
+      wall_sensing_range: 10
+      fn: 0.1  # 0.10
+      fp: 0.05  # 0.05
       bias: 0
       store_history: false
       seed: 10

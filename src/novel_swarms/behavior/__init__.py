@@ -1,5 +1,6 @@
 from .AbstractBehavior import AbstractBehavior
 from .AverageSpeed import AverageSpeedBehavior
+from .AlgebraicConnectivity import AlgebraicConn
 from .SubGroupWrapper import SubGroupBehavior
 from .SensorOffset import GeneElementDifference
 from .AngularMomentum import AngularMomentumBehavior
@@ -15,6 +16,7 @@ from .Circliness import Circliness
 __all__ = [
     "AbstractBehavior",
     "AverageSpeedBehavior",
+    "AlgebraicConn",
     "SubGroupBehavior",
     "GeneElementDifference",
     "AngularMomentumBehavior",

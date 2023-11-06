@@ -2,6 +2,7 @@
 Find the best Homogeneous Agents
 """
 import numpy as np
+import time
 import argparse
 from src.novel_swarms.optim.CMAES import CMAES
 from src.novel_swarms.optim.OptimVar import CMAESVarSet
@@ -123,23 +124,29 @@ if __name__ == "__main__":
     # sample_worlds = world_gen_example([9.972628921291843, -0.11346974170112367, 7.121341798807923, 0.43388471525541417], [-1, -1, -1, -1])
     sample_worlds = world_gen_example([9.9842122541686, -0.050249840391931366, 4.320781261322128, 0.4238766797237554], [-1, -1, -1, -1])
 
-    sample_worlds[0].stop_at = None
-    # sim(world_config=sample_worlds[0], save_every_ith_frame=8, save_duration=4000)
+    def world_callback(world):
+        if world.total_steps == args.t:
+            print(time.time())
+        return False
 
-    sample_worlds[0].save_yaml(exp)
+    sample_worlds[0].stop_at = args.t
 
-    cmaes = CMAES(
-        FITNESS,
-        genome_to_world=get_world_generator(args.n, args.t, init=init, walls=(not args.no_walls)),
-        dvars=DECISION_VARS,
-        num_processes=args.processes,
-        show_each_step=False,
-        target=PERFECT_SCORE,
-        experiment=exp,
-        max_iters=args.iters,
-        pop_size=args.pop_size,
-    )
-    if args.sweep:
-        cmaes.sweep_parameters([7, 7, 7, 7])
-    else:
-        cmaes.minimize()
+    sim(world_config=sample_worlds[0], save_every_ith_frame=8, save_duration=4000, start_paused=False)
+
+    # sample_worlds[0].save_yaml(exp)
+    #
+    # cmaes = CMAES(
+    #     FITNESS,
+    #     genome_to_world=get_world_generator(args.n, args.t, init=init, walls=(not args.no_walls)),
+    #     dvars=DECISION_VARS,
+    #     num_processes=args.processes,
+    #     show_each_step=False,
+    #     target=PERFECT_SCORE,
+    #     experiment=exp,
+    #     max_iters=args.iters,
+    #     pop_size=args.pop_size,
+    # )
+    # if args.sweep:
+    #     cmaes.sweep_parameters([7, 7, 7, 7])
+    # else:
+    #     cmaes.minimize()

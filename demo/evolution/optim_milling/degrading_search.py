@@ -18,15 +18,18 @@ SCALE = 10
 
 DECISION_VARS = CMAESVarSet(
     {
-        "forward_rate_0": [-(1.33 * SCALE), 1.33 * SCALE],  # Body Lengths / second, will be converted to pixel values during search
+        "forward_rate_0": [-(1.33 * SCALE), 1.33 * SCALE],
+        # Body Lengths / second, will be converted to pixel values during search
         "turning_rate_0": [-2.0, 2.0],  # Radians / second
-        "forward_rate_1": [-(1.33 * SCALE), 1.33 * SCALE],  # Body Lengths / second, will be converted to pixel values during search
+        "forward_rate_1": [-(1.33 * SCALE), 1.33 * SCALE],
+        # Body Lengths / second, will be converted to pixel values during search
         "turning_rate_1": [-2.0, 2.0],  # Radians / second
     }
 )
 
 PERFECT_CIRCLE_SCORE = -1.0
 CIRCLINESS_HISTORY = 450
+
 
 def FITNESS(world_set):
     total = 0
@@ -35,10 +38,9 @@ def FITNESS(world_set):
     avg = total / len(world_set)
     return -avg
 
+
 def get_world_generator(n_agents, horizon):
-
-    def gene_to_world(genome, hash_val):
-
+    def gene_to_world(genome, hash_val, reseed=0):
         goal_agent = AgentYAMLFactory.from_yaml("demo/configs/flockbots-icra-milling/flockbot.yaml")
         goal_agent.controller = HomogeneousController(genome)
         goal_agent.seed = 0
@@ -52,6 +54,9 @@ def get_world_generator(n_agents, horizon):
         world.population_size = n_agents
         world.stop_at = horizon
         world.detectable_walls = False
+        # Change the initialization seed
+        world.init_type.reseed(reseed)
+
 
         world.factor_zoom(zoom=SCALE)
         world.addAgentConfig(goal_agent)
@@ -61,6 +66,7 @@ def get_world_generator(n_agents, horizon):
         return worlds
 
     return gene_to_world
+
 
 def m_per_s_to_pixels_per_second(genome):
     genome[0] *= (100 / 15) * SCALE
@@ -90,17 +96,30 @@ if __name__ == "__main__":
     world_gen_example = get_world_generator(args.n, args.t)
 
     translated_genome = m_per_s_to_pixels_per_second([args.v0, args.w0, args.v1, args.w1])
-    sample_worlds = world_gen_example(translated_genome, [-1, -1, -1, -1])
 
-    if args.no_stop:
-        sample_worlds[0].stop_at = None
-    else:
-        sample_worlds[0].stop_at = args.t
+    values = []
+    for i in range(1000):
+        sample_worlds = world_gen_example(translated_genome, [-1, -1, -1, -1], reseed=i)
 
-    w = sim(world_config=sample_worlds[0], save_every_ith_frame=2, save_duration=1000)
-    try:
-        print(f"Final Circliness: {w.behavior[0].out_average()[1]}")
-    except:
-        pass
+        if args.no_stop:
+            sample_worlds[0].stop_at = None
+        else:
+            sample_worlds[0].stop_at = args.t
 
+        w = sim(world_config=sample_worlds[0], save_every_ith_frame=2, save_duration=1000, show_gui=False)
+        try:
+            b = w.behavior[0].out_average()[1]
+            values.append(b)
+            print(f"Final Circliness for seed {i}: {b}")
+        except:
+            pass
+
+    print(values)
+
+    import matplotlib.pyplot as plt
+    plt.hist(values)
+    plt.title("Distribution of Scores running best controller over 1000 different starting seeds")
+    plt.xlabel("Circliness (lambda)")
+    plt.ylabel("Number of Samples")
+    plt.show()
 

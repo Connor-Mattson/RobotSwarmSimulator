@@ -43,6 +43,7 @@ class BinaryFOVSensor(AbstractSensor):
         self.goal_sensing_range = goal_sensing_range
         self.show = show
         self.goal_detected = False
+        self.detect_edges = True
 
         if degrees:
             self.theta = np.deg2rad(self.theta)
@@ -112,7 +113,7 @@ class BinaryFOVSensor(AbstractSensor):
         # Detect Other Agents
         for agent in bag:
             u = agent.getPosition() - sensor_origin
-            d = self.circle_interesect_sensing_cone(u, self.parent.radius)
+            d = self.circle_interesect_sensing_cone(u, self.parent.radius if self.detect_edges else 0.1)
             if d is not None:
                 consideration_set.append((d, agent))
 

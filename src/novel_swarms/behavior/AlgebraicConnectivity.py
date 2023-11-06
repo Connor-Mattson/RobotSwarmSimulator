@@ -4,10 +4,11 @@ from .AbstractBehavior import AbstractBehavior
 
 
 class AlgebraicConn(AbstractBehavior):
-    def __init__(self, history=100, r_disk_size=10):
+    def __init__(self, history=100, r_disk_size=10, track_components=False):
         super().__init__(name="Alg_Connectivity", history_size=history)
         self.population = None
         self.r_disk_size = r_disk_size
+        self.track_components = track_components
 
     def attach_world(self, world):
         self.population = world.population
@@ -30,8 +31,13 @@ class AlgebraicConn(AbstractBehavior):
     def calculate(self):
         m = self.getLapacianMatrix()
         eigen_values = np.linalg.eig(m)[0]
+        # print(m, eigen_values)
+        THRESHOLD = 10e-7
+        if self.track_components:
+            self.set_value(sum([int(np.real(ei) < THRESHOLD) for ei in eigen_values]))
+            return
         eigen_values.sort()
         a_conn = eigen_values[1]
-        if a_conn != 0:
+        if a_conn > THRESHOLD:
             a_conn = 1
         self.set_value(np.real(a_conn))
