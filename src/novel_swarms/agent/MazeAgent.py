@@ -15,6 +15,7 @@ from .control.Controller import Controller
 
 class MazeAgent(Agent):
     SEED = -1
+    DEBUG = False
 
     def __init__(self, config: MazeAgentConfig = None, name=None) -> None:
 
@@ -59,6 +60,9 @@ class MazeAgent(Agent):
         self.goal_seen = False
         self.stop_at_goal = config.stop_at_goal
         self.config = config
+        self.elastic_correction = np.array([0.0, 0.0])
+        self.last_correction = np.array([0.0, 0.0])
+        self.velocity = np.array([0.0, 0.0])
 
         self.sensors = deepcopy(config.sensors)
         for sensor in self.sensors:
@@ -83,6 +87,7 @@ class MazeAgent(Agent):
 
         # timer = Timer("Calculations")
         super().step()
+        self.handle_collisions(world)
 
         if self.dead:
             return
@@ -101,9 +106,16 @@ class MazeAgent(Agent):
         idiosync_1 = self.i_1
         idiosync_2 = self.i_2
 
-        self.dx = v * math.cos(self.angle) * idiosync_1
-        self.dy = v * math.sin(self.angle) * idiosync_1
+        self.dx = (v * math.cos(self.angle) * idiosync_1)
+        self.dy = (v * math.sin(self.angle) * idiosync_1)
         dw = omega * idiosync_2
+
+        self.velocity[0], self.velocity[1] = self.dx, self.dy
+
+        # print(f"Old V: {self.dx}, {self.dy}")
+        self.dx += self.elastic_correction[0]
+        self.dy += self.elastic_correction[1]
+        # print(f"New V: {self.dx}, {self.dy}")
 
         old_x_pos = self.x_pos
         old_y_pos = self.y_pos
@@ -115,16 +127,19 @@ class MazeAgent(Agent):
                 self.body_color = (200, 200, 200)
                 return
         else:
-            self.x_pos += self.dx * self.dt
-            self.y_pos += self.dy * self.dt
+            self.x_pos += (self.dx) * self.dt
+            self.y_pos += (self.dy) * self.dt
+            self.last_correction = np.copy(self.elastic_correction)
+            self.elastic_correction = np.array([0.0, 0.0])
 
+        # If the agents are in collision, point the heading in the opposition direction of the collision
+        if sum(self.last_correction) != 0.0:
+            self.angle = np.arctan2(self.last_correction[1], self.last_correction[0])
         self.angle += dw * self.dt
 
         self.collision_flag = False
         if check_for_world_boundaries is not None:
             check_for_world_boundaries(self)
-
-        self.handle_collisions(world)
 
         # Calculate the 'real' dx, dy after collisions have been calculated.
         # This is what we use for velocity in our equations
@@ -155,6 +170,8 @@ class MazeAgent(Agent):
         vec_with_magnitude = ((vec[0] * mag) + tail[0], (vec[1] * mag) + tail[1])
         pygame.draw.line(screen, (255, 255, 255), tail, vec_with_magnitude)
 
+        if self.DEBUG:
+            self.debug_draw(screen)
 
     # def interpretSensors(self) -> Tuple:
     #     """
@@ -190,7 +207,7 @@ class MazeAgent(Agent):
     def handle_collisions(self, world):
         collisions = True
         attempts = 0
-        while collisions and attempts < 10:
+        while collisions and attempts < 1:
             collisions = False
             attempts += 1
             collider = self.build_collider()
@@ -203,23 +220,24 @@ class MazeAgent(Agent):
                     self.get_aabb().toggle_intersection()
                     correction = collider.collision_then_correction(agent.build_collider())
                     if correction is not None:
-                        self.x_pos += correction[0]
-                        self.y_pos += correction[1]
+                        self.elastic_correction[0] += correction[0]
+                        self.elastic_correction[1] += correction[1]
                         if self.catastrophic_collisions:
                             self.dead = True
                             self.body_color = (200, 200, 200)
                             agent.dead = True
                             agent.body_color = (200, 200, 200)
                         collisions = True
-                        break
-
 
 
     def build_collider(self):
-        return CircularCollider(self.x_pos, self.y_pos, self.radius)
+        return CircularCollider(self.x_pos, self.y_pos, self.radius, self.velocity[0], self.velocity[1], parent=self)
 
     def debug_draw(self, screen):
         self.get_aabb().draw(screen)
+        tail = self.getPosition()
+        pygame.draw.line(screen, (255, 0, 255), tail, tail + self.last_correction, width=5)
+        # pygame.draw.line(screen, (255, 182, 193), tail, tail + 10*self.last_correction, width=2)
 
     def get_aabb(self):
         """
