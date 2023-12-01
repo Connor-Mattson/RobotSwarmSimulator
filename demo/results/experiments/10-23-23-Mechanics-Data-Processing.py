@@ -102,10 +102,10 @@ def radius_3d(df):
                      s=200, c=colo, cmap='plasma')
     plt.colorbar(color_map)
 
-    ax.set_title("Data Filtered by lambda_2 > 0")
+    ax.set_title("Milling Radius (Data Filtered by $\phi < \\frac{2\pi}{N}$)")
     ax.set_xlabel('No. Agents')
     ax.set_ylabel('$\phi$')
-    ax.set_zlabel('$\omega_{max}$')
+    ax.set_zlabel('$v$')
 
     plt.show()
 
@@ -118,14 +118,15 @@ def cluster_3d(df):
     df = df.loc[df["v"] == 1.0]
     print(len(df))
 
-    x = df.loc[:, "n"]
-    y = df.loc[:, "fov"]
-    z = df.loc[:, "omega"]
-
     X = df.loc[:, "average_speed":"group_rotation"]
     print(X.shape)
     af = KMeans(n_clusters=4, random_state=0).fit(X)
     df = df.assign(cluster_label=af.labels_)
+    # df = df.loc[df["fov"] == 3.0]
+
+    x = df.loc[:, "n"]
+    y = df.loc[:, "fov"]
+    z = df.loc[:, "omega"]
     colo = df.loc[:, "cluster_label"]
 
     # print(min(colo), max(colo))
@@ -152,7 +153,7 @@ def cluster_3d(df):
     plt.show()
 
 def plot_circle_radius(df):
-    v, omega = 1.0, 60.0
+    v, omega = 1.0, 30.0
     slice_df = df.loc[df["v"] == v]
     slice_df = slice_df.loc[slice_df["omega"] == omega]
 
@@ -192,7 +193,7 @@ def plot_circle_radius(df):
 if __name__ == "__main__":
     df = pd.read_csv(RESULTS_FILE)
 
-    plot_circle_radius(df)
+    cluster_3d(df)
 
     # Remove all
     # df =

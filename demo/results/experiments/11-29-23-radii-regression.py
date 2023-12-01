@@ -1,3 +1,6 @@
+import os
+os.environ['PATH'] += os.pathsep + '/home/connor/.juliaup/bin'
+
 from scipy.optimize import curve_fit
 import numpy as np
 import pandas as pd
@@ -13,7 +16,7 @@ from pysr import PySRRegressor
 """
 Least Squares prediction of R = f(n, fov, omega_max, v)
 """
-CROSS_SECTION_ONLY = True
+CROSS_SECTION_ONLY = False
 
 def function_linear(X, a1, a2, a3, a4):
     args = [a1, a2, a3, a4]
@@ -39,6 +42,13 @@ def function_3(X, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12):
         tot += (X[i] ** 3) * args[(i * 3) + 2]
     tot += a0
     return tot
+
+def function_linear_cs(X, bias, a1, a2):
+    args = [a1, a2]
+    tot = 0
+    for i in range(2):
+        tot += X[i] * args[i]
+    return tot + bias
 
 def function_quadratic_cs(X, a1, a2, a3, a4):
     args = [a1, a2, a3, a4]
@@ -110,7 +120,7 @@ def preprocess_data(df):
     df_parsed = df.loc[df["fov"] < 360 / df["n"]]
     if CROSS_SECTION_ONLY:
         df_parsed = df_parsed.loc[df_parsed["v"] == 1.0]
-        df_parsed = df_parsed.loc[df_parsed["omega"] == 60.0]
+        df_parsed = df_parsed.loc[df_parsed["omega"] == 30.0]
 
     y_truth = df_parsed["radius"].to_numpy()
 
@@ -129,12 +139,12 @@ def build_truth_dictionary(X, y_truth):
     return t_dict
 
 def plot_estimate(func, args, truth_dict):
-    PLOT_ESTIMATE = False
+    PLOT_ESTIMATE = True
     PLOT_TRUTH = True
     FILTER_MANIFOLD = True
     N = range(4, 40)
     PHI = range(3, 90)
-    V, OMEGA = 1.0, 60
+    V, OMEGA = 1.0, 30
 
     X, Y, Z = [], [], []
     for i in range(len(N)):
@@ -195,6 +205,73 @@ def plot_estimate(func, args, truth_dict):
     # Show the plot
     plt.show()
 
+def plot_symbolic_model(model, model_index, truth_dict, filter_manifold=False):
+    PLOT_ESTIMATE = True
+    PLOT_TRUTH = True
+    N = range(4, 40)
+    PHI = range(3, 90)
+    V, OMEGA = 1.0, 30
+
+    X, Y, Z = [], [], []
+    for i in range(len(N)):
+        for j in range(len(PHI)):
+            if filter_manifold and PHI[j] > (360 / N[i]):
+                continue
+            X.append(N[i])
+            Y.append(PHI[j])
+            if CROSS_SECTION_ONLY:
+                row = [[N[i], PHI[j]]]
+            else:
+                row = [[N[i], PHI[j], OMEGA, V]]
+            Z.append(model.predict(row, model_index))
+
+    fig = plt.figure()
+    ax = fig.add_subplot(projection='3d')
+    if PLOT_ESTIMATE:
+        p = ax.scatter(X, Y, Z, c=Z, marker='o', cmap=cm.plasma, label="Predicted")
+    squared_error = []
+
+    if PLOT_TRUTH:
+        X_T, Y_T, Z_T = [], [], []
+        for k in truth_dict:
+            r = truth_dict[k]
+            if CROSS_SECTION_ONLY:
+                n, phi = k
+            else:
+                n, phi, w, v = k
+                if w != OMEGA or v != V:
+                    continue
+
+            if CROSS_SECTION_ONLY:
+                row = [[n, phi]]
+            else:
+                row = [[n, phi, w, v]]
+            estim = model.predict(row, model_index)
+            squared_error.append(abs(estim - r))
+
+            X_T.append(n)
+            Y_T.append(phi)
+            Z_T.append(r)
+        ax.scatter(X_T, Y_T, Z_T, c="red", marker="^", label="Truth")
+        ax.set_zlim(0, max(max(Z), max(Z_T)))
+
+    mae = sum(squared_error) / len(squared_error)
+    mse = np.sum(np.square(squared_error)) / len(squared_error)
+    print(f"Max Error: {max(squared_error)}")
+    print(f"Prediction MAE: {mae}")
+    print(f"Prediction MSE: {mse}")
+
+    ax.set_xlabel("No. Agents (N)")
+    ax.set_ylabel("Sensing Angle ($\phi$)")
+    ax.set_zlabel("Predicted Radius (cm)")
+
+    plt.title("Predicted Milling Radius")
+    if PLOT_ESTIMATE:
+        fig.colorbar(p)
+    # Show the plot
+    plt.show()
+
+
 def optimize(df, func):
     X, y_truth = preprocess_data(df)
     params = curve_fit(func, X, y_truth, full_output=True, maxfev=2000)
@@ -205,24 +282,28 @@ def optimize(df, func):
 
 def symbolic_regression(df):
     X, y_truth = preprocess_data(df)
+    truth_dict = build_truth_dictionary(X, y_truth)
     model = PySRRegressor(
-        niterations=40,  # < Increase me for better results
-        binary_operators=["+", "*"],
+        niterations=250,
+        population_size=150,
+        binary_operators=["*", "+", "-", "/"],
         unary_operators=[
-            "cos",
+            "square",
+            "cube",
             "exp",
-            "sin",
             "inv(x) = 1/x",
-            # ^ Custom operator (julia syntax)
         ],
         extra_sympy_mappings={"inv": lambda x: 1 / x},
-        # ^ Define operator for SymPy as well
-        # loss="loss(prediction, target) = (prediction - target)^2",
-        # ^ Custom loss function (julia syntax)
     )
     model.fit(X.T, y_truth)
     print(model)
     eq = model.equations_
+    print(eq.columns)
+    selection = int(input("Select Index: "))
+    print(eq.iloc[selection]["equation"])
+    print("Latex: ", model.latex(selection))
+    plot_symbolic_model(model, selection, truth_dict=truth_dict, filter_manifold=True)
+    plot_symbolic_model(model, selection, truth_dict=truth_dict, filter_manifold=False)
 
 if __name__ == "__main__":
     RESULTS_FILE = "../../../demo/results/out/SM-Full-Run/sweep/genes.csv"

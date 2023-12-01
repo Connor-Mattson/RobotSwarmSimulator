@@ -90,7 +90,7 @@ def build_dataset():
     # 2 Hours for 2409
 
 def simulate():
-    N, PHI = 34, 15
+    N, PHI = 16, 3
     OMEGA = 30
     V = 1.0
     w = gene_to_world(N, PHI, OMEGA, V, None)
