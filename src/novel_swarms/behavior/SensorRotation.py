@@ -15,6 +15,9 @@ class SensorRotation(AbstractBehavior):
     def attach_world(self, world):
         self.population = world.population
 
+    def attach_population(self, pop):
+        self.population = pop
+
     def calculate(self):
         sensor_angle = self.population[0].controller[self.i] / (2 * math.pi)
         self.set_value(sensor_angle)

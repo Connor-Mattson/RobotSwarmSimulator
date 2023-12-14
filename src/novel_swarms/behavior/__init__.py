@@ -12,6 +12,7 @@ from .AgentsAtGoal import AgentsAtGoal, PercentageAtGoal
 from .TotalCollisions import TotalCollisionsBehavior
 from .RadialVariance import RadialVarianceBehavior
 from .Circliness import Circliness
+from .SubBehaviors import SubBehaviors
 
 __all__ = [
     "AbstractBehavior",
@@ -27,6 +28,7 @@ __all__ = [
     "PercentageAtGoal",
     "AgentsAtGoal",
     "Circliness",
+    "SubBehaviors",
     "TotalCollisionsBehavior",
     "RadialVarianceBehavior"
 ]

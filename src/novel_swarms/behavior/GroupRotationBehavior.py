@@ -11,6 +11,9 @@ class GroupRotationBehavior(AbstractBehavior):
     def attach_world(self, world):
         self.population = world.population
 
+    def attach_population(self, pop):
+        self.population = pop
+
     def calculate(self):
         n = len(self.population)
         if n == 1:

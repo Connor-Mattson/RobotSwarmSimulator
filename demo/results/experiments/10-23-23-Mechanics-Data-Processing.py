@@ -120,8 +120,9 @@ def cluster_3d(df):
 
     X = df.loc[:, "average_speed":"group_rotation"]
     print(X.shape)
-    af = KMeans(n_clusters=4, random_state=0).fit(X)
+    af = KMeans(n_clusters=3, random_state=0).fit(X)
     df = df.assign(cluster_label=af.labels_)
+    print(np.round(af.cluster_centers_, 4).tolist())
     # df = df.loc[df["fov"] == 3.0]
 
     x = df.loc[:, "n"]
@@ -145,7 +146,7 @@ def cluster_3d(df):
                      s=200, c=colo, cmap='plasma')
     # plt.colorbar(color_map)
 
-    ax.set_title("Clustered Data (k=4)")
+    ax.set_title("Clustered Data (k=3)")
     ax.set_xlabel('No. Agents')
     ax.set_ylabel('$\phi$')
     ax.set_zlabel('$\omega_{max}$')
