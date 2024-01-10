@@ -40,7 +40,7 @@ class DifferentialDriveGUI(AbstractGUI):
             if self.subtitle:
                 self.appendTextToGUI(screen, self.subtitle, size=18)
 
-            self.appendTextToGUI(screen, f"Timesteps: {self.time}")
+            self.appendTextToGUI(screen, f"Timesteps: {self.time} ({round(self.time * self.world.population[0].dt, 1)}s) ")
             if self.selected:
                 a = self.selected
                 self.appendTextToGUI(screen, f"Current Agent: {a.name}")

@@ -403,6 +403,15 @@ class AgentYAMLFactory:
     def from_yaml(file_name):
         import yaml
         config = None
+
+        ## It is possible that the user is running this sourced from lower in the dir tree than the root of the project.
+        # If so, let's test a couple traversals up to see if we can find the right file.
+        for i in range(4):
+            if not os.path.exists(file_name):
+                file_name = "../" + file_name
+            else:
+                break
+
         with open(file_name, "r") as stream:
             config = yaml.safe_load(stream)
 

@@ -9,7 +9,7 @@ sensors:
       agent_sensing_range: 10 # In Body Lengths. previously 17
       show: true
       goal_sensing_range: 10
-      use_goal_state: true
+      use_goal_state: false
       wall_sensing_range: 10
       fn: 0.0  # 0.10
       fp: 0.0  # 0.05
@@ -23,7 +23,7 @@ controller:
   - 0
 agent_radius: 0.5
 stop_at_goal: false
-dt: 0.13
+dt: 0.13 # CHANGE THIS BACK!!!
 body_color:
   - 255
   - 0

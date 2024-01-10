@@ -74,7 +74,6 @@ def build_dataset():
     o = exp.add_sub("sweep")
 
     data = []
-    # Replace mid value with 31
     for n in range(4, 31, 2):
         for omega in range(20, 91, 10):
             for v in range(10, 21, 2):

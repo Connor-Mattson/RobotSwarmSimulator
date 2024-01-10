@@ -152,7 +152,7 @@ class SubBehaviors(AbstractBehavior):
                 textpos = (self.text_baselines[i].x, self.text_baselines[i].y)
                 screen.blit(text, textpos)
 
-            eq = f"{len(self.population)}C -> "
+            eq = f"{len(self.population)} -> "
             first = True
             for key in micro_classes:
                 for count in micro_classes[key]:

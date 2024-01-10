@@ -16,7 +16,7 @@ from pysr import PySRRegressor
 """
 Least Squares prediction of R = f(n, fov, omega_max, v)
 """
-CROSS_SECTION_ONLY = False
+CROSS_SECTION_ONLY = True
 
 def function_linear(X, a1, a2, a3, a4):
     args = [a1, a2, a3, a4]
@@ -283,15 +283,18 @@ def optimize(df, func):
 def symbolic_regression(df):
     X, y_truth = preprocess_data(df)
     truth_dict = build_truth_dictionary(X, y_truth)
+    # print(len(y_truth))
     model = PySRRegressor(
         niterations=250,
         population_size=150,
-        binary_operators=["*", "+", "-", "/"],
+        binary_operators=["*", "+", "-", "/", "^"],
         unary_operators=[
             "square",
             "cube",
             "exp",
             "inv(x) = 1/x",
+            "sign",
+            "neg"
         ],
         extra_sympy_mappings={"inv": lambda x: 1 / x},
     )
@@ -306,7 +309,7 @@ def symbolic_regression(df):
     plot_symbolic_model(model, selection, truth_dict=truth_dict, filter_manifold=False)
 
 if __name__ == "__main__":
-    RESULTS_FILE = "../../../demo/results/out/SM-Full-Run/sweep/genes.csv"
+    RESULTS_FILE = "demo/results/out/r-convergence-5/sweep/genes.csv"
     df = pd.read_csv(RESULTS_FILE)
     # optimize(df, function_combined_root_cs)
     symbolic_regression(df)
