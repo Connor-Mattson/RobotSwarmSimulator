@@ -60,6 +60,8 @@ class UnicycleAgent(Agent):
 
         self.aabb = None
         self.collider = None
+        self.elastic_correction = np.array([0.0, 0.0])
+
         self.body_filled = config.body_filled
         self.body_color = config.body_color
         self.c_now = (0, 0)
@@ -85,6 +87,7 @@ class UnicycleAgent(Agent):
         super().step()
         self.aabb = None
         self.collider = None
+        self.handle_collisions(world)
 
         if world.goals and world.goals[0].agent_achieved_goal(self):
             v, omega = 0, 0
@@ -97,8 +100,8 @@ class UnicycleAgent(Agent):
         idiosync_1 = self.i_1
         idiosync_2 = self.i_2
 
-        self.dx = v * math.cos(self.angle) * idiosync_1
-        self.dy = v * math.sin(self.angle) * idiosync_1
+        self.dx = (v * math.cos(self.angle) * idiosync_1) + self.elastic_correction[0]
+        self.dy = (v * math.sin(self.angle) * idiosync_1) + self.elastic_correction[1]
         dw = omega * idiosync_2
 
         old_x_pos = self.x_pos
@@ -112,6 +115,7 @@ class UnicycleAgent(Agent):
             self.x_pos += self.dx * self.dt
             self.y_pos += self.dy * self.dt
             self.angle += dw * self.dt
+            self.elastic_correction = np.array([0.0, 0.0])
 
         if check_for_world_boundaries is not None:
             check_for_world_boundaries(self)
@@ -119,7 +123,6 @@ class UnicycleAgent(Agent):
         # if check_for_agent_collisions is not None:
         #     check_for_agent_collisions(self, forward_freeze=True)
 
-        self.handle_collisions(world)
 
         if self.stopped_duration > 0:
             self.x_pos = old_x_pos
@@ -158,8 +161,8 @@ class UnicycleAgent(Agent):
                         if np.linalg.norm(correction) == 0:
                             self.stopped_duration = 15
                         else:
-                            self.x_pos += correction[0]
-                            self.y_pos += correction[1]
+                            self.elastic_correction[0] += correction[0]
+                            self.elastic_correction[1] += correction[1]
                         break
             if collisions:
                 self.collider.flag_collision()

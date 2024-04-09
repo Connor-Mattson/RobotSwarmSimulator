@@ -84,5 +84,9 @@ class HeterogeneousSwarmConfig:
         self.add_sub_populuation(configs[0], n_A)
         self.add_sub_populuation(configs[1], n_B)
 
+    def factor_zoom(self, zoom):
+        for k, v in self.subpopulation_information.items():
+            k.rescale(zoom)
+
 
 

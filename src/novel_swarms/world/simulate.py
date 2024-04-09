@@ -3,149 +3,171 @@ from ..gui.agentGUI import DifferentialDriveGUI
 from .WorldFactory import WorldFactory
 from ..util.timer import Timer
 
-screen = None
 FRAMERATE = 200
 
-def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_events=False, gui_key_events=False, subscribers=None, step_size=1):
-    # initialize the pygame module
-    if show_gui:
-        pygame.init()
-        pygame.display.set_caption("Swarm Simulation")
+class Simulation:
+    def __init__(self, world_config, show_gui=True, gui=None, stop_detection=None, world_key_events=False, gui_key_events=False, subscribers=None, save_duration=1200, save_every_ith_frame=3, save_time_per_frame=50, step_size=1, start_paused=False):
+        self.world_config = world_config
+        self.stop_detection = stop_detection
+        self.world_key_events = world_key_events
+        self.gui_key_events = gui_key_events
+        self.save_duration = save_duration
+        self.save_every_ith_frame = save_every_ith_frame
+        self.save_time_per_frame = save_time_per_frame
 
-    # screen must be global so that other modules can access + draw to the window
-    global screen
-    gui_width = 200
-    if gui:
-        gui_width = gui.w
-    if show_gui:
-        screen = pygame.display.set_mode((world_config.w + gui_width, world_config.h))
+        # initialize the pygame module
+        if show_gui:
+            pygame.init()
+            pygame.display.set_caption("Swarm Simulation")
 
-    # define a variable to control the main loop
-    running = True
-    paused = False
-    draw_world = True
-
-    # Create the simulation world
-    world = WorldFactory.create(world_config)
-    
-    # Attach any subscribers to the world
-    world_subscribers = []
-    if subscribers:
-        world_subscribers = subscribers
-
-    # Create the GUI
-    if show_gui and not gui:
-        gui = DifferentialDriveGUI(x=world_config.w, y=0, h=world_config.h, w=gui_width)
-
-    # Attach the world to the gui and vice versa
-    if gui:
-        gui.set_world(world)
-        gui.set_screen(screen)
-        world.attach_gui(gui)
-
-    total_allowed_steps = world_config.stop_at
-    steps_taken = 0
-    steps_per_frame = step_size
-
-    labels = [pygame.K_RETURN, pygame.K_q, pygame.K_0, pygame.K_KP0, pygame.K_1, pygame.K_KP1, pygame.K_2, pygame.K_KP2,
-              pygame.K_3, pygame.K_KP3, pygame.K_4, pygame.K_KP4, pygame.K_5, pygame.K_KP5]
-
-    # Main loop
-    time_me = Timer("World Step")
-    while running:
-        # Looped Event Handling
+        # screen must be global so that other modules can access + draw to the window
+        gui_width = 200
         if gui:
+            gui_width = gui.w
+        if show_gui:
+            self.screen = pygame.display.set_mode((world_config.w + gui_width, world_config.h))
+
+        # define a variable to control the main loop
+        self.running = True
+        self.paused = start_paused
+        self.draw_world = True
+
+        # Create the simulation world
+        self.world = WorldFactory.create(world_config)
+
+        # Attach any subscribers to the world
+        self.world_subscribers = []
+        if subscribers:
+            self.world_subscribers = subscribers
+
+        # Create the GUI
+        self.gui = gui
+        if show_gui and not gui:
+            self.gui = DifferentialDriveGUI(x=world_config.w, y=0, h=world_config.h, w=gui_width)
+
+        # Attach the world to the gui and vice versa
+        if self.gui:
+            self.gui.set_world(self.world)
+            self.gui.set_screen(self.screen)
+            self.world.attach_gui(self.gui)
+
+        self.total_allowed_steps = world_config.stop_at
+        self.steps_taken = 0
+        self.steps_per_frame = step_size
+
+        self.labels = [pygame.K_RETURN, pygame.K_q, pygame.K_0, pygame.K_KP0, pygame.K_1, pygame.K_KP1, pygame.K_2,
+                  pygame.K_KP2,
+                  pygame.K_3, pygame.K_KP3, pygame.K_4, pygame.K_KP4, pygame.K_5, pygame.K_KP5]
+
+    def spin(self):
+        while self.running:
+            ret = self.step()
+            if ret is not None:
+                return ret
+
+    def record_gif(self):
+        from .subscribers.World2Gif import World2Gif
+        self.world_subscribers.append(World2Gif(duration=self.save_duration, every_ith_frame=self.save_every_ith_frame,
+                                                time_per_frame=self.save_time_per_frame))
+
+    def step(self):
+        if self.gui:
             for event in pygame.event.get():
                 # Cancel the game loop if user quits the GUI
                 if event.type == pygame.QUIT:
-                    return world
+                    return self.world
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
-                        paused = not paused
+                        self.paused = not self.paused
                         # print(f"Paused on Simulation Step: {steps_taken}")
-                    if event.key == pygame.K_RIGHT and paused:
+                    if event.key == pygame.K_RIGHT and self.paused:
                         # ON Right Arrow Pressed, draw single frame
-                        world.step()
-                        steps_taken += 1
-                        gui.set_time(steps_taken)
-                        screen.fill(world_config.background_color)
-                        if gui and screen:
-                            if draw_world:
-                                world.draw(screen)
-                            gui.draw(screen)
+                        self.world.step()
+                        self.steps_taken += 1
+                        self.gui.set_time(self.steps_taken)
+                        self.screen.fill(self.world_config.background_color)
+                        if self.gui and self.screen:
+                            if self.draw_world:
+                                self.world.draw(self.screen)
+                            self.gui.draw(self.screen)
                         pygame.display.flip()
                     if event.key == pygame.K_r:
-                        world = WorldFactory.create(world_config)
-                        steps_taken = 0
+                        self.world = WorldFactory.create(self.world_config)
+                        self.steps_taken = 0
                     if event.key == pygame.K_RSHIFT:
-                        steps_per_frame *= 2
-                        steps_per_frame = min(steps_per_frame, 50)
-                    if event.key == pygame.K_LSHIFT and steps_per_frame > 1:
-                        steps_per_frame /= 2
-                        steps_per_frame = round(steps_per_frame)
+                        self.steps_per_frame *= 2
+                        self.steps_per_frame = min(self.steps_per_frame, 100)
+                    if event.key == pygame.K_LSHIFT and self.steps_per_frame > 1:
+                        self.steps_per_frame /= 2
+                        self.steps_per_frame = round(self.steps_per_frame)
                     if event.key == pygame.K_w:
-                        draw_world = not draw_world
+                        draw_world = not self.draw_world
                     if event.key == pygame.K_F3:
                         from .WorldIO import WorldIO
-                        WorldIO.save_world(world)
+                        WorldIO.save_world(self.world)
                     if event.key == pygame.K_F4:
-                        from .subscribers.World2Gif import World2Gif
-                        world_subscribers.append(World2Gif(duration=1200, every_ith_frame=3, time_per_frame=50))
-                    if world_key_events:
-                        world.handle_key_press(event)
-                    if gui and gui_key_events:
-                        gui.pass_key_events(event)
-                    if event.key in labels:
-                        return event.key, steps_taken
+                        self.record_gif()
+                    if self.world_key_events:
+                        self.world.handle_key_press(event)
+                    if self.gui and self.gui_key_events:
+                        self.gui.pass_key_events(event)
+                    if event.key in self.labels:
+                        return event.key, self.steps_taken
 
                 if event.type == pygame.MOUSEBUTTONUP:
                     pos = pygame.mouse.get_pos()
-                    world.onClick(pos)
+                    self.world.onClick(pos)
 
-            if world_key_events:
+            if self.world_key_events:
                 keys = pygame.key.get_pressed()
-                world.handle_held_keys(keys)
+                self.world.handle_held_keys(keys)
 
-            if paused:
+            if self.paused:
                 pygame.time.Clock().tick(FRAMERATE)
-                continue
+                return
 
         # Calculate Steps - Stop if we reach desired frame
-        for _ in range(steps_per_frame):
+        for _ in range(self.steps_per_frame):
 
-            if stop_detection is not None and stop_detection(world):
+            if self.stop_detection is not None and self.stop_detection(self.world):
                 running = False
-                return world
+                return self.world
 
-            if total_allowed_steps is not None:
+            if self.total_allowed_steps is not None:
                 # noinspection PyTypeChecker
-                if steps_taken > total_allowed_steps:
+                if self.steps_taken > self.total_allowed_steps:
                     running = False
-                    return world
+                    return self.world
 
-            world.step()
+            self.world.step()
 
             # Broadcast to any world subscribers
-            _ = [sub.notify(world, screen) for sub in world_subscribers]
+            _ = [sub.notify(self.world, self.screen) for sub in self.world_subscribers]
 
-            steps_taken += 1
+            self.steps_taken += 1
             # if steps_taken % 1000 == 0:
             # print(f"Total steps: {steps_taken}")
 
         # Draw!
-        if gui and screen:
-            gui.set_time(steps_taken)
-            screen.fill(world_config.background_color)
-            if draw_world:
-                world.draw(screen)
+        if self.gui and self.screen:
+            self.gui.set_time(self.steps_taken)
+            self.screen.fill(self.world_config.background_color)
+            if self.draw_world:
+                self.world.draw(self.screen)
             # gui.step()
-            if gui.track_all_mouse:
-                gui.recieve_mouse(pygame.mouse.get_rel())
-            if gui.track_all_events:
-                gui.recieve_events(pygame.event.get())
-            gui.draw(screen)
+            if self.gui.track_all_mouse:
+                self.gui.recieve_mouse(pygame.mouse.get_rel())
+            if self.gui.track_all_events:
+                self.gui.recieve_events(pygame.event.get())
+            self.gui.draw(self.screen)
 
         # Limit the FPS of the simulation to FRAMERATE
-        if gui:
+        if self.gui:
             pygame.display.flip()
             pygame.time.Clock().tick(FRAMERATE)
+
+
+
+def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_events=False, gui_key_events=False, subscribers=None, save_duration=1200, save_every_ith_frame=3, save_time_per_frame=50, step_size=1, start_paused=False):
+    simulation = Simulation(world_config, show_gui, gui, stop_detection, world_key_events, gui_key_events, subscribers, save_duration, save_every_ith_frame, save_time_per_frame, step_size, start_paused)
+    return simulation.spin()

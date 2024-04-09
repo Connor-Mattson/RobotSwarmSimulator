@@ -26,11 +26,11 @@ class HumanDrivenAgent(DifferentialDriveAgent):
         if self.control == "keys-holonomic":
             STEP_SIZE = 2
             if keys[pygame.K_RIGHT]:
-                self.x_pos += STEP_SIZE
+                self.set_x_pos(self.get_x_pos() + STEP_SIZE)
             if keys[pygame.K_LEFT]:
-                self.x_pos -= STEP_SIZE
+                self.set_x_pos(self.get_x_pos() - STEP_SIZE)
             if keys[pygame.K_DOWN]:
-                self.y_pos += STEP_SIZE
+                self.set_y_pos(self.get_y_pos() + STEP_SIZE)
             if keys[pygame.K_UP]:
-                self.y_pos -= STEP_SIZE
+                self.set_y_pos(self.get_y_pos() - STEP_SIZE)
 

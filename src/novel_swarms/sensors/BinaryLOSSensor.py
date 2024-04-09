@@ -24,7 +24,7 @@ class BinaryLOSSensor(AbstractSensor):
         d_hat = d / np.linalg.norm(d)
 
         # Check seen agent from last frame first, to avoid expensive computation
-        if self.parent.agent_in_sight is not None and not self.parent.agent_in_sight.deleted:
+        if self.parent.agent_in_sight is not None:
             agent = self.parent.agent_in_sight
             if self.agent_in_sight(agent, p_0, d_hat):
                 self.parent.agent_in_sight = agent

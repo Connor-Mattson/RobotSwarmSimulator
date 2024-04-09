@@ -40,16 +40,16 @@ class DifferentialDriveGUI(AbstractGUI):
             if self.subtitle:
                 self.appendTextToGUI(screen, self.subtitle, size=18)
 
-            self.appendTextToGUI(screen, f"Timesteps: {self.time}")
+            self.appendTextToGUI(screen, f"Timesteps: {self.time} ({round(self.time * self.world.population[0].dt, 1)}s) ")
             if self.selected:
                 a = self.selected
                 self.appendTextToGUI(screen, f"Current Agent: {a.name}")
                 self.appendTextToGUI(screen, f"")
-                self.appendTextToGUI(screen, f"x: {a.x_pos}")
-                self.appendTextToGUI(screen, f"y: {a.y_pos}")
+                self.appendTextToGUI(screen, f"x: {a.get_x_pos()}")
+                self.appendTextToGUI(screen, f"y: {a.get_y_pos()}")
                 self.appendTextToGUI(screen, f"dx: {a.dx}")
                 self.appendTextToGUI(screen, f"dy: {a.dy}")
-                self.appendTextToGUI(screen, f"sense-state: {a.sensors.getState()}")
+                self.appendTextToGUI(screen, f"sense-state: {a.get_sensors().getState()}")
                 if hasattr(a, "i_1") and hasattr(a, "i_2"):
                     self.appendTextToGUI(screen, f"Idio_1: {a.i_1}")
                     self.appendTextToGUI(screen, f"Idio_2: {a.i_2}")
@@ -58,7 +58,7 @@ class DifferentialDriveGUI(AbstractGUI):
                     self.appendTextToGUI(screen, f"controller: {a.controller}")
                     self.appendTextToGUI(screen, f"")
                 self.appendTextToGUI(screen, f"θ: {a.angle % (2 * np.pi)}")
-                if a.agent_in_sight is not None:
+                if hasattr(a, "agent_in_sight") and a.agent_in_sight is not None:
                     self.appendTextToGUI(screen, f"sees: {a.agent_in_sight.name}")
             else:
                 self.appendTextToGUI(screen, "Current Agent: None")

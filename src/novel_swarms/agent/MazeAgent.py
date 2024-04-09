@@ -10,6 +10,7 @@ from ..sensors.GenomeDependentSensor import GenomeBinarySensor
 from ..util.collider.AABB import AABB
 from ..util.collider.CircularCollider import CircularCollider
 from ..util.timer import Timer
+from .control.Controller import Controller
 
 
 class MazeAgent(Agent):
@@ -17,7 +18,10 @@ class MazeAgent(Agent):
 
     def __init__(self, config: MazeAgentConfig = None, name=None) -> None:
 
-        self.controller = config.controller
+        if isinstance(config.controller, list):
+            self.controller = Controller(config.controller)
+        else:
+            self.controller = config.controller
 
         self.seed = config.seed
         if config.seed is not None:
@@ -52,6 +56,7 @@ class MazeAgent(Agent):
         self.stop_on_collision = config.stop_on_collision
         self.catastrophic_collisions = config.catastophic_collisions
         self.dead = False
+        self.goal_seen = False
         self.stop_at_goal = config.stop_at_goal
         self.config = config
 
@@ -86,11 +91,11 @@ class MazeAgent(Agent):
             if self.stop_at_goal:
                 v, omega = 0, 0
             else:
-                v, omega = self.interpretSensors()
+                v, omega = self.controller.get_actions(self)
             # self.detection_id = 2
             # self.set_color_by_id(3)
         else:
-            v, omega = self.interpretSensors()
+            v, omega = self.controller.get_actions(self)
 
         # Define Idiosyncrasies that may occur in actuation/sensing
         idiosync_1 = self.i_1
@@ -109,7 +114,6 @@ class MazeAgent(Agent):
                 self.dead = True
                 self.body_color = (200, 200, 200)
                 return
-
         else:
             self.x_pos += self.dx * self.dt
             self.y_pos += self.dy * self.dt
@@ -128,10 +132,10 @@ class MazeAgent(Agent):
         self.dy = self.y_pos - old_y_pos
         # timer = timer.check_watch()
 
-        # timer = Timer("Sensors")
         for sensor in self.sensors:
             sensor.step(world=world)
-        # timer = timer.check_watch()
+            if sensor.goal_detected:
+                self.goal_seen = True
 
     def draw(self, screen) -> None:
         super().draw(screen)
@@ -151,17 +155,21 @@ class MazeAgent(Agent):
         vec_with_magnitude = ((vec[0] * mag) + tail[0], (vec[1] * mag) + tail[1])
         pygame.draw.line(screen, (255, 255, 255), tail, vec_with_magnitude)
 
-    def interpretSensors(self) -> Tuple:
-        sensor_state = self.sensors.getState()
-        sensor_detection_id = self.sensors.getDetectionId()
-        # self.set_color_by_id(sensor_detection_id)
 
-        # if sensor_state == 2:
-        #     return 12, 0
-
-        v = self.controller[sensor_state * 2]
-        omega = self.controller[(sensor_state * 2) + 1]
-        return v, omega
+    # def interpretSensors(self) -> Tuple:
+    #     """
+    #     Deprecated: See Controller Class (novel_swarms.agent.control.Controller)
+    #     """
+    #     sensor_state = self.sensors.getState()
+    #     sensor_detection_id = self.sensors.getDetectionId()
+    #     # self.set_color_by_id(sensor_detection_id)
+    #
+    #     # if sensor_state == 2:
+    #     #     return 12, 0
+    #
+    #     v = self.controller[sensor_state * 2]
+    #     omega = self.controller[(sensor_state * 2) + 1]
+    #     return v, omega
 
     def set_color_by_id(self, id):
         if id == 0:

@@ -26,7 +26,7 @@ class AreaGoal(AbstractGoal):
         pygame.draw.rect(screen, self.color, self.rect, width=0)
 
     def agent_achieved_goal(self, agent):
-        pos = [agent.x_pos, agent.y_pos]
+        pos = [agent.get_x_pos(), agent.get_y_pos()]
         return self.rect.collidepoint(pos)
 
     def add_achieved_agent(self, agent_id):
@@ -70,7 +70,7 @@ class CylinderGoal(AbstractGoal):
             "type": "CylinderGoal",
             "center": self.center,
             "r": self.r,
-            "color": self.color,
+            "color": list(self.color),
             "remove_at": self.remove_at,
             "range": self.range
         }

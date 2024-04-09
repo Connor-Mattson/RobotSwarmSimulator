@@ -14,6 +14,9 @@ class RadialVarianceBehavior(AbstractBehavior):
         self.population = world.population
         self.world_radius = world.config.radius
 
+    def attach_population(self, pop):
+        self.population = pop
+
     def calculate(self):
         n = len(self.population)
         r = self.world_radius

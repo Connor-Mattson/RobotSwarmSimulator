@@ -1,0 +1,31 @@
+---
+type: "RectangularWorld"
+size:  # Defined in Agent Body Lengths
+  - 100
+  - 100
+n_agents: 20
+init_type:
+  type: "RectRandomInit"  # A starting region where agents will spawn at t=0
+  bb:
+    - - 30 # Upper Left Bounding Box Corner (Body Lengths) X
+      - 63.33 # Y
+    - - 36.6 # Lower Right Bounding Box Corner (Body Lengths) X
+      - 70 # Y
+goals:   # A list of goals for the robots to find
+  - type: "CylinderGoal"
+    center:
+      - 66.66 # X In Body Lengths
+      - 33.33 # Y In Body Lengths
+    r: 0.5 # In Body Lengths
+    range: 20 # In Body Lengths
+    remove_at: false
+    color:
+      - 0
+      - 255
+      - 0
+padding: 0
+collide_walls: true  # Use No Environment Walls for this problem
+show_walls: true  # Hide Default Walls,
+metadata:
+  hash: _hash
+stop_at: 1000000 # Upper Simulation Limit

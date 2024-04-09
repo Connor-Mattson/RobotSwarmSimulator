@@ -41,7 +41,6 @@ class MultiWorldSimulation:
                 if batched:
                     ret.append(simulate_batch(w, world_stop_condition, show_gui=self.with_gui))
                 else:
-                    print(w.agentConfig.controller)
                     ret.append(simulate(w, world_stop_condition, show_gui=self.with_gui))
         return ret
 

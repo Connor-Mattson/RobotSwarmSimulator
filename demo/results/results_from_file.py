@@ -39,12 +39,12 @@ if __name__ == "__main__":
     # Evolutionary archives are saved to files if GeneticEvolutionConfig.save_archive
     #   is set to True. Files can be found in /out,
     archive = NoveltyArchive(
-        pheno_file="/home/connor/Downloads/MRS_RESULTS/s1/NS6/NS6_s1_t1687461003_b__1687504387.csv",
-        geno_file="/home/connor/Downloads/MRS_RESULTS/s1/NS6/NS6_s1_t1687461003_g__1687504387.csv",
+        pheno_file="/home/connor/Downloads/MRS_RESULTS/s2/NS8/NS8_s2_t1686830016_b__1686875593.csv",
+        geno_file="/home/connor/Downloads/MRS_RESULTS/s2/NS8/NS8_s2_t1686830016_g__1686875593.csv",
         # pheno_file="/home/connor/Desktop/research/SwarmNoveltyNetwork/out/NS5_s0_t1686683208_b__1686697837.csv",
         # geno_file="/home/connor/Desktop/research/SwarmNoveltyNetwork/out/NS5_s0_t1686683208_g__1686697837.csv",
-        # pheno_file="/home/connor/Desktop/research/SwarmNoveltyNetwork/src/z-experiments/MRS-notebooks/out/R-s0_repr_8__b_1687332766.csv",
-        # geno_file="/home/connor/Desktop/research/SwarmNoveltyNetwork/src/z-experiments/MRS-notebooks/out/R-s0_repr_8__g_1687332766.csv",
+        # pheno_file="/home/connor/Desktop/research/SwarmNoveltyNetwork/src/z-experiments/MRS-notebooks/out/R-s2_repr_8__b_1687515596.csv",
+        # geno_file="/home/connor/Desktop/research/SwarmNoveltyNetwork/src/z-experiments/MRS-notebooks/out/R-s2_repr_8__g_1687515596.csv",
         absolute=True
     )
 
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     results_config.early_exaggeration = 2
     results_config.perplexity = 20
     results_config.k = 20
-    results_config.clustering_type = "hierarchical"
+    results_config.clustering_type = "spectral"
     # results_config.eps = 2.0
 
     # Cluster and Explore Reduced Behavior Space

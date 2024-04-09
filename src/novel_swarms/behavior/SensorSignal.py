@@ -20,11 +20,13 @@ class SensorSignalBehavior(AbstractBehavior):
     def out_average(self) -> Tuple:
         vals = np.array([0, 0])
         for a in self.world.population:
-            history = a.sensors.sensors[self.index].history
+            history = np.array(a.sensors.sensors[self.index].history)
+            history[history < 0] = 0
+            history[history > 0] = 1
             total = sum(history)
             vals += np.array([total, len(history) - total])
         prob = vals / sum(vals)
-        print(prob)
+        prob = np.round(prob, 2)
         return (self.name, list(prob))
 
     def calculate(self):
@@ -32,7 +34,7 @@ class SensorSignalBehavior(AbstractBehavior):
             plt.ion()
             plt.clf()
             for i, agent in enumerate(self.world.highlighted_set):
-                history = agent.sensors.sensors[self.index].history
+                history = agent.get_sensors().sensors[self.index].history
                 plt.subplot(len(self.world.highlighted_set), 1, i + 1)
                 x = [self.world.total_steps - len(history) + i for i in range(len(history))]
                 plt.plot(x, history, color=tuple([c / 255 for c in agent.body_color]))

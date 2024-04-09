@@ -1,4 +1,4 @@
-from ..behavior.AgentsAtGoal import AgentsAtGoal
+from ..behavior.AgentsAtGoal import AgentsAtGoal, PercentageAtGoal
 from ..behavior.AverageSpeed import AverageSpeedBehavior
 from ..behavior.AlgebraicConnectivity import AlgebraicConn
 from ..behavior.ScatterBehavior import ScatterBehavior
@@ -43,5 +43,7 @@ class BehaviorFactory:
         #     return SensorRotation(history=d["history_size"])
         elif d["name"] == "Total_Collisions":
             return TotalCollisionsBehavior(history=d["history_size"])
+        elif d["name"].endswith("at_goal"):
+            return PercentageAtGoal(history=d["history_size"], percentage=d["percentage"])
         else:
             raise Exception(f"Cannot Construct Behavior of Type {d['name']}")

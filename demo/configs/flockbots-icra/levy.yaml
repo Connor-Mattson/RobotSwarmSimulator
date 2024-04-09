@@ -1,0 +1,14 @@
+---
+type: "Levy"
+base: "./goalbot.yaml"
+levy_constant: 0.6
+forward_rate: 1.0
+turning_rate: 0.261799
+body_color:
+  - 255
+  - 255
+  - 0
+body_filled: true
+stop_at_goal: false  # Don't stop when the agent is in the goal region...
+stop_on_goal_detect: true  # ...stop when the agent DETECTS the goal
+curve_based: true

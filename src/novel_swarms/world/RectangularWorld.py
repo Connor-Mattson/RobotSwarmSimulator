@@ -13,6 +13,7 @@ from .World import World
 from ..util.timer import Timer
 from ..util.collider.AABB import AABB
 from .goals.Goal import CylinderGoal
+from .objects.Wall import Wall
 
 
 def distance(pointA, pointB) -> float:
@@ -43,6 +44,7 @@ class RectangularWorld(World):
             random.seed(config.seed)
 
         self.heterogeneous = False
+
         if isinstance(config.agentConfig, HeterogeneousSwarmConfig):
             self.population = config.agentConfig.build_agent_population()
             self.heterogeneous = True
@@ -50,6 +52,18 @@ class RectangularWorld(World):
         else:
             self.population = [
                 AgentFactory.create(config.agentConfig, name=f"{i}") for i in range(int(self.population_size))
+            ]
+
+        # Attach Walls to sensors
+        # TODO: Better software engineering here
+        if config.detectable_walls:
+            from ..sensors.BinaryFOVSensor import BinaryFOVSensor
+
+            self.objects += [
+                Wall(self, self.padding - 1, self.padding - 1, 1, self.config.h),
+                Wall(self, self.padding - 1, self.padding - 1, self.config.w, 1),
+                Wall(self, self.padding - 1, self.padding + self.config.h + 1, self.config.w, 1),
+                Wall(self, self.padding + self.config.h + 1, self.padding - 1, 1, self.config.h),
             ]
 
         ac = config.agentConfig
@@ -68,21 +82,21 @@ class RectangularWorld(World):
                     # noise_x = 0
                     # noise_y = 0
                     # noise_theta = 0
-                    self.population[i].x_pos = init[0] + noise_x
-                    self.population[i].y_pos = init[1] + noise_y
+                    self.population[i].set_x_pos(init[0] + noise_x)
+                    self.population[i].set_y_pos(init[1] + noise_y)
                     if len(init) > 2:
                         self.population[i].angle = init[2] + noise_theta
 
             elif self.heterogeneous:
                 for agent in self.population:
-                    agent.x_pos = random.uniform(math.floor(0 + agent.radius), math.floor(self.bounded_width - agent.radius))
-                    agent.y_pos = random.uniform(math.ceil(0 + agent.radius), math.floor(self.bounded_height - agent.radius))
+                    agent.set_x_pos(random.uniform(math.floor(0 + agent.radius), math.floor(self.bounded_width - agent.radius)))
+                    agent.set_y_pos(random.uniform(math.ceil(0 + agent.radius), math.floor(self.bounded_height - agent.radius)))
                     agent.angle = random.random() * 2 * math.pi
 
             elif ac.x is None and config.seed is not None:
                 for agent in self.population:
-                    agent.x_pos = random.uniform(0 + ac.agent_radius, ac.world.w - ac.agent_radius)
-                    agent.y_pos = random.uniform(0 + ac.agent_radius, ac.world.h - ac.agent_radius)
+                    agent.set_x_pos(random.uniform(0 + ac.agent_radius, ac.world.w - ac.agent_radius))
+                    agent.set_y_pos(random.uniform(0 + ac.agent_radius, ac.world.h - ac.agent_radius))
                     agent.angle = random.random() * 2 * math.pi
 
         for i in range(len(self.objects)):
@@ -90,7 +104,7 @@ class RectangularWorld(World):
 
         # Assign Agents Identifiers
         for i, agent in enumerate(self.population):
-            agent.name = str(i)
+            agent.set_name(str(i))
 
         self.behavior = config.behavior
         for b in self.behavior:
@@ -149,7 +163,7 @@ class RectangularWorld(World):
         for agent in self.population:
             if not issubclass(type(agent), Agent):
                 raise Exception("Agents must be subtype of Agent, not {}".format(type(agent)))
-            if distance(center, (agent.x_pos, agent.y_pos)) < r:
+            if distance(center, (agent.get_x_pos(), agent.get_y_pos())) < r:
                 if agent != excluded:
                     filtered_agents.append(agent)
         return filtered_agents
@@ -178,24 +192,24 @@ class RectangularWorld(World):
         """
         padding = self.padding
 
-        old_x, old_y = agent.x_pos, agent.y_pos
+        old_x, old_y = agent.get_x_pos(), agent.get_y_pos()
 
         # Prevent Left Collisions
-        agent.x_pos = max(agent.radius + padding, agent.x_pos)
+        agent.set_x_pos(max(agent.radius + padding, agent.get_x_pos()))
 
         # Prevent Right Collisions
-        agent.x_pos = min((self.bounded_width - agent.radius - padding), agent.x_pos)
+        agent.set_x_pos(min((self.bounded_width - agent.radius - padding), agent.get_x_pos()))
 
         # Prevent Top Collisions
-        agent.y_pos = max(agent.radius + padding, agent.y_pos)
+        agent.set_y_pos(max(agent.radius + padding, agent.get_y_pos()))
 
         # Prevent Bottom Collisions
-        agent.y_pos = min((self.bounded_height - agent.radius - padding), agent.y_pos)
+        agent.set_y_pos(min((self.bounded_height - agent.radius - padding), agent.get_y_pos()))
 
         # agent.angle += (math.pi / 720)
         self.handleWallCollisions(agent)
 
-        if agent.x_pos != old_x or agent.y_pos != old_y:
+        if agent.get_x_pos() != old_x or agent.get_y_pos() != old_y:
             return True
         return False
 
@@ -204,15 +218,15 @@ class RectangularWorld(World):
             if isinstance(goal, CylinderGoal):
                 correction = agent.build_collider().collision_then_correction(goal.get_collider())
                 if correction is not None:
-                    agent.x_pos += correction[0]
-                    agent.y_pos += correction[1]
+                    agent.set_x_pos(agent.get_x_pos() + correction[0])
+                    agent.set_y_pos(agent.get_y_pos() + correction[1])
 
     def handleWallCollisions(self, agent: DifferentialDriveAgent):
         # Check for distances between the agent and the line segments
         in_collision = False
         for obj in self.objects:
             segs = obj.get_sensing_segments()
-            c = (agent.x_pos, agent.y_pos)
+            c = (agent.get_x_pos(), agent.get_y_pos())
             for p1, p2 in segs:
                 # From https://stackoverflow.com/questions/24727773/detecting-rectangle-collision-with-a-circle
                 x1, y1 = p1
@@ -240,17 +254,17 @@ class RectangularWorld(World):
 
                 if dist < agent.radius:
                     in_collision = True
-                    agent.y_pos -= np.sign(dy) * (agent.radius - abs(dy) + 1)
-                    agent.x_pos -= np.sign(dx) * (agent.radius - abs(dx) + 1)
+                    agent.set_y_pos(agent.get_y_pos() - (np.sign(dy) * (agent.radius - abs(dy) + 1)))
+                    agent.set_x_pos(agent.get_x_pos() - (np.sign(dx) * (agent.radius - abs(dx) + 1)))
 
                 # dx = x - x3 - agent.radius
                 # if dx < 0:
                 #     in_collision = True
-                #     agent.x_pos -= dx
+                #     agent.set_x_pos(agent.get_x_pos() - dx)
                 # dy = y - y3 - agent.radius
                 # if dy < 0:
                 #     in_collision = True
-                #     agent.y_pos -= dy
+                #     agent.set_y_pos(agent.get_y_pos() - dy)
 
         return in_collision
 
@@ -302,12 +316,12 @@ class RectangularWorld(World):
                     direction = 1
                     if random.random() > 0.5:
                         direction = -1
-                    agent.x_pos += random.random() * direction * MAGNITUDE
+                    agent.set_x_pos(agent.get_x_pos() + (random.random() * direction * MAGNITUDE))
 
                     direction = 1
                     if random.random() > 0.5:
                         direction = -1
-                    agent.y_pos += random.random() * direction * MAGNITUDE
+                    agent.set_y_pos(agent.get_y_pos() + (random.random() * direction * MAGNITUDE))
 
                     agent_center = agent.getPosition()
                     center_distance = distance(agent_center, colliding_agent.getPosition())
@@ -323,8 +337,8 @@ class RectangularWorld(World):
                 if math.isnan(delta_x) or math.isnan(delta_y):
                     break
 
-                agent.x_pos += delta_x
-                agent.y_pos += delta_y
+                agent.set_x_pos(agent.get_x_pos() + delta_x)
+                agent.set_y_pos(agent.get_y_pos() + delta_y)
                 agent_center = agent.getPosition()
 
             neighborhood = self.getNeighborsWithinDistance(agent_center, minimum_distance, excluded=agent)
@@ -373,7 +387,6 @@ class RectangularWorld(World):
         return False
 
     def handle_key_press(self, event):
-
         for a in self.population:
             a.on_key_press(event)
 
@@ -405,8 +418,8 @@ class RectangularWorld(World):
             for agent in self.human_controlled:
                 i = self.population.index(agent)
                 new_bot = DifferentialDriveAgent(agent.config)
-                new_bot.x_pos = agent.x_pos
-                new_bot.y_pos = agent.y_pos
+                new_bot.x_pos = agent.get_x_pos()
+                new_bot.y_pos = agent.get_y_pos()
                 new_bot.angle = agent.angle
                 self.population[i] = new_bot
             self.human_controlled = []

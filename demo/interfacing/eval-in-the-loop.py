@@ -2,16 +2,21 @@
 Example Script
 The SwarmSimulator allows control of the world and agents at every step within the main loop
 """
+import math
+import random
+import numpy as np
 import random
 
 # Import Agent embodiments
 from src.novel_swarms.config.AgentConfig import *
+from src.novel_swarms.config.HeterogenSwarmConfig import HeterogeneousSwarmConfig
+from src.novel_swarms.agent.MazeAgent import MazeAgent
 
 # Import FOV binary sensor
 from src.novel_swarms.sensors.BinaryFOVSensor import BinaryFOVSensor
 
 # Import Rectangular World Data, Starting Region, and Goal Region
-from src.novel_swarms.config.WorldConfig import RectangularWorldConfig
+from src.novel_swarms.config.WorldConfig import RectangularWorldConfig, WorldYAMLFactory
 from src.novel_swarms.world.goals.Goal import CylinderGoal
 from src.novel_swarms.world.initialization.RandomInit import RectRandomInitialization
 
@@ -21,73 +26,89 @@ from src.novel_swarms.world.subscribers.WorldSubscriber import WorldSubscriber
 # Import the simulation loop
 from src.novel_swarms.world.simulate import main as simulator
 
+# Import the Behavior Measurements (Metrics) that can measure the agents over time
+from src.novel_swarms.behavior import *
+
+# Import the custom Controller Class
+from src.novel_swarms.agent.control.Controller import Controller
+
+# import numpy as np
+SEED = 20
+# np.random.seed(SEED)
+# random.seed(SEED)
+
+
+# Seeding for initial Starting positions, FP/FN Readings.
+SCALE = 10  # Set the conversion factor for Body Lengths to pixels (all metrics will be scaled appropriately by this value)
+N, T = 10, 1000  # Number of agents, N, and timestep limit, T.
+
+
+def custom_controller(agent: MazeAgent):
+    """
+    An example of a "from scratch" controller that you can code with any information contained within the agent class
+    """
+    sigma = agent.goal_seen  # Whether the goal has been detected previously by this agent
+    gamma = agent.agent_in_sight is not None  # Whether the agent detects another agent
+
+    u_1, u_2 = 0.0, 0.0  # Set these by default
+    if not sigma:
+        if not gamma:
+            u_1, u_2 = 1.0 * SCALE, 1.0  # u_1 in pixels/second (BL/sec * SCALE), u_2 in rad/s
+        else:
+            u_1, u_2 = 1.0 * SCALE, -1.0  # u_1 in pixels/second (BL/sec * SCALE), u_2 in rad/s
+    else:
+        u_1, u_2 = 0.0, 0.0  # u_1 in pixels/second (see b2p func), u_2 in rad/s
+    return u_1, u_2
 
 def configure_robots():
     """
     Select the Robot's Sensors and Embodiment, return the robot configuration
     """
-    sensors = SensorSet([
-        BinaryFOVSensor(
-            theta=18,  # Angle of Vision / 2
-            degrees=True,  # Indicate that the fov is defined in degrees, not radians
-            distance=80, # Detection Distance, in pixels
-            show=True, # Whether to show the sensor in the simulator
-            detect_goal_with_added_state=True,
-        )
-    ])
+    # Import the Goal Agent data from YAML
+    goal_seeking_robot = AgentYAMLFactory.from_yaml("../../demo/configs/flockbots-icra/goalbot.yaml")
+    goal_seeking_robot.rescale(SCALE)
 
-    goal_seeking_robot = MazeAgentConfig(
-        sensors=sensors, # Attach the previously defined sensors to the agent
-        # Here, the controller is of the form [v_0, omega_0, v_1, omega_0, ...]
-        controller = [0.5, 0.5, 0.5, 0.5], # Assign a homogeneous controller to the agents (This can be changed at runtime)
-        agent_radius=4, # Body radius, in pixels
-        stop_at_goal=False, # Don't automatically stop this robot when within goal region
-        dt=0.13, # Timestep value
-        body_filled=True  # Color in the body
-    )
+    # Import the flockbot data from YAML
+    normal_flockbot = AgentYAMLFactory.from_yaml("../../demo/configs/flockbots-icra-milling/flockbot.yaml")
+    # normal_flockbot.controller = Controller(custom_controller)
+    normal_flockbot.controller = Controller([10.21016141691062,0.34394605572151926,9.90100680343106,0.10310121227494662])
+    normal_flockbot.seed = SEED
 
-    return goal_seeking_robot
+    # Uncomment to remove FN/FP from agents (Testing)
+    # normal_flockbot.sensors.sensors[0].fn = 0.0
+    # normal_flockbot.sensors.sensors[0].fp = 0.0
+
+    normal_flockbot.rescale(SCALE)  # Convert all the BodyLength measurements to pixels in config
+    return normal_flockbot
 
 
-def configure_env(robot_config, size=(500, 500), num_agents=20):
-    """
-    Select the World for the robots to interact in. Define the start region and goal region.
-    
-    Params:
-    - robot_config: A robot configuration model (see configure_robots func)
-    - size (optional, default: (500, 500)): A two-element tuple containing the WIDTH, HEIGHT of the world, in pixels
-    - num_agents (optional, default: 20): The number of agents to instantiate in the environment
+def establish_goal_metrics():
+    metric_0 = PercentageAtGoal(0.01)  # Record the time (timesteps) at which 1% of the agents found the goal
+    metric_A = PercentageAtGoal(0.5)  # Record the time (timesteps) at which 50% of the agents found the goal
+    metric_B = PercentageAtGoal(0.75)  # Record the time (timesteps) at which 75% of the agents found the goal
+    metric_C = PercentageAtGoal(0.90)  # Record the time (timesteps) at which 90% of the agents found the goal
+    metric_D = PercentageAtGoal(1.00)  # Record the time (timesteps) at which 100% of the agents found the goal
+    metric_E = AgentsAtGoal()  # Record the number of Agents in the Goal Region
+    return [metric_0, metric_A, metric_B, metric_C, metric_D, metric_E]
 
-    Return: The World Configuration Data
-    """
+def establish_milling_metrics():
+    # TODO: Update this value with Kevin's Formulation
+    # circliness = RadialVarianceBehavior()
+    # circliness = Circliness(history=450)
+    circliness = Circliness(avg_history_max=450)
+    return [circliness, TotalCollisionsBehavior()]
 
-    SEED = None # You may configure a world seed
+def configure_env(robot_config, num_agents=20, seed=None):
+    # search_and_rendezvous_world = WorldYAMLFactory.from_yaml("demo/configs/flockbots-icra/world.yaml")
 
-    # Randomly Assign Agents to a x, y, $/theta$ orientation within the specified bounding box
-    starting_region = RectRandomInitialization(
-        num_agents=num_agents,
-        bb=((50, 350), (150, 450)) # Spawn Bounding Box
-    )
-
-    # Create a Goal for the Agents to find
-    goal_region = CylinderGoal(
-        x=400, # Center X, in pixels
-        y=100, # Center y, in pixels
-        r=8.5, # Radius of physical cylinder object
-        range=40.0  # Range, in pixels, at which agents are "counted" as being at the goal
-    )
-
-    # Create the World for the Agents to interact in
-    env = RectangularWorldConfig(
-        size=size,
-        agentConfig=robot_config,
-        n_agents=num_agents,
-        seed=SEED,
-        init_type=starting_region,  # A starting region where agents will spawn at t=0
-        goals=[goal_region]  # A list of goals for the robots to find
-    )
-
-    return env
+    # Import the world data from YAML
+    world = WorldYAMLFactory.from_yaml("../../demo/configs/flockbots-icra-milling/world.yaml")
+    # world.seed = seed
+    world.addAgentConfig(robot_config)
+    world.population_size = num_agents
+    world.factor_zoom(SCALE)
+    world.behavior = establish_milling_metrics()
+    return world
 
 # Get a random controller
 def get_random_controller():
@@ -108,33 +129,43 @@ def callback(world, screen):
     """
 
     # Example: READ all agents (x, y, theta) positions.
-    positions = [(agent.x_pos, agent.y_pos, agent.angle) for agent in world.population]
+    # positions = [(agent.x_pos, agent.y_pos, agent.angle) for agent in world.population]
 
     # Example: READ (Calculate) the number of agents at goal:
-    num_at_goal = sum([int(world.goals[0].agent_achieved_goal(agent)) for agent in world.population])
+    # num_at_goal = sum([int(world.goals[0].agent_achieved_goal(agent)) for agent in world.population])
 
     # print(positions[0])
     # print(num_at_goal)
 
     # Example: WRITE random controllers to all agents every frame
-    for agent in world.population:
-        agent.controller = get_random_controller()
+    # for agent in world.population:
+    #     agent.controller = get_random_controller()
 
     # Example: WRITE (Change) all agents to be a new shade of red every frame
-    new_color = (int((random.random() * 200) + 55), 0, 0)
-    for agent in world.population:
-        agent.body_color = new_color
+    # new_color = (int((random.random() * 200) + 55), 0, 0)
+    # for agent in world.population:
+    #     agent.body_color = new_color
 
+
+def stop_on_collision(world):
+    if world.behavior[1].out_average()[1] > 20:
+        return True
+    return False
 
 # Main Function
 if __name__ == "__main__":
-    robot_config = configure_robots()
-    world_config = configure_env(robot_config=robot_config, num_agents=20)
-    world_subscriber = WorldSubscriber(func=callback)
+    robot_conf = configure_robots()
+    world_conf = configure_env(robot_config=robot_conf, num_agents=N, seed=SEED)
+    world_conf.stop_at = 1000
+    # world_subscriber = WorldSubscriber(func=callback)
 
-    print(robot_config)
+    # print(robot_config)
 
-    simulator(
-        world_config=world_config,
-        subscribers=[world_subscriber]
+    world_output = simulator(
+        world_config=world_conf,
+        # subscribers=[world_subscriber],
+        show_gui=True,
+        save_every_ith_frame=2,
+        save_duration=1000,
+        # stop_detection=stop_on_collision
     )

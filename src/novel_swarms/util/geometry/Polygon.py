@@ -12,6 +12,11 @@ class Polygon:
         self.boundary.append(point)
 
     def draw(self, screen, color=(255, 255, 255), width=1):
+        if len(self.boundary) == 1:
+            pygame.draw.circle(screen, color, (self.boundary[0].x, self.boundary[0].y), radius=width // 2)
+            return
+        elif len(self.boundary) == 0:
+            return
         pygame.draw.polygon(screen, color, [(p.x, p.y) for p in self.boundary], width=width)
 
     def __getitem__(self, item):
