@@ -164,3 +164,7 @@ class WorldYAMLFactory:
             raise Exception(f"Unknown World type: {config['type']}")
 
 
+
+class PhysicsRectangularWorldConfig(RectangularWorldConfig):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)

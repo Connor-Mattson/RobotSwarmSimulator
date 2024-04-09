@@ -35,6 +35,7 @@ pkginfo==1.9.6
 pycparser==2.21
 pygame==2.1.2
 Pygments==2.15.1
+pymunk==6.6.0
 pyparsing==3.0.9
 pyproject_hooks==1.0.0
 PyQt5==5.15.9
