@@ -7,3 +7,5 @@ class WorldFactory:
     def create(config):
         if isinstance(config, RectangularWorldConfig):
             return RectangularWorld(config=config)
+        if isinstance(config, RectangularWorldConfig):
+            return RectangularWorld(config=config)

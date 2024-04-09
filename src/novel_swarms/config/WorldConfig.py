@@ -124,3 +124,7 @@ class RectangularWorldConfig:
             agent_initialization=d["agent_init"]
         )
 
+
+class PhysicsRectangularWorldConfig(RectangularWorldConfig):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
