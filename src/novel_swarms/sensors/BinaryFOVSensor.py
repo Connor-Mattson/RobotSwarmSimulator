@@ -22,6 +22,7 @@ class BinaryFOVSensor(AbstractSensor):
                  wall_sensing_range=10,
                  time_step_between_sensing=1,
                  store_history=False,
+                 history_limit=100,
                  detect_goal_with_added_state=False,
                  show=True,
                  seed=None
@@ -39,6 +40,7 @@ class BinaryFOVSensor(AbstractSensor):
         self.time_since_last_sensing = 0
         self.history = []
         self.store_history = store_history
+        self.history_limit = history_limit
         self.use_goal_state = detect_goal_with_added_state
         self.goal_sensing_range = goal_sensing_range
         self.show = show
@@ -113,7 +115,7 @@ class BinaryFOVSensor(AbstractSensor):
         # Detect Other Agents
         for agent in bag:
             u = agent.getPosition() - sensor_origin
-            d = self.circle_interesect_sensing_cone(u, self.parent.radius if self.detect_edges else 0.1)
+            d = self.circle_interesect_sensing_cone(u, self.parent.radius if self.detect_edges else 1e-5)
             if d is not None:
                 consideration_set.append((d, agent))
 
@@ -220,6 +222,7 @@ class BinaryFOVSensor(AbstractSensor):
                 self.history.append(int(self.parent.agent_in_sight.name))
             else:
                 self.history.append(-1)
+            self.history = self.history[-self.history_limit:]
 
     def draw(self, screen):
         super(BinaryFOVSensor, self).draw(screen)
@@ -270,20 +273,21 @@ class BinaryFOVSensor(AbstractSensor):
 
             # u, defined earlier is the vector from the point of interest to the center of the circle
             # Project u onto e_left and e_right
-            u_l = np.dot(u, e_left) * e_left
-            u_r = np.dot(u, e_right) * e_right
+            if not self.detect_edges:
+                u_l = np.dot(u, e_left) * e_left
+                u_r = np.dot(u, e_right) * e_right
 
-            # Determine the minimum distance between the agent's center (center of circle) and the projected vector
-            dist_l = np.linalg.norm(u - u_l)
-            dist_r = np.linalg.norm(u - u_r)
+                # Determine the minimum distance between the agent's center (center of circle) and the projected vector
+                dist_l = np.linalg.norm(u - u_l)
+                dist_r = np.linalg.norm(u - u_r)
 
-            radius = r  # Note: Assumes homogenous radius
-            if dist_l < radius:
-                d_to_inter = np.linalg.norm(u)
-                return d_to_inter
-            if dist_r < radius:
-                d_to_inter = np.linalg.norm(u)
-                return d_to_inter
+                radius = r  # Note: Assumes homogenous radius
+                if dist_l < radius:
+                    d_to_inter = np.linalg.norm(u)
+                    return d_to_inter
+                if dist_r < radius:
+                    d_to_inter = np.linalg.norm(u)
+                    return d_to_inter
         return None
 
     def getDistance(self, a, b):

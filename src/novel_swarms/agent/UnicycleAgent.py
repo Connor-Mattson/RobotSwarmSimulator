@@ -171,7 +171,7 @@ class UnicycleAgent(Agent):
         if self.stop_on_collision:
             self.collider = AngleSensitiveCC(self.x_pos, self.y_pos, self.radius, self.angle, self.get_action(), sensitivity=45)
         else:
-            self.collider = CircularCollider(self.x_pos, self.y_pos, self.radius, self.dx, self.dy, parent=self)
+            self.collider = CircularCollider(self.x_pos, self.y_pos, self.radius)
         return self.collider
 
     def draw(self, screen) -> None:

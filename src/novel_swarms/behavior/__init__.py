@@ -13,6 +13,7 @@ from .TotalCollisions import TotalCollisionsBehavior
 from .RadialVariance import RadialVarianceBehavior
 from .Circliness import Circliness
 from .SubBehaviors import SubBehaviors
+from .SensorSignal import SensorSignalBehavior
 
 __all__ = [
     "AbstractBehavior",
@@ -23,6 +24,7 @@ __all__ = [
     "AngularMomentumBehavior",
     "SensorRotation",
     "ScatterBehavior",
+    "SensorSignalBehavior",
     "GroupRotationBehavior",
     "DistanceToGoal",
     "PercentageAtGoal",

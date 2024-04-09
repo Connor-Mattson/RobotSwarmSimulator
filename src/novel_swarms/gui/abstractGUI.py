@@ -27,6 +27,12 @@ class AbstractGUI:
     def set_screen(self, screen):
         self.screen = screen
 
+    def set_world(self, world):
+        pass
+
+    def set_time(self, time):
+        pass
+
     def step(self):
         pass
 

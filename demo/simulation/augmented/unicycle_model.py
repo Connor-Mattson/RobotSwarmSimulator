@@ -30,7 +30,7 @@ if __name__ == "__main__":
     # Note that in Vega et al. v_0 = v_1, w_0 = -w_1
 
     # CUSTOM_CONTROLLER = [17.5, 0.25, 17.5, -0.25]  # Dispersion
-    # CUSTOM_CONTROLLER = [12.5, 0.5, 12.5, -0.5]  # Stable Milling
+    CUSTOM_CONTROLLER = [12.5, 0.5, 12.5, -0.5]  # Stable Milling
     # CUSTOM_CONTROLLER = [17.5, 1.25, 17.5, -1.25]  # Semi-Stable Milling
     # CUSTOM_CONTROLLER = [2.5, 2.0, 2.5, -2.0]  # Colliding Unstable
     # CUSTOM_CONTROLLER = [4.5, 0.3, -3, 0.4]  # Our Dispersal Gene
@@ -50,7 +50,7 @@ if __name__ == "__main__":
     # CUSTOM_CONTROLLER = [8.0, -0.9, 15.0, 0.1]  # Milling/Cyclic
     # CUSTOM_CONTROLLER = [-1.7, 0.2, 0.0, 0.2]
 
-    CUSTOM_CONTROLLER = [7.5, 0.2, 7.5, -0.2]
+    # CUSTOM_CONTROLLER = [7.5, 0.2, 7.5, -0.2]
 
     # CUSTOM_CONTROLLER = [20.0, -1.6, 20.0, 1.2]
 
@@ -108,7 +108,7 @@ if __name__ == "__main__":
         padding=GUI_PADDING,
         collide_walls=False,
         show_walls=True,
-        agent_initialization=init_positions,
+        # agent_initialization=init_positions,
         stop_at=EVAL_TIL,
     )
 

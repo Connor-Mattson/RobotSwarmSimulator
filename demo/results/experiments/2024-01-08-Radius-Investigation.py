@@ -24,14 +24,17 @@ import matplotlib.pyplot as plt
 
 SCALE = 10
 
-def gene_to_world(n_agents, fov_angle, w=30, v=1.0, horizon=2000, seed=0):
+def m2BL(m):
+    return m / 0.15
 
+def gene_to_world(n_agents, fov_angle, w=30, v=1.0, gamma=10, horizon=2000, seed=0, dt=0.13):
     goal_agent = AgentYAMLFactory.from_yaml("demo/configs/swarm-mechanics/flockbot.yaml")
     goal_agent.controller = HomogeneousController([v * SCALE, -np.radians(w), v * SCALE, np.radians(w)])
     goal_agent.sensors.sensors[0].theta = np.radians(fov_angle / 2)
-
+    goal_agent.sensors.sensors[0].r = gamma
     goal_agent.sensors.sensors[0].detect_edges = False
     goal_agent.seed = 0
+    goal_agent.dt = dt
     goal_agent.rescale(SCALE)
 
     world = WorldYAMLFactory.from_yaml("demo/configs/swarm-mechanics/world.yaml")
@@ -42,23 +45,28 @@ def gene_to_world(n_agents, fov_angle, w=30, v=1.0, horizon=2000, seed=0):
         # RadialVarianceBehavior(),
         # ScatterBehavior(),
         # GroupRotationBehavior(),
-        AlgebraicConn(history=1, r_disk_size=10 * SCALE),
-        AlgebraicConn(history=500, r_disk_size=10 * SCALE),
-        # AlgebraicConn(history=500, r_disk_size=10 * SCALE, track_components=True),
-        SubBehaviors(r_disk_size=10*SCALE, behavior_classes=[
-            AverageSpeedBehavior(history=1),
-            AngularMomentumBehavior(history=1),
-            RadialVarianceBehavior(history=1),
-            ScatterBehavior(history=1),
-            GroupRotationBehavior(history=1),
-        ]),
-        ScatterBehavior(regularize=False, history=100),
+        # AlgebraicConn(history=1, r_disk_size=10 * SCALE),
+        # AlgebraicConn(history=500, r_disk_size=10 * SCALE),
+        AlgebraicConn(history=500, r_disk_size=10 * SCALE, track_components=True),
+        # SubBehaviors(r_disk_size=10*SCALE, behavior_classes=[
+        #     AverageSpeedBehavior(history=1),
+        #     AngularMomentumBehavior(history=1),
+        #     RadialVarianceBehavior(history=1),
+        #     ScatterBehavior(history=1),
+        #     GroupRotationBehavior(history=1),
+        #     Circliness(history=1),
+        # ]),
+        Circliness(),
+        ScatterBehavior(regularize=False, history=horizon, multiplier=1.5),
         # ScatterBehavior(regularize=False, history=20000),
         # TotalCollisionsBehavior(),
     ]
     world.population_size = n_agents
     world.stop_at = horizon
-    world.init_type = NGonInitialization(n_agents, radius=47.95/15)
+
+    # Smallest Radius Possible
+    r = 1 / (2 * np.sin(np.pi / n_agents))
+    world.init_type = NGonInitialization(n_agents, radius=r)
 
     world.factor_zoom(zoom=SCALE)
     world.addAgentConfig(goal_agent)
@@ -73,10 +81,12 @@ def gene_to_world(n_agents, fov_angle, w=30, v=1.0, horizon=2000, seed=0):
 def simulate():
     exp = Experiment("../out", "mechanics-radius")
 
-    N, PHI = 20, 18
+    N, PHI = 10, 36.0
     OMEGA = 30
     V = 1.0
-    w = gene_to_world(N, PHI, OMEGA, V, None, seed=0)
+    GAMMA = m2BL(1.5)
+    DT = 0.13
+    w = gene_to_world(N, PHI, OMEGA, V, GAMMA, None, seed=0, dt=DT)
     w_out = sim(w, show_gui=True)
 
     exp.write_metadata(
@@ -85,52 +95,40 @@ def simulate():
             "phi": PHI,
             "V" : V,
             "omega": OMEGA,
+            "gamma": GAMMA,
+            "dt": DT
         }
     )
     exp.write_array(w_out.behavior[-1].value_history, "radius_hist.txt")
 
 def plot_data():
 
-    FILE = "../out/mechanics-radius-11/radius_hist.txt"
-    nparr_1 = np.loadtxt(FILE)[0:]
-    nparr_1 *= 1.5
+    FILE = "../out/mechanics-radius-7/radius_hist.txt"
+
+    y_arr_1 = np.loadtxt(FILE)[0:]
+    x_arr_1 = np.array(list(range(len(y_arr_1)))) * 0.05
 
     FILE = "../out/mechanics-radius-4/radius_hist.txt"
-    nparr_2 = np.loadtxt(FILE)[0:]
-    nparr_2 *= 1.5
 
-    FILE = "../out/mechanics-radius-5/radius_hist.txt"
-    nparr_3 = np.loadtxt(FILE)[0:]
-    nparr_3 *= 1.5
+    y_arr_2 = np.loadtxt(FILE)[0:][:5000]
+    x_arr_2 = np.array(list(range(len(y_arr_2)))) * 0.13
 
-    FILE = "../out/mechanics-radius-6/radius_hist.txt"
-    nparr_4 = np.loadtxt(FILE)[0:]
-    nparr_4 *= 1.5
+    FILE = "../out/mechanics-radius-10/radius_hist.txt"
+    y_arr_3 = np.loadtxt(FILE)[0:]
+    x_arr_3 = np.array(list(range(len(y_arr_3)))) * 0.015
 
-    FILE = "../out/mechanics-radius-7/radius_hist.txt"
-    nparr_5 = np.loadtxt(FILE)[0:]
-    nparr_5 *= 1.5
+    FILE = "../out/mechanics-radius-11/radius_hist.txt"
+    y_arr_4 = np.loadtxt(FILE)[0:]
+    x_arr_4 = np.array(list(range(len(y_arr_4)))) * 0.002
 
-    # FILE = "../out/mechanics-radius-10/radius_hist.txt"
-    # nparr_6 = np.loadtxt(FILE)[500:]
-    # nparr_6 *= 1.5
-
-    t_arr = np.array(list(range(0, len(nparr_2))), dtype=float)
-    t_arr *= 0.13
-
-    t_arr_2 = np.array(list(range(0, len(nparr_1))), dtype=float)
-    t_arr_2 *= 0.02
-
-    plt.plot(t_arr, nparr_2, label="n=6, $\phi$=60")
-    plt.plot(t_arr, nparr_4, label="n=8, $\phi$=45")
-    plt.plot(t_arr, nparr_3, label="n=12, $\phi$=30")
-    plt.plot(t_arr, nparr_5, label="n=15, $\phi$=24")
-    plt.plot(t_arr_2, nparr_1, label="n=20, $\phi$=18")
-    # plt.plot(t_arr_2, nparr_6, label="n=24, $\phi$=15")
+    plt.plot(x_arr_4, y_arr_4, label="dt=0.002")
+    plt.plot(x_arr_3, y_arr_3, label="dt=0.015")
+    plt.plot(x_arr_1, y_arr_1, label="dt=0.05")
+    plt.plot(x_arr_2, y_arr_2, label="dt=0.13")
 
     plt.xlabel("Time (s)")
     plt.ylabel("Milling Radius (cm)")
-    plt.title("Milling Radius over Time (varying N, seed=0)")
+    plt.title("Milling Radius for N=10 agents as dt changes")
     plt.legend()
     plt.show()
 

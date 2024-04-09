@@ -6,7 +6,7 @@ class NGonInitialization(AbstractInitialization):
     """
     NGonInitialization: Initialize all agents at the vertices of a perfect n-gon
     """
-    def __init__(self, n, radius, center=None):
+    def __init__(self, n, radius, center=None, disturbance_stddev=0):
         super().__init__()
         if center is None:
             center = [50, 50]
@@ -15,12 +15,15 @@ class NGonInitialization(AbstractInitialization):
         self.scale = 1
         self.scaled = False
         self.center = center
+        self.deviation = disturbance_stddev
         self.positions = self.getPositions()
+        self.seed = None
 
     def rescale(self, zoom_factor):
         self.scale = zoom_factor
         self.center[0] *= zoom_factor
         self.center[1] *= zoom_factor
+        self.deviation *= zoom_factor
         if not self.scaled:
             for line in self.positions:
                 line[0] *= zoom_factor
@@ -48,7 +51,16 @@ class NGonInitialization(AbstractInitialization):
         for n in range(self.n):
             x = (np.cos(circle_angle) * self.r) + self.center[0]
             y = (np.sin(circle_angle) * self.r) + self.center[1]
+
+            x += float(np.random.normal(0, self.deviation))
+            y += float(np.random.normal(0, self.deviation))
+
             theta = circle_angle - (np.pi / 2)
             positions.append([x, y, theta])
             circle_angle += angle_offset
         return positions
+
+    def reseed(self, seed):
+        self.seed = seed
+        np.random.seed(self.seed)
+        self.positions = self.getPositions()

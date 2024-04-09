@@ -124,6 +124,12 @@ class SubBehaviors(AbstractBehavior):
             poly = Polygon(points)
             self.polygon_set.append(poly)
 
+        # Cluster, if possible
+        for i in range(len(self.polygon_set)):
+            b_vec = [round(self.sub_behaviors[i][j][1], 3) for j in range(len(self.behavior_classes))]
+            subswarm_class = self.classify_from_clusters(b_vec)
+            self.sub_swarm_classes.append(subswarm_class)
+
     def draw(self, screen):
         if self.to_draw:
 
@@ -134,8 +140,7 @@ class SubBehaviors(AbstractBehavior):
             }
 
             for i, poly in enumerate(self.polygon_set):
-                b_vec = [round(self.sub_behaviors[i][j][1], 3) for j in range(len(self.behavior_classes))]
-                poly_class = self.classify_from_clusters(b_vec)
+                poly_class = self.sub_swarm_classes[i]
                 class_name_color = {
                     0: ("C", (27, 134, 161)),
                     1: ("B", (246, 150, 198)),

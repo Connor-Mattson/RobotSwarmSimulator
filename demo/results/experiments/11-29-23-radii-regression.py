@@ -117,18 +117,18 @@ def function_combined_root_cs(X, bias, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, 
 
 
 def preprocess_data(df):
-    df_parsed = df.loc[df["fov"] < 360 / df["n"]]
+    df = df.loc[df["n"] <= 16]
+    df_parsed = df.loc[df["fov"] <= (360 / df["n"])]
+    df_parsed = df_parsed.loc[df_parsed["circliness"] > 0.95]
     if CROSS_SECTION_ONLY:
         df_parsed = df_parsed.loc[df_parsed["v"] == 1.0]
         df_parsed = df_parsed.loc[df_parsed["omega"] == 30.0]
+    print(f"Reduced Datasize from {len(df)} to {len(df_parsed)}")
 
-    y_truth = df_parsed["radius"].to_numpy()
-
-    if CROSS_SECTION_ONLY:
-        X = df_parsed.loc[:, "n":"fov"].to_numpy()
-    else:
-        X = df_parsed.loc[:, "n":"v"].to_numpy()
+    y_truth = df_parsed["radius"].to_numpy() * 1.5  # Convert from px to cm
+    X = df_parsed.loc[:, "n":"v"].to_numpy()
     X = np.swapaxes(X, 0, 1)
+    # print(f"Reduced Datasize from {len(df)} to {len(X)}")
     return X, y_truth
 
 def build_truth_dictionary(X, y_truth):
@@ -140,8 +140,9 @@ def build_truth_dictionary(X, y_truth):
 
 def plot_estimate(func, args, truth_dict):
     PLOT_ESTIMATE = True
-    PLOT_TRUTH = True
+    PLOT_TRUTH = False
     FILTER_MANIFOLD = True
+    FILTER_CIRCLINESS = True
     N = range(4, 40)
     PHI = range(3, 90)
     V, OMEGA = 1.0, 30
@@ -153,10 +154,6 @@ def plot_estimate(func, args, truth_dict):
                 continue
             X.append(N[i])
             Y.append(PHI[j])
-            if CROSS_SECTION_ONLY:
-                row = [N[i], PHI[j]]
-            else:
-                row = [N[i], PHI[j], OMEGA, V]
             Z.append(func(row, *list(args)))
 
     fig = plt.figure()
@@ -205,33 +202,29 @@ def plot_estimate(func, args, truth_dict):
     # Show the plot
     plt.show()
 
-def plot_symbolic_model(model, model_index, truth_dict, filter_manifold=False):
-    PLOT_ESTIMATE = True
-    PLOT_TRUTH = True
+def plot_symbolic_model(model, model_index, truth_dict, filter_manifold=False, plot_estimate=True, plot_truth=True):
     N = range(4, 40)
-    PHI = range(3, 90)
+    GAMMA = range(50, 200, 10)
     V, OMEGA = 1.0, 30
 
     X, Y, Z = [], [], []
     for i in range(len(N)):
-        for j in range(len(PHI)):
-            if filter_manifold and PHI[j] > (360 / N[i]):
-                continue
+        for j in range(len(GAMMA)):
             X.append(N[i])
-            Y.append(PHI[j])
+            Y.append(GAMMA[j])
             if CROSS_SECTION_ONLY:
-                row = [[N[i], PHI[j]]]
+                row = [[N[i], GAMMA[j], 15, 30, OMEGA, V]]
             else:
-                row = [[N[i], PHI[j], OMEGA, V]]
+                row = [[N[i], GAMMA[j], OMEGA, V]]
             Z.append(model.predict(row, model_index))
 
     fig = plt.figure()
     ax = fig.add_subplot(projection='3d')
-    if PLOT_ESTIMATE:
+    if plot_estimate:
         p = ax.scatter(X, Y, Z, c=Z, marker='o', cmap=cm.plasma, label="Predicted")
     squared_error = []
 
-    if PLOT_TRUTH:
+    if plot_truth:
         X_T, Y_T, Z_T = [], [], []
         for k in truth_dict:
             r = truth_dict[k]
@@ -242,10 +235,7 @@ def plot_symbolic_model(model, model_index, truth_dict, filter_manifold=False):
                 if w != OMEGA or v != V:
                     continue
 
-            if CROSS_SECTION_ONLY:
-                row = [[n, phi]]
-            else:
-                row = [[n, phi, w, v]]
+            row = [[n, phi, w, v]]
             estim = model.predict(row, model_index)
             squared_error.append(abs(estim - r))
 
@@ -254,23 +244,27 @@ def plot_symbolic_model(model, model_index, truth_dict, filter_manifold=False):
             Z_T.append(r)
         ax.scatter(X_T, Y_T, Z_T, c="red", marker="^", label="Truth")
         ax.set_zlim(0, max(max(Z), max(Z_T)))
-
-    mae = sum(squared_error) / len(squared_error)
-    mse = np.sum(np.square(squared_error)) / len(squared_error)
-    print(f"Max Error: {max(squared_error)}")
-    print(f"Prediction MAE: {mae}")
-    print(f"Prediction MSE: {mse}")
+        mae = sum(squared_error) / len(squared_error)
+        mse = np.sum(np.square(squared_error)) / len(squared_error)
+        print(f"Max Error: {max(squared_error)}")
+        print(f"Prediction MAE: {mae}")
+        print(f"Prediction MSE: {mse}")
 
     ax.set_xlabel("No. Agents (N)")
-    ax.set_ylabel("Sensing Angle ($\phi$)")
-    ax.set_zlabel("Predicted Radius (cm)")
+    ax.set_ylabel("Gamma (cm)")
+    ax.set_zlabel("Radius (cm)")
 
-    plt.title("Predicted Milling Radius")
-    if PLOT_ESTIMATE:
+    plt.title(f"Measured Milling Radius" if not plot_estimate else f"Predicted Milling Radius" )
+    if plot_estimate:
         fig.colorbar(p)
     # Show the plot
     plt.show()
 
+def add_static_column_values(df):
+    df.insert(2, "rho", np.ones(len(df)) * 15, False)
+    df.insert(2, "gamma", np.ones(len(df)) * 150, False)
+    print(df.head())
+    return df
 
 def optimize(df, func):
     X, y_truth = preprocess_data(df)
@@ -280,37 +274,61 @@ def optimize(df, func):
     truth_dict = build_truth_dictionary(X, y_truth)
     plot_estimate(func, params[0], truth_dict)
 
+
 def symbolic_regression(df):
     X, y_truth = preprocess_data(df)
+    print(f"Training with {len(X[0])} observations")
     truth_dict = build_truth_dictionary(X, y_truth)
     # print(len(y_truth))
     model = PySRRegressor(
         niterations=250,
-        population_size=150,
-        binary_operators=["*", "+", "-", "/", "^"],
+        population_size=250,
+        binary_operators=[
+            "*",
+            "+",
+            "-",
+            "/"
+        ],
         unary_operators=[
             "square",
             "cube",
-            "exp",
             "inv(x) = 1/x",
-            "sign",
-            "neg"
+            "neg",
+            "cos",
+            "sin",
+            "pidiv(x) = 3.14159 / x",
+            "pitimes(x) = 3.14159 * x",
+            "tx(x) = 2 * x"
         ],
-        extra_sympy_mappings={"inv": lambda x: 1 / x},
+        extra_sympy_mappings={"inv": lambda x: 1 / x, "pitimes": lambda x: 3.14159 * x, "pidiv": lambda x: 3.14159 / x, "tx": lambda x: 2 * x},
+        complexity_of_variables=1,
+        # complexity_of_operators={
+        #     "tx" : 2,
+        # },
+        complexity_of_constants=2,
+        precision=64,
+        maxsize=10
     )
-    model.fit(X.T, y_truth)
+    #
+    model.fit(X.T, y_truth, variable_names=["n", "gam", "rho", "phi", "omega", "v"])
     print(model)
     eq = model.equations_
     print(eq.columns)
     selection = int(input("Select Index: "))
     print(eq.iloc[selection]["equation"])
     print("Latex: ", model.latex(selection))
-    plot_symbolic_model(model, selection, truth_dict=truth_dict, filter_manifold=True)
-    plot_symbolic_model(model, selection, truth_dict=truth_dict, filter_manifold=False)
+    print("Table: ", model.latex_table(precision=3))
+    plot_symbolic_model(model, selection, truth_dict=truth_dict, filter_manifold=True, plot_estimate=False)
+    plot_symbolic_model(model, selection, truth_dict=truth_dict, filter_manifold=True, plot_truth=False)
+
+
 
 if __name__ == "__main__":
-    RESULTS_FILE = "demo/results/out/r-convergence-5/sweep/genes.csv"
+    # RESULTS_FILE = "demo/results/out/r-convergence-8/sweep/genes.csv"
+    # RESULTS_FILE = "demo/results/out/SM-Full-Run/sweep/genes.csv"
+    RESULTS_FILE = "demo/results/out/r-manifold-mini/sweep/genes.csv"
     df = pd.read_csv(RESULTS_FILE)
+    df = add_static_column_values(df)
     # optimize(df, function_combined_root_cs)
     symbolic_regression(df)
 

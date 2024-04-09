@@ -25,10 +25,7 @@ from src.novel_swarms.world.simulate import main as sim
 import matplotlib.pyplot as plt
 
 SCALE = 10
-MAX_TIME_LIMIT = 2000000
-
-def m2BL(m):
-    return m / 0.15
+MAX_TIME_LIMIT = 100000
 
 def stop_when_radius_converges(world):
     """
@@ -43,15 +40,15 @@ def stop_when_radius_converges(world):
             return True
     return False
 
-def gene_to_world(n_agents, fov_angle, w=30, v=1.0, gamma=10, horizon=2000, seed=0, dt=0.13):
+def gene_to_world(n_agents, fov_angle, w=30, v=1.0, gamma=10, horizon=2000, seed=0):
 
     goal_agent = AgentYAMLFactory.from_yaml("demo/configs/swarm-mechanics/flockbot.yaml")
     goal_agent.controller = HomogeneousController([v * SCALE, -np.radians(w), v * SCALE, np.radians(w)])
     goal_agent.sensors.sensors[0].theta = np.radians(fov_angle / 2)
     goal_agent.sensors.sensors[0].r = gamma
     goal_agent.sensors.sensors[0].detect_edges = False
+    goal_agent.sensors.sensors[0].store_history = True
     goal_agent.seed = 0
-    goal_agent.dt = dt
     goal_agent.rescale(SCALE)
 
     world = WorldYAMLFactory.from_yaml("demo/configs/swarm-mechanics/world.yaml")
@@ -73,8 +70,8 @@ def gene_to_world(n_agents, fov_angle, w=30, v=1.0, gamma=10, horizon=2000, seed
         #     GroupRotationBehavior(history=1),
         #     Circliness(history=1),
         # ]),
+        SensorSignalBehavior(history=100, show=False, sensor_index=0),
         Circliness(),
-        ScatterBehavior(regularize=False, history=1, multiplier=1.5),
         ScatterBehavior(regularize=False, history=201),
         # ScatterBehavior(regularize=False, history=20000),
         # TotalCollisionsBehavior(),
@@ -88,81 +85,100 @@ def gene_to_world(n_agents, fov_angle, w=30, v=1.0, gamma=10, horizon=2000, seed
 
     world.factor_zoom(zoom=SCALE)
     world.addAgentConfig(goal_agent)
-    world.metadata = {'hash': hash(tuple([n_agents, fov_angle, w, v])), 'fov':fov_angle, 'n':n_agents, 'omega':w, 'v':v}
+    world.metadata = {'hash': hash(tuple([n_agents, fov_angle, w, v])), 'fov':fov_angle, 'n':n_agents, 'omega':w, 'v':v, 'gamma':gamma}
 
     # If a configured initialization was called, we assume that we want to find a solution fit
     # to that specific init, therefore, we only evaluate one world, with no attempt to generalize
     return world
 
-def build_dataset():
-    time_start = time.time()
-    world_processor = MultiWorldSimulation(pool_size=24, single_step=False, with_gui=False)
-    exp = Experiment("../out", "r-convergence")
-    o = exp.add_sub("sweep")
-
-    data = []
-    for n in range(6, 21, 1):
-        # Just simulate elements below the 2pi/N manifold
-        phi_below_manifold = [phi if phi <= (360 / n) else None for phi in range(3, 76, 1)]
-        final_phi = list(filter(lambda x: x is not None, phi_below_manifold))
-        print(f"Running with {n} agents on phi values {final_phi}!")
-        worlds = [gene_to_world(n, phi, w=30, v=1.0, horizon=MAX_TIME_LIMIT) for phi in final_phi]
-        b_ret = world_processor.execute(worlds, world_stop_condition=stop_when_radius_converges)
-        for w in b_ret:
-            data.append([w.meta["n"]] + [w.meta["fov"]] + [w.meta["omega"]] + [w.meta["v"]] + list(w.getBehaviorVector()) + [w.total_steps, w.total_steps * w.population[0].dt])
-
-        df = pd.DataFrame(data)
-        df.columns = ["n", "fov", "omega", "v", "conn_components", "circliness", "radius", "timesteps", "time"]
-        df.to_csv(os.path.join(o, "genes.csv"))
-        print(f"Elapsed Time: f{time.time() - time_start}s")
-    exp.write_metadata({})
-
-
-def build_manifold_dataset():
-    time_start = time.time()
-    world_processor = MultiWorldSimulation(pool_size=18, single_step=False, with_gui=False)
-    exp = Experiment("../out", "r-manifold-mini")
-    o = exp.add_sub("sweep")
-
-    data = []
-    worlds = []
-    for n in range(5, 30, 1):
-        # Just simulate elements below the 2pi/N manifold
-        phi = np.floor(360 / n)
-        print(f"Running with {n} agents on phi values {phi}!")
-        worlds.append(gene_to_world(n, phi, w=30, v=1.0, horizon=MAX_TIME_LIMIT))
-
-    b_ret = world_processor.execute(worlds, world_stop_condition=stop_when_radius_converges)
-    for w in b_ret:
-        data.append([w.meta["n"]] + [w.meta["fov"]] + [w.meta["omega"]] + [w.meta["v"]] + list(w.getBehaviorVector()) + [w.total_steps, w.total_steps * w.population[0].dt])
-
-    df = pd.DataFrame(data)
-    df.columns = ["n", "fov", "omega", "v", "conn_components", "circliness", "radius", "timesteps", "time"]
-    df.to_csv(os.path.join(o, "genes.csv"))
-    print(f"Elapsed Time: f{time.time() - time_start}s")
-    exp.write_metadata({})
 
 def plot_data():
-    df = pd.read_csv("../out/r-convergence-8/sweep/genes.csv")
-    df = df.pivot(index="fov", columns="n", values="circliness")
-    ax = sns.heatmap(df, annot=True, cmap="crest", fmt=".2f", norm=LogNorm(), cbar=False)
-    ax.invert_yaxis()
-    # plt.xlabel("Time (s)")
-    # plt.ylabel("Milling Radius (cm)")
-    plt.title("Circliness")
+
+    bounds_x = np.arange(2.0, 30.0, 0.5)
+    upper_bound_y = np.array([150 / (2 * np.sin(np.pi / x)) for x in bounds_x])
+    lower_bound_y = np.array([15 / (2 * np.sin(np.pi / x)) for x in bounds_x])
+
+    df_1 = pd.read_csv("../out/SM-Full-Run/sweep/genes.csv")
+    df_1 = df_1.loc[df_1['conn_components'] == 1.0]
+    df_1 = df_1.loc[df_1['radial_variance'] < 0.002]
+    scatter_x = df_1["n"]
+    scatter_y = df_1["radius"] * 1.5  # 1.5 converts from pixels to cm
+
+    fig, ax = plt.subplots()
+    ax.plot(bounds_x, upper_bound_y, label="Proposed Upper Bound")
+    ax.plot(bounds_x, lower_bound_y, label="Proposed Lower Bound")
+    ax.scatter(scatter_x, scatter_y, marker="x", alpha=0.45, label="Experiment Radii", c="gray")
+
+    plt.xlabel("Number of Agents")
+    plt.ylabel("Milling Radius (cm)")
+    plt.title(f"Empirical Assessment of Radius Bounds ({len(df_1)} experiments)")
+
+    plt.legend()
     plt.show()
 
-def simulate_termination():
-    N, PHI = 10, 35.0
-    OMEGA = 30
-    V = m2BL(0.5)
-    GAMMA = m2BL(1.5)
-    w = gene_to_world(N, PHI, OMEGA, V, GAMMA, MAX_TIME_LIMIT, seed=0, dt=0.002)
-    w_out = sim(w, show_gui=True, stop_detection=None)
-    print(w_out.total_steps)
+def plot_GMU_comparison():
+    # data_x = list(range(2, 30, 1))
+    # data_y = [(((0.1583 * i) + 0.043) * 150) for i in data_x]
+    # fig, ax = plt.subplots()
+
+    # upper_bound_y = np.array([150 / (2 * np.sin(np.pi / x)) for x in data_x])
+
+    # GAMMA = 150
+    # measured_GMU_x = [6, 8, 10, 12]
+    # measured_GMU_y = [
+    #     0.9931 * GAMMA + 0.0042,
+    #     1.3008 * GAMMA - 0.0038,
+    #     1.6146 * GAMMA - 0.0156,
+    #     1.9334 * GAMMA - 0.0346
+    # ]
+    #
+    # ax.plot(data_x, data_y, label="Vega et al.")
+    # ax.plot(data_x, data_y, label="Upper Bound")
+    # ax.scatter(measured_GMU_x, measured_GMU_y, marker="x", label="GMU measurements")
+    # plt.legend()
+    # plt.show()
+    data_x = list(range(2, 30, 1))
+    data_y = list(range(50, 300, 25))
+    X, Y = np.meshgrid(data_x, data_y)
+    Z = ((0.1583 * X) + 0.043) * Y
+
+    fig = plt.figure(figsize=(12,12))
+    ax = fig.gca(projection='3d')
+    ax.plot_surface(X, Y, Z, cmap='summer', rstride=1, cstride=1, alpha=None)
+
+    ax.set_xlabel("Number of Agents")
+    ax.set_ylabel("Vision Distance, $\gamma$ (cm)")
+    ax.set_zlabel("Milling Radius (cm)")
+    plt.title("Vega et. al Manifold Prediction")
+    plt.show()
+
+    data_x = list(range(2, 30, 1))
+    data_y = list(range(50, 300, 25))
+    X, Y = np.meshgrid(data_x, data_y)
+    Z = Y / (2 * np.sin(np.pi / X))
+
+    fig = plt.figure(figsize=(12, 12))
+    ax = fig.gca(projection='3d')
+    ax.plot_surface(X, Y, Z, cmap='plasma', rstride=1, cstride=1, alpha=None)
+
+    ax.set_xlabel("Number of Agents")
+    ax.set_ylabel("Vision Distance, $\gamma$ (cm)")
+    ax.set_zlabel("Milling Radius (cm)")
+    plt.title("Derived Manifold Prediction")
+    plt.show()
+
+
+# def simulate_termination():
+#     OMEGA = 20
+#     V = 0.0
+#     GAMMA = 10
+#     w = gene_to_world(N, PHI, OMEGA, V, GAMMA, MAX_TIME_LIMIT, seed=0)
+#     w_out = sim(w, show_gui=True, stop_detection=None)
+#     print(w_out.total_steps)
+#     print(w_out.behavior[-1].out_current()[1])
 
 if __name__ == "__main__":
     # build_dataset()
     # plot_data()
-    simulate_termination()
-    # build_manifold_dataset()
+    plot_GMU_comparison()
+    # simulate_termination()

@@ -20,11 +20,13 @@ class SensorSignalBehavior(AbstractBehavior):
     def out_average(self) -> Tuple:
         vals = np.array([0, 0])
         for a in self.world.population:
-            history = a.sensors.sensors[self.index].history
+            history = np.array(a.sensors.sensors[self.index].history)
+            history[history < 0] = 0
+            history[history > 0] = 1
             total = sum(history)
             vals += np.array([total, len(history) - total])
         prob = vals / sum(vals)
-        print(prob)
+        prob = np.round(prob, 2)
         return (self.name, list(prob))
 
     def calculate(self):
