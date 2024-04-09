@@ -1,5 +1,6 @@
 # Ignore Experiment Files
 git.sh
+bin
 
 # Media
 *.gif
