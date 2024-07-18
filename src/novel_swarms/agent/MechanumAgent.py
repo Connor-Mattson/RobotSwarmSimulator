@@ -6,18 +6,20 @@ import pymunk
 import numpy as np
 from copy import deepcopy
 from .Agent import Agent
-from ..config.AgentConfig import DiffDriveAgentConfig
+from ..config.AgentConfig import MechanumAgentConfig
 from ..sensors.GenomeDependentSensor import GenomeBinarySensor
 from ..util.collider.AABB import AABB
 from ..util.collider.CircularCollider import CircularCollider
-from ..util.timer import Timer
 
-class DifferentialDriveAgent(Agent):
+class MechanumDriveAgent(Agent):
+    """
+    TODO: Documentation
+    """
 
     SEED = -1
     DEBUG = False
 
-    def __init__(self, config: DiffDriveAgentConfig = None) -> None:
+    def __init__(self, config: MechanumAgentConfig = None, name=None) -> None:
 
         self.controller = config.controller
 
@@ -25,35 +27,32 @@ class DifferentialDriveAgent(Agent):
             self.seed(config.seed)
 
         if config.x is None:
-            self.set_x_pos(random.randint(0 + config.agent_radius, config.world.w - config.agent_radius))
+            self.set_x_pos(random.randint(0, config.world.w))
         else:
             self.set_x_pos(config.x)
 
         if config.y is None:
-            self.set_y_pos(random.randint(0 + config.agent_radius, config.world.h - config.agent_radius))
+            self.set_y_pos(random.randint(0, config.world.h))
         else:
             self.set_y_pos(config.y)
 
-        super().__init__(self.x_pos, self.y_pos, name="None")
+        super().__init__(self.x_pos, self.y_pos, name=name)
 
         if config.angle is None:
             self.angle = random.random() * math.pi * 2
         else:
             self.angle = config.angle
 
-        self.radius = config.agent_radius
+        ### Unique parameters
+        self.lx = config.lx
+        self.ly = config.ly
         self.wheel_radius = config.wheel_radius
         self.dt = config.dt
-        self.is_highlighted = False
-        self.deleted = False
-        self.body_filled = config.body_filled
         self.agent_in_sight = None
-        self.config = config
+        self.radius = max(self.ly, self.lx)
 
-        self.body = pymunk.Body(2, 2)
-        self.body.position = [self.x_pos, self.y_pos]
-        self.shape = pymunk.Circle(self.body, self.radius)
-
+        self.body_filled = False
+        self.is_highlighted = False
         # Set Trace Settings if a trace was assigned to this object.
         self.trace = config.trace_length is not None
         if self.trace:
@@ -64,6 +63,7 @@ class DifferentialDriveAgent(Agent):
             self.body_color = self.get_random_color()
         else:
             self.body_color = config.body_color
+
         if not config.trace_color:
             self.trace_color = self.body_color
         else:
@@ -83,8 +83,6 @@ class DifferentialDriveAgent(Agent):
 
     def step(self, check_for_world_boundaries=None, world=None, check_for_agent_collisions=None) -> None:
 
-        self.x_pos, self.y_pos = self.body.position
-
         if world is None:
             raise Exception("Expected a Valid value for 'World' in step method call")
 
@@ -93,20 +91,23 @@ class DifferentialDriveAgent(Agent):
         self.aabb = None
 
         if world.goals and world.goals[0].agent_achieved_goal(self):
-            vl, vr = 0, 0
+            vx, vy, dtheta = 0, 0, 0
         else:
-            vl, vr = self.interpretSensors()
+            vx, vy, dtheta = self.interpretSensors()
 
-        self.dx = (self.wheel_radius / 2) * (vl + vr) * math.cos(self.angle)
-        self.dy = (self.wheel_radius / 2) * (vl + vr) * math.sin(self.angle)
-        heading = (vl - vr) / (self.radius * 2)
+        # Calculate Heading
+        v = np.sqrt(vx ** 2 + vy ** 2)
+        heading = math.atan2(vy, vx)
+
+        self.dx = v * math.cos(self.angle + heading)
+        self.dy = v * math.sin(self.angle + heading)
 
         old_x_pos = self.get_x_pos()
         old_y_pos = self.get_y_pos()
 
-        self.body.velocity = (self.dx, self.dy)
-        # self.body.position = [self.x_pos, self.y_pos]
-        self.angle += heading * self.dt
+        self.x_pos += self.dx * self.dt
+        self.y_pos += self.dy * self.dt
+        self.angle += dtheta * self.dt
 
         if check_for_world_boundaries is not None:
             check_for_world_boundaries(self)
@@ -126,6 +127,13 @@ class DifferentialDriveAgent(Agent):
             sensor.step(world=world)
         # timer = timer.check_watch()
 
+    @staticmethod
+    def rotate_tuple(t, theta, x=0, y=0):
+        c = np.cos(theta)
+        s = np.sin(theta)
+        rot = c * t[0] + s * t[1], -s * t[0] + c * t[1]
+        return rot[0] + x, rot[1] + y
+
     def draw(self, screen) -> None:
         super().draw(screen)
         for sensor in self.sensors:
@@ -133,7 +141,34 @@ class DifferentialDriveAgent(Agent):
 
         # Draw Cell Membrane
         filled = 0 if self.is_highlighted or self.body_filled else 1
-        pygame.draw.circle(screen, self.body_color, (self.x_pos, self.y_pos), self.radius, width=filled)
+        x, y = self.get_x_pos(), self.get_y_pos()
+        lx, ly = self.lx, self.ly
+
+        top_left_0 = (-lx, -ly)
+        bot_left_0 = (-lx, ly)
+        bot_right_0 = (lx, ly)
+        top_right_0 = (lx, -ly)
+
+        # Essentially, an expanded rotation matrix multiplication and translation back to (x, y)
+        tl = self.rotate_tuple(top_left_0, -self.angle, x, y)
+        bl = self.rotate_tuple(bot_left_0, -self.angle, x, y)
+        br = self.rotate_tuple(bot_right_0, -self.angle, x, y)
+        tr = self.rotate_tuple(top_right_0, -self.angle, x, y)
+
+        pygame.draw.polygon(screen, self.body_color, [tl, bl, br, tr], width=filled)
+
+        # Draw Wheels
+        xdist = 0.9 * self.lx
+        ydist = (0.8 * self.ly)
+        offx = (0.2 * self.lx)
+        offy = self.wheel_radius / 2
+        for deltax, deltay in [(xdist, ydist), (-xdist, ydist), (-xdist, -ydist), (xdist, -ydist)]:
+            poly = []
+            for offx, offy in [(offx, offy), (offx, -offy), (-offx, -offy), (-offx, offy)]:
+                p = (offy + deltay, offx + deltax)  # Note, Intentionally Flopped
+                poly.append(self.rotate_tuple(p, -self.angle, x, y))
+            pygame.draw.polygon(screen, self.body_color, poly, width=filled)
+            # pygame.draw.circle(screen, self.body_color, center=(deltax + x, deltay + y), radius=3, width=filled)
 
         # Draw Trace (if parameterized to do so)
         self.draw_trace(screen)
@@ -142,7 +177,7 @@ class DifferentialDriveAgent(Agent):
         head = self.getFrontalPoint()
         tail = self.getPosition()
         vec = [head[0] - tail[0], head[1] - tail[1]]
-        mag = self.radius * 2
+        mag = self.lx * 2
         vec_with_magnitude = ((vec[0] * mag) + tail[0], (vec[1] * mag) + tail[1])
         pygame.draw.line(screen, self.body_color, tail, vec_with_magnitude)
 
@@ -151,9 +186,10 @@ class DifferentialDriveAgent(Agent):
 
     def interpretSensors(self) -> Tuple:
         sensor_state = self.sensors.getState()
-        vl = self.controller[sensor_state * 2]
-        vr = self.controller[(sensor_state * 2) + 1]
-        return vl, vr
+        forward_v = self.controller[sensor_state * 3]
+        strafe_v = self.controller[(sensor_state * 3) + 1]
+        turning_rate = self.controller[(sensor_state * 3) + 2]
+        return forward_v, strafe_v, turning_rate
 
     def draw_trace(self, screen):
         if not self.trace:
@@ -198,7 +234,7 @@ class DifferentialDriveAgent(Agent):
                         break
 
     def build_collider(self):
-        return CircularCollider(self.x_pos, self.y_pos, self.radius)
+        return CircularCollider(self.x_pos, self.y_pos, self.lx)
 
     def simulate_error(self, err_type="Death"):
         if err_type == "Death":
@@ -215,10 +251,10 @@ class DifferentialDriveAgent(Agent):
         Return the Bounding Box of the agent
         """
         if not self.aabb:
-            top_left = (self.x_pos - self.radius, self.y_pos - self.radius)
-            bottom_right = (self.x_pos + self.radius, self.y_pos + self.radius)
+            top_left = (self.x_pos - self.lx, self.y_pos - self.lx)
+            bottom_right = (self.x_pos + self.lx, self.y_pos + self.lx)
             self.aabb = AABB(top_left, bottom_right)
         return self.aabb
 
     def __str__(self) -> str:
-        return "(x: {}, y: {}, r: {}, θ: {})".format(self.x_pos, self.y_pos, self.radius, self.angle)
+        return "(x: {}, y: {}, r: {}, θ: {})".format(self.x_pos, self.y_pos, self.lx, self.angle)

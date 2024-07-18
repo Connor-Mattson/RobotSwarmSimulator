@@ -4,11 +4,13 @@ from .AbstractBehavior import AbstractBehavior
 
 
 class RadialVarianceBehavior(AbstractBehavior):
-    def __init__(self, history=100, regularize=True):
+    def __init__(self, history=100, regularize=True, ceil=None, floor=None):
         super().__init__(name="Radial_Variance", history_size=history)
         self.population = None
         self.world_radius = 0
         self.regularize = regularize
+        self.ceil = ceil
+        self.floor = floor
 
     def attach_world(self, world):
         self.population = world.population
@@ -40,8 +42,11 @@ class RadialVarianceBehavior(AbstractBehavior):
         scaling_factor = (1 / (r * r * n)) if self.regularize else (1 / n)
         radial_variance = sum(variance_list) * scaling_factor
 
-        WEIGHT = 20.0
-        self.set_value(radial_variance * WEIGHT)
+        if self.ceil is not None:
+            radial_variance = min(self.ceil, radial_variance)
+        if self.floor is not None:
+            radial_variance = max(self.floor, radial_variance)
+        self.set_value(radial_variance)
 
     def center_of_mass(self):
         positions = [

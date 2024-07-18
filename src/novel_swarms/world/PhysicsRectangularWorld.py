@@ -7,7 +7,7 @@ import pygame.draw
 from ..agent.Agent import Agent
 from ..agent.DiffDriveAgent import DifferentialDriveAgent
 from .. agent.HumanAgent import HumanDrivenAgent
-from ..config.WorldConfig import RectangularWorldConfig
+from ..config.WorldConfig import PhysicsRectangularWorldConfig
 from ..agent.AgentFactory import AgentFactory
 from ..config.HeterogenSwarmConfig import HeterogeneousSwarmConfig
 from .World import World
@@ -21,12 +21,12 @@ def distance(pointA, pointB) -> float:
 
 
 class PhysicsRectangularWorld(World):
-    def __init__(self, config: RectangularWorldConfig = None):
+    def __init__(self, config: PhysicsRectangularWorldConfig = None):
         if config is None:
             raise Exception("RectangularWorld must be instantiated with a WorldConfig class")
         super().__init__(config.w, config.h, config.metadata)
         self.space = pymunk.Space()
-        self.space.gravity = 0.0, -100.0
+        self.space.gravity = 0.0, 0.0
 
         self.config = config
         self.population_size = config.population_size
@@ -97,6 +97,7 @@ class PhysicsRectangularWorld(World):
         # Assign Agents Identifiers
         for i, agent in enumerate(self.population):
             agent.name = str(i)
+            self.space.add(agent.body, agent.shape)
 
         self.behavior = config.behavior
         for b in self.behavior:
@@ -125,7 +126,10 @@ class PhysicsRectangularWorld(World):
         for behavior in self.behavior:
             behavior.calculate()
 
-        self.space.step(1/60.0)
+        for object in self.objects:
+            object.step()
+
+        self.space.step(0.13)
         # behavior_timer.check_watch()
 
     def draw(self, screen):
@@ -218,38 +222,38 @@ class PhysicsRectangularWorld(World):
     def handleWallCollisions(self, agent: DifferentialDriveAgent):
         # Check for distances between the agent and the line segments
         in_collision = False
-        for obj in self.objects:
-            segs = obj.get_sensing_segments()
-            c = (agent.x_pos, agent.y_pos)
-            for p1, p2 in segs:
-                # From https://stackoverflow.com/questions/24727773/detecting-rectangle-collision-with-a-circle
-                x1, y1 = p1
-                x2, y2 = p2
-                x3, y3 = c
-                px = x2 - x1
-                py = y2 - y1
-
-                something = px * px + py * py
-
-                u = ((x3 - x1) * px + (y3 - y1) * py) / float(something)
-
-                if u > 1:
-                    u = 1
-                elif u < 0:
-                    u = 0
-
-                x = x1 + u * px
-                y = y1 + u * py
-
-                dx = x - x3
-                dy = y - y3
-
-                dist = math.sqrt(dx * dx + dy * dy)
-
-                if dist < agent.radius:
-                    in_collision = True
-                    agent.y_pos -= np.sign(dy) * (agent.radius - abs(dy) + 1)
-                    agent.x_pos -= np.sign(dx) * (agent.radius - abs(dx) + 1)
+        # for obj in self.objects:
+            # segs = obj.get_sensing_segments()
+            # c = (agent.x_pos, agent.y_pos)
+            # for p1, p2 in segs:
+            #     # From https://stackoverflow.com/questions/24727773/detecting-rectangle-collision-with-a-circle
+            #     x1, y1 = p1
+            #     x2, y2 = p2
+            #     x3, y3 = c
+            #     px = x2 - x1
+            #     py = y2 - y1
+            #
+            #     something = px * px + py * py
+            #
+            #     u = ((x3 - x1) * px + (y3 - y1) * py) / float(something)
+            #
+            #     if u > 1:
+            #         u = 1
+            #     elif u < 0:
+            #         u = 0
+            #
+            #     x = x1 + u * px
+            #     y = y1 + u * py
+            #
+            #     dx = x - x3
+            #     dy = y - y3
+            #
+            #     dist = math.sqrt(dx * dx + dy * dy)
+            #
+            #     if dist < agent.radius:
+            #         in_collision = True
+            #         agent.y_pos -= np.sign(dy) * (agent.radius - abs(dy) + 1)
+            #         agent.x_pos -= np.sign(dx) * (agent.radius - abs(dx) + 1)
 
                 # dx = x - x3 - agent.radius
                 # if dx < 0:

@@ -4,12 +4,14 @@ from .AbstractBehavior import AbstractBehavior
 
 
 class ScatterBehavior(AbstractBehavior):
-    def __init__(self, history=100, regularize=True, multiplier=1.0):
+    def __init__(self, history=100, regularize=True, multiplier=1.0, ceil=None, floor=None):
         super().__init__(name="Scatter", history_size=history)
         self.population = None
         self.world_radius = 0
         self.regularize = regularize
         self.multiplier = multiplier
+        self.ceil = ceil
+        self.floor = floor
 
     def attach_world(self, world):
         self.population = world.population
@@ -38,6 +40,11 @@ class ScatterBehavior(AbstractBehavior):
             scatter = sum(distance_list) / (r * r * n)
         else:
             scatter = sum(distance_list) / n
+
+        if self.ceil is not None:
+            scatter = min(self.ceil, scatter)
+        if self.floor is not None:
+            scatter = max(self.floor, scatter)
 
         self.set_value(scatter * self.multiplier)
 

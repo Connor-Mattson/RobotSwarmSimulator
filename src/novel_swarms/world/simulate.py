@@ -34,6 +34,7 @@ class Simulation:
 
         # Create the simulation world
         self.world = WorldFactory.create(world_config)
+        print(self.world)
 
         # Attach any subscribers to the world
         self.world_subscribers = []

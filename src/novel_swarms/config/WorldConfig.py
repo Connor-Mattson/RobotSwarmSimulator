@@ -23,7 +23,8 @@ class RectangularWorldConfig:
                 raise Exception(f"Length of Predefined Starting Locations ({len(self.agent_init)}) must equal number of agents ({n_agents})")
         
         elif init_type is None:
-            init_type = RectRandomInitialization(num_agents=n_agents, bb=((0, 0), size))
+            if n_agents > 0:
+                init_type = RectRandomInitialization(num_agents=n_agents, bb=((0, 0), size))
         
         self.init_type = init_type
         self.behavior = behavior
@@ -56,7 +57,7 @@ class RectangularWorldConfig:
             size=(self.w, self.h),
             n_agents=self.population_size,
             seed=self.seed,
-            init_type=self.init_type.getShallowCopy(),
+            init_type=self.init_type.getShallowCopy() if self.init_type else None,
             padding=self.padding,
             goals=self.goals,
             objects=self.objects

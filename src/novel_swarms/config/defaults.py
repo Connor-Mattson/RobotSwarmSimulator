@@ -32,8 +32,8 @@ class ConfigurationDefaults:
     BEHAVIOR_VECTOR = [
         AverageSpeedBehavior(),
         AngularMomentumBehavior(),
-        RadialVarianceBehavior(),
-        ScatterBehavior(),
+        RadialVarianceBehavior(ceil=1),
+        ScatterBehavior(ceil=1),
         GroupRotationBehavior(),
     ]
 

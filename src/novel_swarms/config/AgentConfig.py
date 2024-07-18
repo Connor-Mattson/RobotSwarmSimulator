@@ -197,6 +197,75 @@ class UnicycleAgentConfig:
         return ret
 
 
+class MechanumAgentConfig:
+    def __init__(self,
+                 x=None,
+                 y=None,
+                 controller=None,
+                 angle=None,
+                 world_config: RectangularWorldConfig = None,
+                 seed=None,
+                 lx=1,
+                 ly=1,
+                 wheel_radius=2.0,
+                 dt=1.0,
+                 sensors: SensorSet = None,
+                 idiosyncrasies=False,
+                 stop_on_collide=False,
+                 body_color=(255, 255, 255),
+                 body_filled=False,
+                 trace_length=None,
+                 trace_color=None,
+                 ):
+        self.x = x
+        self.y = y
+        self.angle = angle
+        self.world = world_config
+        self.seed = seed
+        self.dt = dt
+        self.lx = lx
+        self.ly = ly
+        self.wheel_radius = wheel_radius
+        self.controller = controller
+        self.sensors = sensors
+        self.idiosyncrasies = idiosyncrasies
+        self.stop_on_collision = stop_on_collide
+        self.body_color = body_color
+        self.body_filled = body_filled
+        self.trace_length = trace_length
+        self.trace_color = trace_color
+
+    def attach_world_config(self, world_config):
+        self.world = world_config
+
+    def as_dict(self):
+        return {
+            "type": "UnicycleAgentConfig",
+            "x": self.x,
+            "y": self.y,
+            "angle": self.angle,
+            "seed": self.seed,
+            "dt": self.dt,
+            "agent_radius": self.agent_radius,
+            "body_color": list(self.body_color),
+            "body_filled": self.body_filled,
+            "controller": self.controller,
+            "sensors": self.sensors.as_config_dict(),
+            "idiosyncrasies": self.idiosyncrasies,
+            "stop_on_collision": self.stop_on_collision,
+            "trace_length": self.trace_length,
+            "trace_color": self.trace_color,
+        }
+
+    @staticmethod
+    def from_dict(d):
+        ret = UnicycleAgentConfig()
+        for k, v in d.items():
+            if k != "type":
+                setattr(ret, k, v)
+        ret.sensors = SensorFactory.create(ret.sensors)
+        return ret
+
 class LevyAgentConfig:
     def __init__(self, **kwargs):
         self.x = kwargs["config"].x

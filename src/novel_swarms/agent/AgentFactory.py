@@ -1,4 +1,5 @@
-from ..config.AgentConfig import DiffDriveAgentConfig, UnicycleAgentConfig, MazeAgentConfig, StaticAgentConfig, LevyAgentConfig, DroneAgentConfig, ModeSwitchingAgentConfig
+from ..config.AgentConfig import DiffDriveAgentConfig, UnicycleAgentConfig, MazeAgentConfig, StaticAgentConfig, \
+    LevyAgentConfig, DroneAgentConfig, ModeSwitchingAgentConfig, MechanumAgentConfig
 from .DiffDriveAgent import DifferentialDriveAgent
 from .UnicycleAgent import UnicycleAgent
 from .StaticAgent import StaticAgent
@@ -6,6 +7,7 @@ from .MazeAgent import MazeAgent
 from .LevyAgent import LevyAgent
 from .DroneAgent import DroneAgent
 from .ModeSwitchingAgent import ModeSwitchingAgent
+from .MechanumAgent import MechanumDriveAgent
 
 
 class AgentFactory:
@@ -25,4 +27,6 @@ class AgentFactory:
             return DroneAgent(config=agent_config, name=name)
         if isinstance(agent_config, ModeSwitchingAgentConfig):
             return ModeSwitchingAgent(config=agent_config, name=name)
+        if isinstance(agent_config, MechanumAgentConfig):
+            return MechanumDriveAgent(config=agent_config, name=name)
         raise Exception(f"Could not Create Agent of type: {agent_config.__class__.__name__}")

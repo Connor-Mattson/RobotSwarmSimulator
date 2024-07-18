@@ -69,19 +69,19 @@ class RectangularWorld(World):
         ac = config.agentConfig
 
         # Iniitalize the Agents
-        if config.init_type:
+        if config.init_type is not None:
             config.init_type.set_to_world(self)
        
         else:  # TODO: Deprecate defined_start
             if config.defined_start:
                 for i in range(len(config.agent_init)):
                     init = config.agent_init[i]
-                    noise_x = ((np.random.random() * 2) - 1) * 20
-                    noise_y = ((np.random.random() * 2) - 1) * 20
-                    noise_theta = ((np.random.random() * 2) - 1) * (np.pi / 8)
-                    # noise_x = 0
-                    # noise_y = 0
-                    # noise_theta = 0
+                    # noise_x = ((np.random.random() * 2) - 1) * 20
+                    # noise_y = ((np.random.random() * 2) - 1) * 20
+                    # noise_theta = ((np.random.random() * 2) - 1) * (np.pi / 8)
+                    noise_x = 0
+                    noise_y = 0
+                    noise_theta = 0
                     self.population[i].set_x_pos(init[0] + noise_x)
                     self.population[i].set_y_pos(init[1] + noise_y)
                     if len(init) > 2:
@@ -224,47 +224,47 @@ class RectangularWorld(World):
     def handleWallCollisions(self, agent: DifferentialDriveAgent):
         # Check for distances between the agent and the line segments
         in_collision = False
-        for obj in self.objects:
-            segs = obj.get_sensing_segments()
-            c = (agent.get_x_pos(), agent.get_y_pos())
-            for p1, p2 in segs:
-                # From https://stackoverflow.com/questions/24727773/detecting-rectangle-collision-with-a-circle
-                x1, y1 = p1
-                x2, y2 = p2
-                x3, y3 = c
-                px = x2 - x1
-                py = y2 - y1
-
-                something = px * px + py * py
-
-                u = ((x3 - x1) * px + (y3 - y1) * py) / float(something)
-
-                if u > 1:
-                    u = 1
-                elif u < 0:
-                    u = 0
-
-                x = x1 + u * px
-                y = y1 + u * py
-
-                dx = x - x3
-                dy = y - y3
-
-                dist = math.sqrt(dx * dx + dy * dy)
-
-                if dist < agent.radius:
-                    in_collision = True
-                    agent.set_y_pos(agent.get_y_pos() - (np.sign(dy) * (agent.radius - abs(dy) + 1)))
-                    agent.set_x_pos(agent.get_x_pos() - (np.sign(dx) * (agent.radius - abs(dx) + 1)))
-
-                # dx = x - x3 - agent.radius
-                # if dx < 0:
-                #     in_collision = True
-                #     agent.set_x_pos(agent.get_x_pos() - dx)
-                # dy = y - y3 - agent.radius
-                # if dy < 0:
-                #     in_collision = True
-                #     agent.set_y_pos(agent.get_y_pos() - dy)
+        # for obj in self.objects:
+        #     segs = obj.get_sensing_segments()
+        #     c = (agent.get_x_pos(), agent.get_y_pos())
+        #     for p1, p2 in segs:
+        #         # From https://stackoverflow.com/questions/24727773/detecting-rectangle-collision-with-a-circle
+        #         x1, y1 = p1
+        #         x2, y2 = p2
+        #         x3, y3 = c
+        #         px = x2 - x1
+        #         py = y2 - y1
+        #
+        #         something = px * px + py * py
+        #
+        #         u = ((x3 - x1) * px + (y3 - y1) * py) / float(something)
+        #
+        #         if u > 1:
+        #             u = 1
+        #         elif u < 0:
+        #             u = 0
+        #
+        #         x = x1 + u * px
+        #         y = y1 + u * py
+        #
+        #         dx = x - x3
+        #         dy = y - y3
+        #
+        #         dist = math.sqrt(dx * dx + dy * dy)
+        #
+        #         if dist < agent.radius:
+        #             in_collision = True
+        #             agent.set_y_pos(agent.get_y_pos() - (np.sign(dy) * (agent.radius - abs(dy) + 1)))
+        #             agent.set_x_pos(agent.get_x_pos() - (np.sign(dx) * (agent.radius - abs(dx) + 1)))
+        #
+        #         # dx = x - x3 - agent.radius
+        #         # if dx < 0:
+        #         #     in_collision = True
+        #         #     agent.set_x_pos(agent.get_x_pos() - dx)
+        #         # dy = y - y3 - agent.radius
+        #         # if dy < 0:
+        #         #     in_collision = True
+        #         #     agent.set_y_pos(agent.get_y_pos() - dy)
 
         return in_collision
 
