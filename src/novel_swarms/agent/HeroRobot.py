@@ -3,7 +3,7 @@ import pygame
 import random
 import math
 import time
-import pymunk
+# import pymunk
 import numpy as np
 from copy import deepcopy
 from .Agent import Agent
@@ -58,11 +58,11 @@ class HeroRobot(Agent):
         self.i_2 = np.random.normal(I2_MEAN, I2_SD) if self.idiosyncrasies else 1.0
         self.stop_on_collision = config.stop_on_collision
 '''
-        mass=1
-        inertia=pymunk.moment_for_circle(mass,0,self.shield_radius)
-        self.munk_body=pymunk.Body(mass,inertia)
-        self.munk_body.position=self.x_pos,self.y_pos
-        self.munk_shape=pymunk.Circle(self.munk_body, self.shield_radius)
+        # mass=1
+        # inertia=pymunk.moment_for_circle(mass,0,self.shield_radius)
+        # self.munk_body=pymunk.Body(mass,inertia)
+        # self.munk_body.position=self.x_pos,self.y_pos
+        # self.munk_shape=pymunk.Circle(self.munk_body, self.shield_radius)
         
         self.sensors = deepcopy(config.sensors)
         for sensor in self.sensors:
