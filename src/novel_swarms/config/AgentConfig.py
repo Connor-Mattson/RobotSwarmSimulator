@@ -197,6 +197,73 @@ class UnicycleAgentConfig:
         ret.sensors = SensorFactory.create(ret.sensors)
         return ret
 
+class HeroRobotConfig:
+    def __init__(self,
+                 x=None,
+                 y=None,
+                 controller=None,
+                 angle=None,
+                 world_config: RectangularWorldConfig = None,
+                 seed=None,
+                 agent_radius=4*3,
+                 distance_bw_wheels=6.5*3,
+                 shield_radius=6*3,
+                 wheel_radius=5.0*3,
+                 dt=1.0,
+                 sensors: SensorSet = None,
+                 body_color=(255, 255, 255),
+                 body_filled=False,
+                 trace_length=None,
+                 trace_color=None,
+                 ):
+        self.x = x
+        self.y = y
+        self.angle = angle
+        self.world = world_config
+        self.seed = seed
+        self.dt = dt
+        self.agent_radius = agent_radius
+        self.distance_bw_wheels = distance_bw_wheels
+        self.wheel_radius = wheel_radius
+        self.shield_radius = shield_radius
+        self.controller = controller
+        self.sensors = sensors
+        self.body_color = body_color
+        self.body_filled = body_filled
+        self.trace_length = trace_length
+        self.trace_color = trace_color
+
+    def attach_world_config(self, world_config):
+        self.world = world_config
+
+    def as_dict(self):
+        return {
+            "type": "HeroRobotConfig",
+            "x": self.x,
+            "y": self.y,
+            "angle": self.angle,
+            "seed": self.seed,
+            "dt": self.dt,
+            "agent_radius": self.agent_radius,
+            "distance_bw_wheels": self.distance_bw_wheels,
+            "shield_radius": self.shield_radius,
+            "wheel_radius": self.wheel_radius,
+            "body_color": self.body_color,
+            "body_filled": self.body_filled,
+            "controller": self.controller,
+            "sensors": self.sensors.as_config_dict(),
+            "trace_length": self.trace_length,
+            "trace_color": self.trace_color,
+        }
+
+    @staticmethod
+    def from_dict(d):
+        ret = HeroRobotConfig()
+        for k, v in d.items():
+            if k != "type":
+                setattr(ret, k, v)
+        ret.sensors = SensorFactory.create(ret.sensors)
+        return ret
 
 class LevyAgentConfig:
     def __init__(self,
@@ -427,6 +494,8 @@ class AgentConfigFactory:
             return LevyAgentConfig.from_dict(d)
         elif d["type"] == "UnicycleAgentConfig":
             return UnicycleAgentConfig.from_dict(d)
+        elif d["type"] == "HeroRobotConfig":
+            return HeroRobotConfig.from_dict(d)
         elif d["type"] == "DroneAgentConfig":
             return DroneAgentConfig.from_dict(d)
         elif d["type"] == "DiffDriveAgentConfig":

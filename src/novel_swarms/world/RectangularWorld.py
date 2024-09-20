@@ -5,6 +5,7 @@ from typing import List, Tuple
 import pygame.draw
 from ..agent.Agent import Agent
 from ..agent.DiffDriveAgent import DifferentialDriveAgent
+from ..agent.HeroRobot import HeroRobot
 from .. agent.HumanAgent import HumanDrivenAgent
 from ..config.WorldConfig import RectangularWorldConfig
 from ..agent.AgentFactory import AgentFactory
@@ -176,28 +177,53 @@ class RectangularWorld(World):
         """
         Set agent position with respect to the world's boundaries and the bounding box of the agent
         """
-        padding = self.padding
+        if isinstance(agent,HeroRobot):
+            padding = self.padding
 
-        old_x, old_y = agent.x_pos, agent.y_pos
+            old_x, old_y = agent.x_pos, agent.y_pos
 
-        # Prevent Left Collisions
-        agent.x_pos = max(agent.radius + padding, agent.x_pos)
+	    # Prevent Left Collisions
+            agent.x_pos = max(agent.shield_radius + padding, agent.x_pos)
 
-        # Prevent Right Collisions
-        agent.x_pos = min((self.bounded_width - agent.radius - padding), agent.x_pos)
+	    # Prevent Right Collisions
+            agent.x_pos = min((self.bounded_width - agent.shield_radius - padding), agent.x_pos)
 
-        # Prevent Top Collisions
-        agent.y_pos = max(agent.radius + padding, agent.y_pos)
+	    # Prevent Top Collisions
+            agent.y_pos = max(agent.shield_radius + padding, agent.y_pos)
 
-        # Prevent Bottom Collisions
-        agent.y_pos = min((self.bounded_height - agent.radius - padding), agent.y_pos)
+	    # Prevent Bottom Collisions
+            agent.y_pos = min((self.bounded_height - agent.shield_radius - padding), agent.y_pos)
 
-        # agent.angle += (math.pi / 720)
-        self.handleWallCollisions(agent)
+	    # agent.angle += (math.pi / 720)
+            self.handleWallCollisions(agent)
 
-        if agent.x_pos != old_x or agent.y_pos != old_y:
-            return True
-        return False
+            if agent.x_pos != old_x or agent.y_pos != old_y:
+                return True
+            return False
+        else:
+            padding = self.padding
+
+            old_x, old_y = agent.x_pos, agent.y_pos
+
+	    # Prevent Left Collisions
+            agent.x_pos = max(agent.radius + padding, agent.x_pos)
+
+	    # Prevent Right Collisions
+            agent.x_pos = min((self.bounded_width - agent.radius - padding), agent.x_pos)
+
+	    # Prevent Top Collisions
+            agent.y_pos = max(agent.radius + padding, agent.y_pos)
+
+	    # Prevent Bottom Collisions
+            agent.y_pos = min((self.bounded_height - agent.radius - padding), agent.y_pos)
+
+	    # agent.angle += (math.pi / 720)
+            self.handleWallCollisions(agent)
+
+            if agent.x_pos != old_x or agent.y_pos != old_y:
+                return True
+            return False
+	
 
     def handleGoalCollisions(self, agent):
         for goal in self.goals:
@@ -209,50 +235,84 @@ class RectangularWorld(World):
 
     def handleWallCollisions(self, agent: DifferentialDriveAgent):
         # Check for distances between the agent and the line segments
-        in_collision = False
-        for obj in self.objects:
-            segs = obj.get_sensing_segments()
-            c = (agent.x_pos, agent.y_pos)
-            for p1, p2 in segs:
-                # From https://stackoverflow.com/questions/24727773/detecting-rectangle-collision-with-a-circle
-                x1, y1 = p1
-                x2, y2 = p2
-                x3, y3 = c
-                px = x2 - x1
-                py = y2 - y1
+        if isinstance(agent,HeroRobot):
+            in_collision = False
+            for obj in self.objects:
+                segs = obj.get_sensing_segments()
+                c = (agent.x_pos, agent.y_pos)
+                for p1, p2 in segs:
+	        # From https://stackoverflow.com/questions/24727773/detecting-rectangle-collision-with-a-circle
+                    x1, y1 = p1
+                    x2, y2 = p2
+                    x3, y3 = c
+                    px = x2 - x1
+                    py = y2 - y1
+                    something = px * px + py * py
+                    u = ((x3 - x1) * px + (y3 - y1) * py) / float(something)
+                    if u > 1:
+                        u = 1
+                    elif u < 0:
+                        u = 0
 
-                something = px * px + py * py
+                    x = x1 + u * px
+                    y = y1 + u * py
+                    dx = x - x3
+                    dy = y - y3
+                    dist = math.sqrt(dx * dx + dy * dy)
 
-                u = ((x3 - x1) * px + (y3 - y1) * py) / float(something)
+                    if dist < agent.shield_radius:
+                        in_collision = True
+                        agent.y_pos -= np.sign(dy) * (agent.shield_radius - abs(dy) + 1)
+                        agent.x_pos -= np.sign(dx) * (agent.shield_radius - abs(dx) + 1)
 
-                if u > 1:
-                    u = 1
-                elif u < 0:
-                    u = 0
+	        # dx = x - x3 - agent.radius
+	        # if dx < 0:
+	        #     in_collision = True
+	        #     agent.x_pos -= dx
+	        # dy = y - y3 - agent.radius
+	        # if dy < 0:
+	        #     in_collision = True
+	        #     agent.y_pos -= dy
+            return in_collision
+        else:
+            in_collision = False
+            for obj in self.objects:
+                segs = obj.get_sensing_segments()
+                c = (agent.x_pos, agent.y_pos)
+                for p1, p2 in segs:
+	        # From https://stackoverflow.com/questions/24727773/detecting-rectangle-collision-with-a-circle
+                    x1, y1 = p1
+                    x2, y2 = p2
+                    x3, y3 = c
+                    px = x2 - x1
+                    py = y2 - y1
+                    something = px * px + py * py
+                    u = ((x3 - x1) * px + (y3 - y1) * py) / float(something)
+                    if u > 1:
+                        u = 1
+                    elif u < 0:
+                        u = 0
 
-                x = x1 + u * px
-                y = y1 + u * py
+                    x = x1 + u * px
+                    y = y1 + u * py
+                    dx = x - x3
+                    dy = y - y3
+                    dist = math.sqrt(dx * dx + dy * dy)
 
-                dx = x - x3
-                dy = y - y3
+                    if dist < agent.radius:
+                        in_collision = True
+                        agent.y_pos -= np.sign(dy) * (agent.radius - abs(dy) + 1)
+                        agent.x_pos -= np.sign(dx) * (agent.radius - abs(dx) + 1)
 
-                dist = math.sqrt(dx * dx + dy * dy)
-
-                if dist < agent.radius:
-                    in_collision = True
-                    agent.y_pos -= np.sign(dy) * (agent.radius - abs(dy) + 1)
-                    agent.x_pos -= np.sign(dx) * (agent.radius - abs(dx) + 1)
-
-                # dx = x - x3 - agent.radius
-                # if dx < 0:
-                #     in_collision = True
-                #     agent.x_pos -= dx
-                # dy = y - y3 - agent.radius
-                # if dy < 0:
-                #     in_collision = True
-                #     agent.y_pos -= dy
-
-        return in_collision
+	        # dx = x - x3 - agent.radius
+	        # if dx < 0:
+	        #     in_collision = True
+	        #     agent.x_pos -= dx
+	        # dy = y - y3 - agent.radius
+	        # if dy < 0:
+	        #     in_collision = True
+	        #     agent.y_pos -= dy
+            return in_collision
 
     def preventAgentCollisions(self, agent: DifferentialDriveAgent, forward_freeze=False) -> None:
         agent_center = agent.getPosition()
