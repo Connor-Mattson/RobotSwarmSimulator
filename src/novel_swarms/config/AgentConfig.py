@@ -209,6 +209,7 @@ class HeroRobotConfig:
                  distance_bw_wheels=6.5*3,
                  shield_radius=6*3,
                  wheel_radius=5.0*3,
+                 robot_friction=0.09,
                  dt=1.0,
                  sensors: SensorSet = None,
                  body_color=(255, 255, 255),
@@ -222,6 +223,7 @@ class HeroRobotConfig:
         self.world = world_config
         self.seed = seed
         self.dt = dt
+        self.robot_friction=robot_friction
         self.agent_radius = agent_radius
         self.distance_bw_wheels = distance_bw_wheels
         self.wheel_radius = wheel_radius

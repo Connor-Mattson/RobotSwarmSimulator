@@ -45,6 +45,8 @@ class HeroRobot(Agent):
             self.angle = config.angle
 
         self.radius = config.agent_radius
+        self.robot_friction= config.robot_friction
+
         self.distance_bw_wheels = config.distance_bw_wheels
         self.wheel_radius = config.wheel_radius
         self.shield_radius = config.shield_radius
@@ -63,14 +65,20 @@ class HeroRobot(Agent):
         # self.munk_body=pymunk.Body(mass,inertia)
         # self.munk_body.position=self.x_pos,self.y_pos
         # self.munk_shape=pymunk.Circle(self.munk_body, self.shield_radius)
-        
+        self.dw_f=0 # try using this to control angle - adds to dw
+        self.da =0
+        self.o_da=0
+
         self.sensors = deepcopy(config.sensors)
         for sensor in self.sensors:
             if isinstance(sensor, GenomeBinarySensor) or isinstance(sensor, GenomeFOVSensor):
                 sensor.augment_from_genome(config.controller)
 
         self.aabb = None
+        self.old_collide_agent=False
         self.collider = None
+        self.old_collide = None
+
         self.body_filled = config.body_filled
         self.body_color = config.body_color
         self.c_now = (0, 0)
@@ -124,8 +132,12 @@ class HeroRobot(Agent):
             self.y_pos += self.dy * self.dt
             self.angle += dw * self.dt
 
+        self.dx = self.x_pos - old_x_pos
+        self.dy = self.y_pos - old_y_pos
+        self.da = self.angle - old_heading
+
         if check_for_world_boundaries is not None:
-            check_for_world_boundaries(self)
+            self.old_collide=check_for_world_boundaries(self)
 
         # if check_for_agent_collisions is not None:
         #     check_for_agent_collisions(self, forward_freeze=True)
@@ -141,6 +153,7 @@ class HeroRobot(Agent):
         # This is what we use for velocity in our equations
         self.dx = self.x_pos - old_x_pos
         self.dy = self.y_pos - old_y_pos
+        self.o_da = self.da
         # timer = timer.check_watch()
 
         # timer = Timer("Sensors")
@@ -161,16 +174,24 @@ class HeroRobot(Agent):
             for agent in agent_set:
                 if agent.name == self.name:
                     continue
-                if self.aabb.intersects(agent.get_aabb()):
+                if self.aabb.intersects(agent.get_aabb()) or self.old_collide_agent:
+                    dist_between_radii = np.linalg.norm(np.array([agent.x_pos, agent.y_pos, 0]) - np.array([self.x_pos, self.y_pos, 0]))
+                    dist_difference = ((self.shield_radius+1) + (agent.shield_radius)) - dist_between_radii
+                    #print(np.linalg.norm(np.array([self.dx,self.dy,0])))
+                    if dist_difference > 0 and np.linalg.norm(np.array([self.dx,self.dy,0]))==0:
+                        #print("here",self.da,np.linalg.norm(np.array([self.dx,self.dy,0])))
+                        self.angle+=self.da*0.01 - self.da
                     self.get_aabb().toggle_intersection()
-                    correction = self.collider.collision_then_correction(agent.build_collider())
+                    correction,angle_correction,flag  = self.collider.collision_then_correction(agent.build_collider())
+                    self.old_collide_agent=flag
                     if correction is not None:
                         collisions = True
                         if np.linalg.norm(correction) == 0:
                             self.stopped_duration = 15
                         else:
-                            self.x_pos += correction[0]
-                            self.y_pos += correction[1]
+                            self.x_pos -= correction[0]
+                            self.y_pos -= correction[1]
+                            self.angle -= angle_correction
                         break
             if collisions:
                 self.collider.flag_collision()
@@ -179,7 +200,8 @@ class HeroRobot(Agent):
         if self.stop_on_collision:
             self.collider = AngleSensitiveCC(self.x_pos, self.y_pos, self.shield_radius, self.angle, self.get_action(), sensitivity=45)
         else:
-            self.collider = CircularCollider(self.x_pos, self.y_pos, self.shield_radius)
+            self.collider = CircularCollider(self.x_pos, self.y_pos, self.shield_radius, self.angle, self.c_now[0],self.dx,self.dy,self.da,self.robot_friction,self.old_collide_agent)
+
         return self.collider
 
     def draw(self, screen) -> None:

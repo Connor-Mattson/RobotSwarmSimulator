@@ -72,7 +72,7 @@ if __name__ == "__main__":
 
     world_config = RectangularWorldConfig(
         size=(171*3, 142*3),
-        n_agents=11,
+        n_agents=5,
         seed=SEED,
         behavior=behavior,
         agentConfig=agent_config,

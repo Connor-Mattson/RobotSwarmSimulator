@@ -179,25 +179,37 @@ class RectangularWorld(World):
         """
         if isinstance(agent,HeroRobot):
             padding = self.padding
-
             old_x, old_y = agent.x_pos, agent.y_pos
+            
 
 	    # Prevent Left Collisions
             agent.x_pos = max(agent.shield_radius + padding, agent.x_pos)
+           
 
 	    # Prevent Right Collisions
             agent.x_pos = min((self.bounded_width - agent.shield_radius - padding), agent.x_pos)
-
+            
 	    # Prevent Top Collisions
             agent.y_pos = max(agent.shield_radius + padding, agent.y_pos)
-
+           
 	    # Prevent Bottom Collisions
             agent.y_pos = min((self.bounded_height - agent.shield_radius - padding), agent.y_pos)
-
+            
+                
 	    # agent.angle += (math.pi / 720)
-            self.handleWallCollisions(agent)
+            self.handleWallCollisions(agent) 
 
-            if agent.x_pos != old_x or agent.y_pos != old_y:
+            #print(agent.old_collide)
+
+            
+
+            if agent.x_pos != old_x or agent.y_pos != old_y or agent.old_collide:
+                collide_point_vector=np.array([old_x,old_y,0])-np.array([agent.x_pos,agent.y_pos,0])
+                wall_dir= np.cross(-collide_point_vector,np.array([agent.dx,agent.dy,0]))[2]/ (2 * (agent.c_now[0]+0.000000000000000001)**2)    
+                agent.angle -=(agent.da+agent.da*-wall_dir)#(-1+(((wall_dir*np.linalg.norm(np.array([agent.dx,agent.dy,0])))+agent.c_now[0]*np.sqrt(2))/(agent.c_now[0]*np.sqrt(2)))))
+                #print("eher",0.42* (wall_dir*np.linalg.norm(np.array([agent.dx,agent.dy,0]))))
+                if agent.x_pos == old_x and agent.y_pos == old_y and agent.c_now[0]!=0 :
+                    return False
                 return True
             return False
         else:
@@ -210,15 +222,20 @@ class RectangularWorld(World):
 
 	    # Prevent Right Collisions
             agent.x_pos = min((self.bounded_width - agent.radius - padding), agent.x_pos)
+            
 
 	    # Prevent Top Collisions
             agent.y_pos = max(agent.radius + padding, agent.y_pos)
+            
 
 	    # Prevent Bottom Collisions
             agent.y_pos = min((self.bounded_height - agent.radius - padding), agent.y_pos)
+            
 
 	    # agent.angle += (math.pi / 720)
             self.handleWallCollisions(agent)
+            
+
 
             if agent.x_pos != old_x or agent.y_pos != old_y:
                 return True
