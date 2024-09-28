@@ -1,5 +1,6 @@
 from ..sensors.BinaryFOVSensor import BinaryFOVSensor
 from ..sensors.BinaryLOSSensor import BinaryLOSSensor
+from ..sensors.DiscreteDistanceFOVSensor import DiscreteDistanceFOVSensor
 from ..sensors.SensorSet import SensorSet
 
 
@@ -12,6 +13,8 @@ class SensorFactory:
                 sensors.append(BinaryLOSSensor.from_dict(s))
             elif s["type"] == 'BinaryFOVSensor':
                 sensors.append(BinaryFOVSensor.from_dict(s))
+            elif s["type"] == "DiscreteDistanceFOVSensor":
+                sensors.append(DiscreteDistanceFOVSensor.from_dict(s))
             else:
                 raise Exception(f"Parsing of Sensor {s['type']} not recognized.")
 

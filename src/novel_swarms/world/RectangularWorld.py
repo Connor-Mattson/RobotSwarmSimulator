@@ -179,7 +179,6 @@ class RectangularWorld(World):
         """
         if isinstance(agent,HeroRobot):
             padding = self.padding
-
             old_x, old_y = agent.x_pos, agent.y_pos
             
 
@@ -220,7 +219,6 @@ class RectangularWorld(World):
 
 	    # Prevent Left Collisions
             agent.x_pos = max(agent.radius + padding, agent.x_pos)
-            
 
 	    # Prevent Right Collisions
             agent.x_pos = min((self.bounded_width - agent.radius - padding), agent.x_pos)
@@ -237,7 +235,7 @@ class RectangularWorld(World):
 	    # agent.angle += (math.pi / 720)
             self.handleWallCollisions(agent)
             
-            
+
 
             if agent.x_pos != old_x or agent.y_pos != old_y:
                 return True
@@ -279,13 +277,10 @@ class RectangularWorld(World):
                     dy = y - y3
                     dist = math.sqrt(dx * dx + dy * dy)
 
-                    print("here")
-
                     if dist < agent.shield_radius:
                         in_collision = True
                         agent.y_pos -= np.sign(dy) * (agent.shield_radius - abs(dy) + 1)
                         agent.x_pos -= np.sign(dx) * (agent.shield_radius - abs(dx) + 1)
-                        #agent.angle += 1
 
 	        # dx = x - x3 - agent.radius
 	        # if dx < 0:
