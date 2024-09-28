@@ -179,7 +179,6 @@ class RectangularWorld(World):
         """
         if isinstance(agent,HeroRobot):
             padding = self.padding
-
             old_x, old_y = agent.x_pos, agent.y_pos
 
 	    # Prevent Left Collisions
