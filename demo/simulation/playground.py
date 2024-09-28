@@ -17,7 +17,7 @@ from src.novel_swarms.behavior.TotalCollisions import TotalCollisionsBehavior
 from src.novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
 from src.novel_swarms.sensors.BinaryFOVSensor import BinaryFOVSensor
 from src.novel_swarms.sensors.SensorSet import SensorSet
-from src.novel_swarms.config.AgentConfig import DiffDriveAgentConfig
+from src.novel_swarms.config.AgentConfig import HeroRobotConfig
 from src.novel_swarms.config.WorldConfig import RectangularWorldConfig
 import numpy as np
 import math
@@ -33,12 +33,15 @@ if __name__ == "__main__":
     # CUSTOM_GENOME = [0.8, 1.0, 0.5, 0.6]  # Milling
     # CUSTOM_GENOME = [1.0, 0.95, 1.0, 1.0]  # Wall Following
     # CUSTOM_GENOME = [-0.8, -0.7, 0.2, -0.5]  # Random
-    CUSTOM_GENOME = [0.5118773770184124, 0.12775717006510645, 0.2612236621699462, 0.5507791161133743]
+    #CUSTOM_GENOME = [0.5118773770184124, 0.12775717006510645, 0.2612236621699462, 0.5507791161133743]
+    
+    #[v_0, w_0, v_1, w_1]
+    CUSTOM_GENOME = [-3.06, 0.17, 0.0, 0.59]  # Aggregation
 
     SEED = None
 
     sensors = SensorSet([
-        BinaryLOSSensor(angle=0, draw=True),
+        BinaryFOVSensor(theta=0.12, distance=100*3),
     ])
 
     # agent_config = DiffDriveAgentConfig(
@@ -50,14 +53,12 @@ if __name__ == "__main__":
     #     seed=None,
     # )
 
-    agent_config = DiffDriveAgentConfig(
+    agent_config = HeroRobotConfig(
         controller=CUSTOM_GENOME,
         sensors=sensors,
         trace_length=0,
-        agent_radius=7,
-        # wheel_radius=1,
-        # body_color="Random",
         body_filled=True,
+                 
     )
 
     behavior = [
@@ -70,8 +71,8 @@ if __name__ == "__main__":
     ]
 
     world_config = RectangularWorldConfig(
-        size=(500, 500),
-        n_agents=18,
+        size=(171*3, 142*3),
+        n_agents=5,
         seed=SEED,
         behavior=behavior,
         agentConfig=agent_config,
