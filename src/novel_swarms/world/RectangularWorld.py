@@ -206,7 +206,7 @@ class RectangularWorld(World):
             if agent.x_pos != old_x or agent.y_pos != old_y or agent.old_collide:
                 collide_point_vector=np.array([old_x,old_y,0])-np.array([agent.x_pos,agent.y_pos,0])
                 wall_dir= np.cross(-collide_point_vector,np.array([agent.dx,agent.dy,0]))[2]/ (2 * (agent.c_now[0]+0.000000000000000001)**2)    
-                agent.angle -=(agent.da+agent.da*-wall_dir)#(-1+(((wall_dir*np.linalg.norm(np.array([agent.dx,agent.dy,0])))+agent.c_now[0]*np.sqrt(2))/(agent.c_now[0]*np.sqrt(2)))))
+                agent.angle -=(agent.da+agent.da*-wall_dir)-agent.da*0.002#(-1+(((wall_dir*np.linalg.norm(np.array([agent.dx,agent.dy,0])))+agent.c_now[0]*np.sqrt(2))/(agent.c_now[0]*np.sqrt(2)))))
                 #print("eher",0.42* (wall_dir*np.linalg.norm(np.array([agent.dx,agent.dy,0]))))
                 if agent.x_pos == old_x and agent.y_pos == old_y and agent.c_now[0]!=0 :
                     return False
