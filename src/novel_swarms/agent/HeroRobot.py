@@ -154,6 +154,9 @@ class HeroRobot(Agent):
         self.dx = self.x_pos - old_x_pos
         self.dy = self.y_pos - old_y_pos
         self.o_da = self.da
+        
+        if not ((abs(self.angle - old_heading) <= abs(self.c_now[1]+0.04))):
+            self.angle=old_heading
         # timer = timer.check_watch()
 
         # timer = Timer("Sensors")
