@@ -6,7 +6,7 @@ import pygame.draw
 from ..agent.Agent import Agent
 from ..agent.DiffDriveAgent import DifferentialDriveAgent
 from ..agent.HeroRobot import HeroRobot
-from .. agent.HumanAgent import HumanDrivenAgent
+from ..agent.HumanAgent import HumanDrivenAgent
 from ..config.WorldConfig import RectangularWorldConfig
 from ..agent.AgentFactory import AgentFactory
 from ..config.HeterogenSwarmConfig import HeterogeneousSwarmConfig
@@ -58,7 +58,7 @@ class RectangularWorld(World):
         # Iniitalize the Agents
         if config.init_type:
             config.init_type.set_to_world(self)
-       
+
         else:  # TODO: Deprecate defined_start
             if config.defined_start:
                 for i in range(len(config.agent_init)):
@@ -76,8 +76,10 @@ class RectangularWorld(World):
 
             elif self.heterogeneous:
                 for agent in self.population:
-                    agent.x_pos = random.uniform(math.floor(0 + agent.radius), math.floor(self.bounded_width - agent.radius))
-                    agent.y_pos = random.uniform(math.ceil(0 + agent.radius), math.floor(self.bounded_height - agent.radius))
+                    agent.x_pos = random.uniform(math.floor(0 + agent.radius),
+                                                 math.floor(self.bounded_width - agent.radius))
+                    agent.y_pos = random.uniform(math.ceil(0 + agent.radius),
+                                                 math.floor(self.bounded_height - agent.radius))
                     agent.angle = random.random() * 2 * math.pi
 
             elif ac.x is None and config.seed is not None:
@@ -131,6 +133,10 @@ class RectangularWorld(World):
             h = self.config.h
             pygame.draw.rect(screen, (200, 200, 200), pygame.Rect((p, p), (w - (2 * p), h - (2 * p))), 1)
 
+        # Draw optional objects first
+        if self.config.init_type:
+            self.config.init_type.draw(screen)
+
         for world_obj in self.objects:
             world_obj.draw(screen)
 
@@ -141,6 +147,8 @@ class RectangularWorld(World):
             if not issubclass(type(agent), Agent):
                 raise Exception("Agents must be subtype of Agent, not {}".format(type(agent)))
             agent.draw(screen)
+
+
 
     def getNeighborsWithinDistance(self, center: Tuple, r, excluded=None) -> List:
         """
@@ -177,38 +185,33 @@ class RectangularWorld(World):
         """
         Set agent position with respect to the world's boundaries and the bounding box of the agent
         """
-        if isinstance(agent,HeroRobot):
+        if isinstance(agent, HeroRobot):
             padding = self.padding
             old_x, old_y = agent.x_pos, agent.y_pos
-            
 
-	    # Prevent Left Collisions
+            # Prevent Left Collisions
             agent.x_pos = max(agent.shield_radius + padding, agent.x_pos)
-           
 
-	    # Prevent Right Collisions
+            # Prevent Right Collisions
             agent.x_pos = min((self.bounded_width - agent.shield_radius - padding), agent.x_pos)
-            
-	    # Prevent Top Collisions
+
+            # Prevent Top Collisions
             agent.y_pos = max(agent.shield_radius + padding, agent.y_pos)
-           
-	    # Prevent Bottom Collisions
+
+            # Prevent Bottom Collisions
             agent.y_pos = min((self.bounded_height - agent.shield_radius - padding), agent.y_pos)
-            
-                
-	    # agent.angle += (math.pi / 720)
-            self.handleWallCollisions(agent) 
+
+            # agent.angle += (math.pi / 720)
+            self.handleWallCollisions(agent)
 
             #print(agent.old_collide)
-
-            
 
             if agent.x_pos != old_x or agent.y_pos != old_y or agent.old_collide:
                 collide_point_vector=np.array([old_x,old_y,0])-np.array([agent.x_pos,agent.y_pos,0])
                 wall_dir= np.cross(-collide_point_vector,np.array([agent.dx,agent.dy,0]))[2]/ (2 * (agent.c_now[0]+0.000000000000000001)**2)    
                 agent.angle -=(agent.da+agent.da*-wall_dir)-agent.da*0.002#(-1+(((wall_dir*np.linalg.norm(np.array([agent.dx,agent.dy,0])))+agent.c_now[0]*np.sqrt(2))/(agent.c_now[0]*np.sqrt(2)))))
                 #print("eher",0.42* (wall_dir*np.linalg.norm(np.array([agent.dx,agent.dy,0]))))
-                if agent.x_pos == old_x and agent.y_pos == old_y and agent.c_now[0]!=0 :
+                if agent.x_pos == old_x and agent.y_pos == old_y and agent.c_now[0] != 0:
                     return False
                 return True
             return False
@@ -217,30 +220,24 @@ class RectangularWorld(World):
 
             old_x, old_y = agent.x_pos, agent.y_pos
 
-	    # Prevent Left Collisions
+            # Prevent Left Collisions
             agent.x_pos = max(agent.radius + padding, agent.x_pos)
 
-	    # Prevent Right Collisions
+            # Prevent Right Collisions
             agent.x_pos = min((self.bounded_width - agent.radius - padding), agent.x_pos)
-            
 
-	    # Prevent Top Collisions
+            # Prevent Top Collisions
             agent.y_pos = max(agent.radius + padding, agent.y_pos)
-            
 
-	    # Prevent Bottom Collisions
+            # Prevent Bottom Collisions
             agent.y_pos = min((self.bounded_height - agent.radius - padding), agent.y_pos)
-            
 
-	    # agent.angle += (math.pi / 720)
+            # agent.angle += (math.pi / 720)
             self.handleWallCollisions(agent)
-            
-
 
             if agent.x_pos != old_x or agent.y_pos != old_y:
                 return True
             return False
-	
 
     def handleGoalCollisions(self, agent):
         for goal in self.goals:
@@ -252,13 +249,13 @@ class RectangularWorld(World):
 
     def handleWallCollisions(self, agent: DifferentialDriveAgent):
         # Check for distances between the agent and the line segments
-        if isinstance(agent,HeroRobot):
+        if isinstance(agent, HeroRobot):
             in_collision = False
             for obj in self.objects:
                 segs = obj.get_sensing_segments()
                 c = (agent.x_pos, agent.y_pos)
                 for p1, p2 in segs:
-	        # From https://stackoverflow.com/questions/24727773/detecting-rectangle-collision-with-a-circle
+                    # From https://stackoverflow.com/questions/24727773/detecting-rectangle-collision-with-a-circle
                     x1, y1 = p1
                     x2, y2 = p2
                     x3, y3 = c
@@ -282,14 +279,14 @@ class RectangularWorld(World):
                         agent.y_pos -= np.sign(dy) * (agent.shield_radius - abs(dy) + 1)
                         agent.x_pos -= np.sign(dx) * (agent.shield_radius - abs(dx) + 1)
 
-	        # dx = x - x3 - agent.radius
-	        # if dx < 0:
-	        #     in_collision = True
-	        #     agent.x_pos -= dx
-	        # dy = y - y3 - agent.radius
-	        # if dy < 0:
-	        #     in_collision = True
-	        #     agent.y_pos -= dy
+                # dx = x - x3 - agent.radius
+                # if dx < 0:
+                #     in_collision = True
+                #     agent.x_pos -= dx
+                # dy = y - y3 - agent.radius
+                # if dy < 0:
+                #     in_collision = True
+                #     agent.y_pos -= dy
             return in_collision
         else:
             in_collision = False
@@ -297,7 +294,7 @@ class RectangularWorld(World):
                 segs = obj.get_sensing_segments()
                 c = (agent.x_pos, agent.y_pos)
                 for p1, p2 in segs:
-	        # From https://stackoverflow.com/questions/24727773/detecting-rectangle-collision-with-a-circle
+                    # From https://stackoverflow.com/questions/24727773/detecting-rectangle-collision-with-a-circle
                     x1, y1 = p1
                     x2, y2 = p2
                     x3, y3 = c
@@ -321,14 +318,14 @@ class RectangularWorld(World):
                         agent.y_pos -= np.sign(dy) * (agent.radius - abs(dy) + 1)
                         agent.x_pos -= np.sign(dx) * (agent.radius - abs(dx) + 1)
 
-	        # dx = x - x3 - agent.radius
-	        # if dx < 0:
-	        #     in_collision = True
-	        #     agent.x_pos -= dx
-	        # dy = y - y3 - agent.radius
-	        # if dy < 0:
-	        #     in_collision = True
-	        #     agent.y_pos -= dy
+                # dx = x - x3 - agent.radius
+                # if dx < 0:
+                #     in_collision = True
+                #     agent.x_pos -= dx
+                # dy = y - y3 - agent.radius
+                # if dy < 0:
+                #     in_collision = True
+                #     agent.y_pos -= dy
             return in_collision
 
     def preventAgentCollisions(self, agent: DifferentialDriveAgent, forward_freeze=False) -> None:
@@ -495,4 +492,3 @@ class RectangularWorld(World):
 
     def as_config_dict(self):
         return self.config.as_dict()
-
