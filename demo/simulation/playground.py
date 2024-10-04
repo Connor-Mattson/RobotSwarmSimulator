@@ -19,6 +19,7 @@ from src.novel_swarms.sensors.BinaryFOVSensor import BinaryFOVSensor
 from src.novel_swarms.sensors.SensorSet import SensorSet
 from src.novel_swarms.config.AgentConfig import HeroRobotConfig
 from src.novel_swarms.config.WorldConfig import RectangularWorldConfig
+from src.novel_swarms.world.initialization.GridInit import GridInitialization
 import numpy as np
 import math
 
@@ -36,12 +37,13 @@ if __name__ == "__main__":
     #CUSTOM_GENOME = [0.5118773770184124, 0.12775717006510645, 0.2612236621699462, 0.5507791161133743]
     
     #[v_0, w_0, v_1, w_1]
-    CUSTOM_GENOME = [-3.06, 0.17, 0.0, 0.59]  # Aggregation
+    # CUSTOM_GENOME = [-3.06, 0.17, 0.0, 0.59]  # Aggregation
+    CUSTOM_GENOME = [-4.913272964762577, 0.48705670652326516, -4.486379165218005, 0.9286818047066245] # Cyclic
 
     SEED = None
 
     sensors = SensorSet([
-        BinaryFOVSensor(theta=0.12, distance=100*3),
+        BinaryFOVSensor(theta=0.12, distance=100*3, show=False),
     ])
 
     # agent_config = DiffDriveAgentConfig(
@@ -70,13 +72,19 @@ if __name__ == "__main__":
         TotalCollisionsBehavior(),
     ]
 
+    num_agents = 8
     world_config = RectangularWorldConfig(
         size=(171*3, 142*3),
-        n_agents=11,
-        seed=SEED,
+        n_agents=num_agents,
+        seed=0,
         behavior=behavior,
         agentConfig=agent_config,
         padding=15,
+        init_type=GridInitialization(
+            num_agents=num_agents,
+            grid_size=(4, 3),
+            bb=((25*3, 30 * 3), (146*3, 111*3))
+        ),
         stop_at=None,
     )
 

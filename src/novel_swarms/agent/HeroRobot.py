@@ -200,9 +200,10 @@ class HeroRobot(Agent):
         head = self.getFrontalPoint()
         tail = self.getPosition()
         vec = [head[0] - tail[0], head[1] - tail[1]]
-        mag = self.radius * 2
+        mag = self.radius * 1.7
         vec_with_magnitude = ((vec[0] * mag) + tail[0], (vec[1] * mag) + tail[1])
-        pygame.draw.line(screen, (255, 255, 255), tail, vec_with_magnitude)
+        pygame.draw.line(screen, (255, 255, 255), tail, vec_with_magnitude, width=3)
+
 
         if self.DEBUG:
             self.debug_draw(screen)
