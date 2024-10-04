@@ -30,5 +30,11 @@ class AbstractGUI:
     def step(self):
         pass
 
+    def set_time(self, time):
+        pass
+
+    def set_world(self, world):
+        pass
+
     def pass_key_events(self, events):
         pass

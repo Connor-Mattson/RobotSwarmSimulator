@@ -10,17 +10,20 @@ from ..util.geometry.ConvexHull import ConvexHull as CH
 from ..util.geometry.Polygon import Polygon
 
 class ConvexHull(AbstractBehavior):
-    def __init__(self, name="Convex_Hull_Area", history=100):
+    def __init__(self, name="Convex_Hull_Area", history=100, normalize=True):
         super().__init__(name=name, history_size=history)
         self.population = None
         self.goals = None
         self.world = None
         self.polygon = None
+        self.normalize = normalize
+        self.world_area = 1
 
     def attach_world(self, world):
         self.population = world.population
         self.goals = world.goals
         self.world = world
+        self.world_area = world.bounded_height * world.bounded_width
 
     def calculate(self):
         if not self.world:
@@ -34,8 +37,10 @@ class ConvexHull(AbstractBehavior):
             except Exception as e1:
                 print(f"ConvexHull Calculation Error! {e1}")
                 self.polygon = Polygon()
-
-        self.set_value(self.polygon.area())
+        if self.normalize:
+            self.set_value(self.polygon.area() / self.world_area)
+        else:
+            self.set_value(self.polygon.area())
 
     def draw(self, screen):
         if not self.polygon:

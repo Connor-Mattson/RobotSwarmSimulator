@@ -16,3 +16,6 @@ class AbstractInitialization(ABC):
 
         for i in range(len(world.population)):
             world.population[i].set_pos_vec(self.positions[i])
+
+    def draw(self, screen):
+        pass

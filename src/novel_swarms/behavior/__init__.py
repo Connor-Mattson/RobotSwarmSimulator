@@ -11,6 +11,7 @@ from .AgentsAtGoal import AgentsAtGoal
 from .TotalCollisions import TotalCollisionsBehavior
 from .RadialVariance import RadialVarianceBehavior
 
+
 __all__ = [
     "AbstractBehavior",
     "AverageSpeedBehavior",
