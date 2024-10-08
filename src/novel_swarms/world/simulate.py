@@ -6,7 +6,7 @@ from ..util.timer import Timer
 FRAMERATE = 200
 
 class Simulation:
-    def __init__(self, world_config, show_gui=True, gui=None, stop_detection=None, world_key_events=False, gui_key_events=False, subscribers=None, save_duration=1200, save_every_ith_frame=3, save_time_per_frame=50, step_size=1, start_paused=False):
+    def __init__(self, world_config, show_gui=True, gui=None, stop_detection=None, world_key_events=False, gui_key_events=False, subscribers=None, save_duration=1200, save_every_ith_frame=3, save_time_per_frame=50, step_size=1, auto_start_gif=None, start_paused=False):
         self.world_config = world_config
         self.stop_detection = stop_detection
         self.world_key_events = world_key_events
@@ -14,6 +14,7 @@ class Simulation:
         self.save_duration = save_duration
         self.save_every_ith_frame = save_every_ith_frame
         self.save_time_per_frame = save_time_per_frame
+        self.auto_start_gif = auto_start_gif
 
         # initialize the pygame module
         if show_gui:
@@ -70,7 +71,7 @@ class Simulation:
         self.world_subscribers.append(World2Gif(duration=self.save_duration, every_ith_frame=self.save_every_ith_frame,
                                                 time_per_frame=self.save_time_per_frame))
 
-    def step(self):
+    def step(self, per_step_draw=True):
         if self.gui:
             for event in pygame.event.get():
                 # Cancel the game loop if user quits the GUI
@@ -149,7 +150,7 @@ class Simulation:
             # print(f"Total steps: {steps_taken}")
 
         # Draw!
-        if self.gui and self.screen:
+        if self.gui and self.screen and per_step_draw:
             self.gui.set_time(self.steps_taken)
             self.screen.fill(self.world_config.background_color)
             if self.draw_world:
@@ -161,6 +162,10 @@ class Simulation:
                 self.gui.recieve_events(pygame.event.get())
             self.gui.draw(self.screen)
 
+        # Determine whether to automatically call a gif save here
+        if self.auto_start_gif is not None and self.auto_start_gif == self.world.total_steps:
+            self.record_gif()
+
         # Limit the FPS of the simulation to FRAMERATE
         if self.gui:
             pygame.display.flip()
@@ -168,6 +173,6 @@ class Simulation:
 
 
 
-def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_events=False, gui_key_events=False, subscribers=None, save_duration=1200, save_every_ith_frame=3, save_time_per_frame=50, step_size=1, start_paused=False):
-    simulation = Simulation(world_config, show_gui, gui, stop_detection, world_key_events, gui_key_events, subscribers, save_duration, save_every_ith_frame, save_time_per_frame, step_size, start_paused)
+def main(world_config, show_gui=True, gui=None, stop_detection=None, world_key_events=False, gui_key_events=False, subscribers=None, save_duration=1200, save_every_ith_frame=3, save_time_per_frame=50, step_size=1, auto_start_gif=None, start_paused=False):
+    simulation = Simulation(world_config, show_gui, gui, stop_detection, world_key_events, gui_key_events, subscribers, save_duration, save_every_ith_frame, save_time_per_frame, step_size, auto_start_gif, start_paused)
     return simulation.spin()

@@ -169,6 +169,7 @@ class HeroRobot(Agent):
     def handle_collisions(self, world):
         collisions = True
         limit = 10
+        self.collision_flag = False
         while collisions and limit > 0:
             limit -= 1
             collisions = False
@@ -198,6 +199,7 @@ class HeroRobot(Agent):
                         break
             if collisions:
                 self.collider.flag_collision()
+                self.collision_flag = True
 
     def build_collider(self):
         if self.stop_on_collision:

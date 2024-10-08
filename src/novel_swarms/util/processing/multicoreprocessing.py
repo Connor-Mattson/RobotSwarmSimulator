@@ -1,11 +1,17 @@
 import warnings
 from multiprocessing import Pool
+from ...gui.abstractGUI import AbstractGUI
 from ...world.simulate import main as sim
+from ...world.simulate import Simulation
+import os
 
 
 def simulate(world_config, terminate_function, show_gui=False):
     try:
-        world = sim(world_config, show_gui=show_gui, stop_detection=terminate_function, step_size=5)
+        if show_gui is False:
+            os.environ["SDL_VIDEODRIVER"] = "dummy"
+        world = sim(world_config, show_gui=True, gui=AbstractGUI(), stop_detection=terminate_function, step_size=5, auto_start_gif=100, save_duration=500, save_every_ith_frame=10)
+        world.gui = None
         return world
     except Exception as e:
         warnings.WarningMessage("World could not be simulated: " + str(e))

@@ -10,7 +10,7 @@ from ..util.geometry.ConvexHull import ConvexHull as CH
 from ..util.geometry.Polygon import Polygon
 
 class ConvexHull(AbstractBehavior):
-    def __init__(self, name="Convex_Hull_Area", history=100, normalize=True):
+    def __init__(self, name="Convex_Hull_Area", history=100, normalize=True, show=True):
         super().__init__(name=name, history_size=history)
         self.population = None
         self.goals = None
@@ -18,6 +18,7 @@ class ConvexHull(AbstractBehavior):
         self.polygon = None
         self.normalize = normalize
         self.world_area = 1
+        self.show = show
 
     def attach_world(self, world):
         self.population = world.population
@@ -43,7 +44,7 @@ class ConvexHull(AbstractBehavior):
             self.set_value(self.polygon.area())
 
     def draw(self, screen):
-        if not self.polygon:
+        if not self.polygon or not self.show:
             return
         self.polygon.draw(screen, color=(0, 255, 0), width=4)
 

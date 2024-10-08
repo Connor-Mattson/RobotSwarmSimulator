@@ -15,12 +15,14 @@ def get_rand(mag):
     return ((np.random.random() * 2) - 1) * mag
 
 if __name__ == "__main__":
-
     controllers = []
     behaviors = []
 
-    for i in range(8):
+    for i in range(1000):
         CONTROLLER = [get_rand(5), get_rand(1), get_rand(5), get_rand(1)]
+        print("*" * 40)
+        print("Iter", i)
+        print("*" * 40)
         print(CONTROLLER)
 
         sensors = SensorSet([
@@ -64,19 +66,22 @@ if __name__ == "__main__":
         sim = Simulation(world_config=world_config, save_duration=500, save_every_ith_frame=5, gui=AbstractGUI(), show_gui=True)
 
         for s in range(1510):
-            ret = sim.step()
+            ret = sim.step(per_step_draw=True)
             if ret is not None:
                 break
             if s == 1000:
+                b = sim.world.getBehaviorVector()
+                print("Behavior Vector:", b)
+                if b[0] < 0.05:
+                    print("This is WAY too slow!")
                 sim.record_gif()
         controllers.append(CONTROLLER)
         b = sim.world.getBehaviorVector()
         behaviors.append(b)
-        print(b)
     COLUMNS = [f"controller_{i}" for i in range(len(controllers[0]))] + [f"behavior_{i}" for i in range(len(behaviors[0]))]
 
-    controller_df = pd.DataFrame(controllers)
-    behavior_df = pd.DataFrame(behaviors)
-    df = pd.concat([controller_df, behavior_df], axis=1)
-    df.columns = COLUMNS
-    df.to_csv("metadata.csv", index=True)
+    # controller_df = pd.DataFrame(controllers)
+    # behavior_df = pd.DataFrame(behaviors)
+    # df = pd.concat([controller_df, behavior_df], axis=1)
+    # df.columns = COLUMNS
+    # df.to_csv("metadata.csv", index=True)
