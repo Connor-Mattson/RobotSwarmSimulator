@@ -3,6 +3,7 @@ git.sh
 
 # Media
 *.gif
+*.zip
 
 # Distribution / packaging
 __pycache__
