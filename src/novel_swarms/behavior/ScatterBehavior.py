@@ -23,7 +23,6 @@ class ScatterBehavior(AbstractBehavior):
 
         for agent in self.population:
             x_i = agent.getPosition()
-
             if self.regularize:
                 distance = np.linalg.norm(x_i - mew) ** 2
             else:

@@ -36,9 +36,7 @@ class RadialVarianceBehavior(AbstractBehavior):
 
         scaling_factor = (1 / (r * r * n)) if self.regularize else (1 / n)
         radial_variance = sum(variance_list) * scaling_factor
-
-        WEIGHT = 20.0
-        self.set_value(radial_variance * WEIGHT)
+        self.set_value(radial_variance)
 
     def center_of_mass(self):
         positions = [

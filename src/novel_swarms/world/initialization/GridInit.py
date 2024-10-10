@@ -42,6 +42,7 @@ class GridInitialization(AbstractInitialization):
         self.grid_positions = np.array([
             (((spawn_w / n) * (i + 0.5)) + self.bb[0][0], ((spawn_h / m) * (j + 0.5)) + self.bb[0][1], np.random.random() * np.pi * 2) for i in range(n) for j in range(m)
         ])
+        print(self.grid_positions[:, 0:2])
 
         indices = np.random.choice(len(self.grid_positions), size=self.num_agents, replace=False)
         self.positions = self.grid_positions[indices][:self.num_agents]

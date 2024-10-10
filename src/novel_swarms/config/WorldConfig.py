@@ -19,7 +19,7 @@ class RectangularWorldConfig:
                  objects=[],
                  goals=[],
                  background_color=(0, 0, 0),
-                 metadata=None,
+                 metadata={},
                  ):
 
         if behavior is None:
@@ -70,8 +70,11 @@ class RectangularWorldConfig:
             seed=self.seed,
             padding=self.padding,
             goals=self.goals,
-            objects=self.objects
+            objects=self.objects,
         )
+
+    def deep_copy(self):
+        return self.from_dict(self.as_dict())
 
     def set_attributes(self, dictionary):
         for key in dictionary:

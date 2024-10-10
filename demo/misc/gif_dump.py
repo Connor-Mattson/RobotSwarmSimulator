@@ -18,7 +18,7 @@ if __name__ == "__main__":
     controllers = []
     behaviors = []
 
-    for i in range(1000):
+    for i in range(1):
         CONTROLLER = [get_rand(5), get_rand(1), get_rand(5), get_rand(1)]
         print("*" * 40)
         print("Iter", i)
