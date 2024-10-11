@@ -22,9 +22,9 @@ class BehaviorFactory:
         elif d["name"] == "Alg_Connectivity":
             return AlgebraicConn(history=d["history_size"])
         elif d["name"] == "Angular_Momentum":
-            return AngularMomentumBehavior(history=d["history_size"])
+            return AngularMomentumBehavior(history=d["history_size"], normalization_constant=d["normalization"])
         elif d["name"] == "Average_Speed":
-            return AverageSpeedBehavior(history=d["history_size"])
+            return AverageSpeedBehavior(history=d["history_size"], normalization_constant=d["normalization"])
         elif d["name"] == "Centroid":
             return Centroid(history=d["history_size"])
         elif d["name"] == "Convex_Hull_Area":
@@ -32,7 +32,7 @@ class BehaviorFactory:
         elif d["name"] == "Goal_Dist":
             return DistanceToGoal(history=d["history_size"])
         elif d["name"] == "Group_Rotation":
-            return GroupRotationBehavior(history=d["history_size"])
+            return GroupRotationBehavior(history=d["history_size"], normalization_constant=d["normalization"])
         elif d["name"] == "Radial_Variance":
             return RadialVarianceBehavior(history=d["history_size"])
         elif d["name"] == "Scatter":

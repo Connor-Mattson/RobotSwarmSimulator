@@ -1,6 +1,7 @@
 import pygame
 import numpy as np
 import time
+import os
 from PIL import Image
 
 class World2Gif:
@@ -11,10 +12,11 @@ class World2Gif:
         self.snips = []
         self.total_steps = 0
         self.saved = False
-
-        print("Saving World Gif... Please do not close the window until prompted")
+        self.world = None
+        # print("Saving World Gif... Please do not close the window until prompted")
 
     def notify(self, world, screen):
+        self.world = world
         if self.total_steps > self.duration:
             if self.saved:
                 return
@@ -33,7 +35,11 @@ class World2Gif:
 
     def gif_n_save(self):
         first_frame = self.snips[0]
-        name = f'{int(time.time())}.gif'
+        if "id" in self.world.meta:
+            name = f"{self.world.meta['id']}.gif"
+        else:
+            t = str(time.time()).replace(".", "")[:15]
+            name = f'{t}.gif'
         first_frame.save(name, format="GIF", append_images=self.snips, save_all=True,
                          duration=self.time_per_frame, loop=0)
         print(f"Gif saved as {name}. You may now exit the window.")

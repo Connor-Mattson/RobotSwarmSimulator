@@ -5,11 +5,11 @@ from .NoveltyArchive import NoveltyArchive
 from ..config.HeterogenSwarmConfig import HeterogeneousSwarmConfig
 from ..results.Trends import Trends
 from ..world.WorldFactory import WorldFactory
-from ..cache.ExternalSimulationArchive import ExternalSimulationArchive
 from ..util.timer import Timer
+from ..util.processing.multicoreprocessing import MultiWorldSimulation
 
 
-class BehaviorDiscovery:
+class OptimizedBehaviorDiscovery:
     """
     A Genetic Algorithm that will run many simulations of agent interaction and search for novel
     controllers.
@@ -17,8 +17,8 @@ class BehaviorDiscovery:
 
     def __init__(self, generations=10, population_size=20, crossover_rate=0.3, mutation_rate=0.1, genome_builder=None,
                  lifespan=200, world_config=None, behavior_config=None, k_neighbors=15, tournament_members=10,
-                 mutation_flip_chance = 0.2, allow_external_archive=False, genome_dependent_world=None, force_repeats=False,
-                 seed=None):
+                 mutation_flip_chance=0.2, allow_external_archive=False, genome_dependent_world=None, force_repeats=False,
+                 seed=None, num_threads=1):
         self.population = np.array([])
         self.behavior = np.array([])
         self.scores = np.array([])
@@ -55,13 +55,10 @@ class BehaviorDiscovery:
         if genome_builder is None:
             raise Exception("BehaviorDiscovery must be initialized with a genotype ruleset.")
         self.gene_builder = genome_builder
-
         self.initializePopulation()
-        if self.allow_external_archive:
-            DEPTH = 4
-            BASE_DIRECTORY = "/home/connor/Desktop/Original_Capability_Archive"
-            assert DEPTH == len(self.gene_builder.rules)
-            self.external_archive = ExternalSimulationArchive(BASE_DIRECTORY, 4)
+
+        # Initialize Multi-Threaded Environment
+        self.pool = MultiWorldSimulation(pool_size=num_threads)
 
     def initializePopulation(self):
         self.population = np.array([
@@ -69,6 +66,27 @@ class BehaviorDiscovery:
         ])
         self.scores = np.array([0.0 for i in range(self.population_size)])
         self.behavior = np.array([[-1.0 for j in range(len(self.behavior_config))] for i in range(self.population_size)])
+
+    def runEntireGeneration(self, screen=None, output_config=None):
+        configs = []
+        for i in range(self.population_size):
+            conf = self.world_config.deep_copy()
+            conf.agentConfig.controller = self.population[i]
+            conf.stop_at = self.lifespan
+            conf.metadata["id"] = (self.curr_generation * self.population_size) + self.curr_genome
+            configs.append(conf)
+
+        # Batch Simulate the Entire Generation
+        ret = self.pool.batch_evaluation(configs, output_config)
+
+        # Post-Process: Scrape behavior vector and output tensors
+        outputs, behaviors = [], []
+        for i, (world, output) in enumerate(ret):
+            self.behavior[i] = world.getBehaviorVector()
+            behaviors.append(self.behavior[i])
+            outputs.append(output)
+            self.archive.addToArchive(self.behavior[i], world.population[0].controller)  # Assumes Homogeneity
+        return outputs, behaviors
 
     def runSinglePopulation(self, screen=None, i=0, save=True, genome=None, seed=None, output_config=None, heterogeneous=False):
         """
@@ -95,57 +113,15 @@ class BehaviorDiscovery:
             # print("Setting Key!", key, " with Value: ", genome[self.genome_dependent_world[key]])
             setattr(self.world_config, key, genome[self.genome_dependent_world[key]])
 
-        behavior = None
-        output = None
-
-        # Check to see if the genome is already in our archive
-        # There is a chance we will be asked to simulate the same genome twice,
-        #   if a repeat genome is discovered do not re-simulate it just copy the appropriate phenome.
-        if not self.force_repeats:
-            genome_index = -1
-            for j in range(len(self.archive.genotypes)):
-                if np.array_equal(self.archive.genotypes[j], genome):
-                    genome_index = j
-                    break
-            if genome_index >= 0 and not output_config:
-                behavior = self.archive.archive[genome_index]
-                # print("I've seen this genome before!")
-                # print(genome_index, behavior)
-                # print(f"Controller: {genome}")
-                if save:
-                    self.behavior[i] = behavior
-                    self.archive.addToArchive(behavior, genome)
-                    return output
-
-        # If the behavior has already been simulated and its in the external archive, use that information
-        if self.allow_external_archive:
-            rounded_genome = self.round_genome(genome)
-            r, _ = self.external_archive.retrieve_if_exists(rounded_genome, with_image=False)
-            if r is not None:
-                behavior = r
-                # print(f"We just utilized the archive: {rounded_genome}")
-                if save:
-                    self.behavior[i] = behavior
-                    self.archive.addToArchive(behavior, genome)
-                    return output
-
         # If the genome is new, simulate
         world = WorldFactory.create(self.world_config)
         output = world.evaluate(self.lifespan, output_capture=output_config)
-        if screen is not None:
-            world.draw(screen)
         behavior = world.getBehaviorVector()
 
         if save:
             self.behavior[i] = behavior
             self.archive.addToArchive(behavior, genome)
-            if self.allow_external_archive:
-                rounded_genome = self.round_genome(genome)
-                self.external_archive.save_if_empty(rounded_genome, behavior, image=output)
-                # print(f"We just saved to the archive: {rounded_genome}")
-
             return output
-
         return output, behavior
 
     def evaluate(self):

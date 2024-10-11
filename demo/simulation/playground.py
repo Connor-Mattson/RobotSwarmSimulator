@@ -35,10 +35,10 @@ if __name__ == "__main__":
     # CUSTOM_GENOME = [1.0, 0.95, 1.0, 1.0]  # Wall Following
     # CUSTOM_GENOME = [-0.8, -0.7, 0.2, -0.5]  # Random
     #CUSTOM_GENOME = [0.5118773770184124, 0.12775717006510645, 0.2612236621699462, 0.5507791161133743]
-    
+
     #[v_0, w_0, v_1, w_1]
     # CUSTOM_GENOME = [-3.06, 0.17, 0.0, 0.59]  # Aggregation
-    CUSTOM_GENOME = [-4.913272964762577, 0.48705670652326516, -4.486379165218005, 0.9286818047066245] # Cyclic
+    CUSTOM_GENOME = [0.0, -1.2,  -21,  -1.2]  # Cyclic
 
     SEED = None
 
@@ -60,11 +60,11 @@ if __name__ == "__main__":
         sensors=sensors,
         trace_length=0,
         body_filled=True,
-                 
+        dt=0.1
     )
 
     behavior = [
-        AverageSpeedBehavior(),
+        AverageSpeedBehavior(normalization_constant=2.7),
         AngularMomentumBehavior(),
         RadialVarianceBehavior(),
         ScatterBehavior(),
@@ -88,4 +88,4 @@ if __name__ == "__main__":
         stop_at=None,
     )
 
-    simulate(world_config=world_config)
+    simulate(world_config=world_config,)

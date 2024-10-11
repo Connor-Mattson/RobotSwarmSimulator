@@ -1,11 +1,17 @@
 import warnings
 from multiprocessing import Pool
+from ...gui.abstractGUI import AbstractGUI
 from ...world.simulate import main as sim
+from ...world.simulate import Simulation, DirectEvaluation
+import os
 
 
 def simulate(world_config, terminate_function, show_gui=False):
     try:
-        world = sim(world_config, show_gui=show_gui, stop_detection=terminate_function, step_size=5)
+        if show_gui is False:
+            os.environ["SDL_VIDEODRIVER"] = "dummy"
+        world = sim(world_config, show_gui=True, gui=AbstractGUI(), stop_detection=terminate_function, step_size=5, auto_start_gif=100, save_duration=500, save_every_ith_frame=10)
+        world.gui = None
         return world
     except Exception as e:
         warnings.WarningMessage("World could not be simulated: " + str(e))
@@ -16,6 +22,17 @@ def simulate_batch(world_config_list, terminate_function, show_gui=False):
     for w in world_config_list:
         ret.append(simulate(w, terminate_function, show_gui=False))
     return ret
+
+def evaluate(world_config, output_config, show_gui=False):
+    try:
+        if show_gui is False:
+            os.environ["SDL_VIDEODRIVER"] = "dummy"
+        world, output = DirectEvaluation(world_config, show_gui=True, gui=AbstractGUI(), output_capture=output_config).evaluate()
+        world.gui = None
+        return world, output
+    except Exception as e:
+        warnings.WarningMessage("World could not be simulated: " + str(e))
+    return None
 
 class MultiWorldSimulation:
     """
@@ -43,5 +60,13 @@ class MultiWorldSimulation:
                 else:
                     print(w.agentConfig.controller)
                     ret.append(simulate(w, world_stop_condition, show_gui=self.with_gui))
+        return ret
+
+    def batch_evaluation(self, world_setup: list, output_config):
+        if not world_setup:
+            raise Exception("No world_setup list provided to execute.")
+        ret = []
+        with Pool(self.pool_size) as pool:
+            ret = pool.starmap(evaluate, zip(world_setup, [output_config for _ in world_setup]))
         return ret
 

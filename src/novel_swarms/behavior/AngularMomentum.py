@@ -3,10 +3,11 @@ from typing import List
 from .AbstractBehavior import AbstractBehavior
 
 class AngularMomentumBehavior(AbstractBehavior):
-    def __init__(self, history=100):
+    def __init__(self, history=100, normalization_constant=1):
         super().__init__(name="Angular_Momentum", history_size=history)
         self.population = None
         self.world_radius = 0
+        self.normalization_constant = normalization_constant
 
     def attach_world(self, world):
         self.population = world.population
@@ -26,7 +27,7 @@ class AngularMomentumBehavior(AbstractBehavior):
             momentum = np.cross(v_i, x_i - mew)
             momentum_list.append(momentum)
 
-        average_momentum = sum(momentum_list) / (r * n)
+        average_momentum = sum(momentum_list) / (r * n * self.normalization_constant)
         self.set_value(average_momentum)
 
     def center_of_mass(self):
@@ -37,3 +38,6 @@ class AngularMomentumBehavior(AbstractBehavior):
         ]
         center = np.array([np.average(pos) for pos in positions])
         return center
+
+    def as_config_dict(self):
+        return {"name": self.name, "history_size": self.history_size, "normalization": self.normalization_constant}

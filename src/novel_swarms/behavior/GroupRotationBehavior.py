@@ -4,9 +4,10 @@ from .AbstractBehavior import AbstractBehavior
 
 class GroupRotationBehavior(AbstractBehavior):
 
-    def __init__(self, history=100):
-        super().__init__(name = "Group_Rotation", history_size=history)
+    def __init__(self, history=100, normalization_constant=1):
+        super().__init__(name="Group_Rotation", history_size=history)
         self.population = None
+        self.normalization_constant = normalization_constant
 
     def attach_world(self, world):
         self.population = world.population
@@ -28,7 +29,7 @@ class GroupRotationBehavior(AbstractBehavior):
             momentum = np.cross(v_i, distance_unit_vector)
             momentum_list.append(momentum)
 
-        normalized_momentum = sum(momentum_list) / n
+        normalized_momentum = sum(momentum_list) / (n * self.normalization_constant)
         self.set_value(normalized_momentum)    
 
     def center_of_mass(self):
@@ -39,3 +40,6 @@ class GroupRotationBehavior(AbstractBehavior):
         ]
         center = np.array([np.average(pos) for pos in positions])
         return center
+
+    def as_config_dict(self):
+        return {"name": self.name, "history_size": self.history_size, "normalization": self.normalization_constant}
