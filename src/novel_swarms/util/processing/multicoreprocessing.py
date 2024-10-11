@@ -1,3 +1,4 @@
+import pygame
 import warnings
 from multiprocessing import Pool
 from ...gui.abstractGUI import AbstractGUI

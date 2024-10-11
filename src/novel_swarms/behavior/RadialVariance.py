@@ -34,7 +34,7 @@ class RadialVarianceBehavior(AbstractBehavior):
             variance = (distance - avg_dist) ** 2  # Square to make positive(?)
             variance_list.append(variance)
 
-        scaling_factor = (1 / (r * r * n)) if self.regularize else (1 / n)
+        scaling_factor = (1 / (r * r * n * 0.15)) if self.regularize else (1 / n)
         radial_variance = sum(variance_list) * scaling_factor
         self.set_value(radial_variance)
 

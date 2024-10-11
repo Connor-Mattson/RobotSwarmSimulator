@@ -188,7 +188,8 @@ class GeneRuleContinuous(GeneRule):
         Shift the value of the genome element within the step_size and w.r.t. the _min and _max bounds
         """
         augment = (random.random() * self.mutation_step * 2) - self.mutation_step
-        return round(self.clip(value + augment), self.round_digits)
+        sign = -1 if random.random() > 0.5 else 1
+        return round(self.clip(value + augment), self.round_digits) * sign
 
     def clip(self, value):
         """
@@ -211,7 +212,7 @@ class GeneRuleContinuous(GeneRule):
         return value
 
     def getRandomFloat(self):
-        return (np.random.rand() * self._range) + self._min
+        return self.clip((np.random.rand() * self._range) + self._min)
 
     def getRandomRoundedFloat(self):
         return round(self.getRandomFloat(), self.round_digits)

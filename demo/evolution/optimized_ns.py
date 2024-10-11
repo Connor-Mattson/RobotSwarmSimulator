@@ -2,6 +2,7 @@
 An Optimized Version of Novelty Search that utilizes multi-threading
 """
 from src.novel_swarms.config.AgentConfig import HeroRobotConfig
+from src.novel_swarms.config.OutputTensorConfig import OutputTensorConfig
 from src.novel_swarms.novelty.GeneRule import GeneRule, GeneRuleContinuous
 from src.novel_swarms.novelty.optim_evolve import main as evolve
 from src.novel_swarms.results.results import main as report
@@ -53,7 +54,7 @@ if __name__ == "__main__":
     world_config = RectangularWorldConfig(
         size=(171 * 3, 142 * 3),
         n_agents=num_agents,
-        seed=0,
+        seed=None,
         behavior=phenotype,
         agentConfig=agent_config,
         padding=15,
@@ -70,10 +71,11 @@ if __name__ == "__main__":
     # Increase simulation_lifespan to allow agents to interact with each other for longer.
     # Set save_archive to True to save the resulting archive to /out.
     novelty_config = GeneticEvolutionConfig(
+        seed=1,
         gene_rules=genotype,
         phenotype_config=phenotype,
         n_generations=50,
-        n_population=50,
+        n_population=24,
         crossover_rate=0.7,
         mutation_rate=0.15,
         world_config=world_config,
@@ -84,8 +86,15 @@ if __name__ == "__main__":
         show_gui=True
     )
 
+    output_config = OutputTensorConfig(
+        timeless=False,
+        total_frames=10,
+        steps_between_frames=30,
+        screen=None
+    )
+
     # Novelty Search through Genetic Evolution
-    archive = evolve(config=novelty_config)
+    archive = evolve(config=novelty_config, output_config=output_config)
 
     results_config = ConfigurationDefaults.RESULTS
     results_config.world = world_config

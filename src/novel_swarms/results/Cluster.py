@@ -5,9 +5,9 @@ from sklearn.manifold import TSNE
 from sklearn.cluster import AgglomerativeClustering, SpectralClustering, DBSCAN
 from sklearn_extra.cluster import KMedoids
 
-from src.novel_swarms.novelty.NoveltyArchive import NoveltyArchive
-from src.novel_swarms.results.ClusterPoint import ClusterPoint
-from src.novel_swarms.config.ResultsConfig import ResultsConfig
+from ..novelty.NoveltyArchive import NoveltyArchive
+from ..results.ClusterPoint import ClusterPoint
+from ..config.ResultsConfig import ResultsConfig
 
 
 class Cluster:

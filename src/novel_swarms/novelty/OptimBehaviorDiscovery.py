@@ -80,13 +80,14 @@ class OptimizedBehaviorDiscovery:
         ret = self.pool.batch_evaluation(configs, output_config)
 
         # Post-Process: Scrape behavior vector and output tensors
-        outputs, behaviors = [], []
+        outputs, behaviors, controllers = [], [], []
         for i, (world, output) in enumerate(ret):
             self.behavior[i] = world.getBehaviorVector()
             behaviors.append(self.behavior[i])
+            controllers.append(world.population[0].controller)
             outputs.append(output)
             self.archive.addToArchive(self.behavior[i], world.population[0].controller)  # Assumes Homogeneity
-        return outputs, behaviors
+        return outputs, behaviors, controllers
 
     def runSinglePopulation(self, screen=None, i=0, save=True, genome=None, seed=None, output_config=None, heterogeneous=False):
         """

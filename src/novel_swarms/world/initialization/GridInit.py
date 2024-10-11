@@ -1,7 +1,6 @@
 import pygame
 
-from src.novel_swarms.world.initialization.AbstractInit import AbstractInitialization
-from src.novel_swarms.world.World import World
+from ..initialization.AbstractInit import AbstractInitialization
 import numpy as np
 from typing import Tuple, Iterable
 
