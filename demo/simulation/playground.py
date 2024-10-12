@@ -38,7 +38,7 @@ if __name__ == "__main__":
 
     #[v_0, w_0, v_1, w_1]
     # CUSTOM_GENOME = [-3.06, 0.17, 0.0, 0.59]  # Aggregation
-    CUSTOM_GENOME = [0.0, -1.2,  -21,  -1.2]  # Cyclic
+    CUSTOM_GENOME = [7.0,-1.0, 7.0, 1.0]  # Cyclic
 
     SEED = None
 
