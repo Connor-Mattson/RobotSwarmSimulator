@@ -3,10 +3,6 @@ from ..results.Cluster import Cluster
 from ..results.Trends import Trends
 
 
-def foo():
-    pass
-
-
 # define a main function
 def main(config: ResultsConfig, world_metadata=None, heterogeneous=False, dim_reduction=False):
     if config.show_trends:

@@ -74,7 +74,7 @@ if __name__ == "__main__":
         seed=1,
         gene_rules=genotype,
         phenotype_config=phenotype,
-        n_generations=50,
+        n_generations=3,
         n_population=24,
         crossover_rate=0.7,
         mutation_rate=0.15,
@@ -99,6 +99,7 @@ if __name__ == "__main__":
     results_config = ConfigurationDefaults.RESULTS
     results_config.world = world_config
     results_config.archive = archive
+    results_config.k = 8
 
     # Take Results from Evolution, reduce dimensionality, and present User with Clusters.
     report(config=results_config)

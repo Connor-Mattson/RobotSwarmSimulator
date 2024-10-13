@@ -46,7 +46,8 @@ class CircularCollider:
         if correction_vector is None:
             other_dir=0
             self_dir=0
-        angle = self.da+self.da*(-other_dir-self_dir)- self.da*0.003 #self.robot_friction*(((self_dir/(np.pi/2))*self_mag*1)-((other_dir/(np.pi/2))*other_mag*0.5)) # (equal and opp reaction) - (external reaction)
+        # angle = self.da+self.da*(-other_dir-self_dir)- self.da*0.003 #self.robot_friction*(((self_dir/(np.pi/2))*self_mag*1)-((other_dir/(np.pi/2))*other_mag*0.5)) # (equal and opp reaction) - (external reaction)
+        angle = self.da-self.da*(self_dir*1.12)- self.da*0.003
         #print(angle)
         #print("correct ang",self.da,other_dir,self_dir)
         if correction_vector is not None:
