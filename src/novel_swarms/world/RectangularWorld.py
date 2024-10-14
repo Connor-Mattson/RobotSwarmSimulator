@@ -5,7 +5,7 @@ from typing import List, Tuple
 import pygame.draw
 from ..agent.Agent import Agent
 from ..agent.DiffDriveAgent import DifferentialDriveAgent
-from ..agent.HeroRobot import HeroRobot
+from ..agent.HeroRobot import HeroRobot,HeroPlusRobot
 from ..agent.HumanAgent import HumanDrivenAgent
 from ..config.WorldConfig import RectangularWorldConfig
 from ..agent.AgentFactory import AgentFactory
@@ -185,7 +185,7 @@ class RectangularWorld(World):
         """
         Set agent position with respect to the world's boundaries and the bounding box of the agent
         """
-        if isinstance(agent, HeroRobot):
+        if isinstance(agent, HeroPlusRobot) and self.config.friction:
             padding = self.padding
             old_x, old_y = agent.x_pos, agent.y_pos
 
@@ -209,10 +209,33 @@ class RectangularWorld(World):
             if agent.x_pos != old_x or agent.y_pos != old_y or agent.old_collide:
                 collide_point_vector=np.array([old_x,old_y,0])-np.array([agent.x_pos,agent.y_pos,0])
                 wall_dir= np.cross(-collide_point_vector,np.array([agent.dx,agent.dy,0]))[2]/ (2 * (agent.c_now[0]+0.000000000000000001)**2)    
-                agent.angle -=(agent.da+agent.da*-wall_dir)-agent.da*0.002#(-1+(((wall_dir*np.linalg.norm(np.array([agent.dx,agent.dy,0])))+agent.c_now[0]*np.sqrt(2))/(agent.c_now[0]*np.sqrt(2)))))
+                agent.angle -=(agent.da+agent.da*-wall_dir)-agent.da*0.0002#(-1+(((wall_dir*np.linalg.norm(np.array([agent.dx,agent.dy,0])))+agent.c_now[0]*np.sqrt(2))/(agent.c_now[0]*np.sqrt(2)))))
                 #print("eher",0.42* (wall_dir*np.linalg.norm(np.array([agent.dx,agent.dy,0]))))
                 if agent.x_pos == old_x and agent.y_pos == old_y and agent.c_now[0] != 0:
                     return False
+                return True
+            return False
+        
+        elif isinstance(agent, HeroPlusRobot) and not self.config.friction:
+            padding = self.padding
+            old_x, old_y = agent.x_pos, agent.y_pos
+
+            # Prevent Left Collisions
+            agent.x_pos = max(agent.shield_radius + padding, agent.x_pos)
+
+            # Prevent Right Collisions
+            agent.x_pos = min((self.bounded_width - agent.shield_radius - padding), agent.x_pos)
+
+            # Prevent Top Collisions
+            agent.y_pos = max(agent.shield_radius + padding, agent.y_pos)
+
+            # Prevent Bottom Collisions
+            agent.y_pos = min((self.bounded_height - agent.shield_radius - padding), agent.y_pos)
+
+            # agent.angle += (math.pi / 720)
+            self.handleWallCollisions(agent)
+
+            if agent.x_pos != old_x or agent.y_pos != old_y:
                 return True
             return False
         else:
@@ -249,7 +272,7 @@ class RectangularWorld(World):
 
     def handleWallCollisions(self, agent: DifferentialDriveAgent):
         # Check for distances between the agent and the line segments
-        if isinstance(agent, HeroRobot):
+        if isinstance(agent, HeroPlusRobot):
             in_collision = False
             for obj in self.objects:
                 segs = obj.get_sensing_segments()

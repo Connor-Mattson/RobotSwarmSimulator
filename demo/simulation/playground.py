@@ -17,7 +17,7 @@ from src.novel_swarms.behavior.TotalCollisions import TotalCollisionsBehavior
 from src.novel_swarms.sensors.BinaryLOSSensor import BinaryLOSSensor
 from src.novel_swarms.sensors.BinaryFOVSensor import BinaryFOVSensor
 from src.novel_swarms.sensors.SensorSet import SensorSet
-from src.novel_swarms.config.AgentConfig import HeroRobotConfig
+from src.novel_swarms.config.AgentConfig import HeroRobotConfig,HeroPlusRobotConfig
 from src.novel_swarms.config.WorldConfig import RectangularWorldConfig
 from src.novel_swarms.world.initialization.GridInit import GridInitialization
 import numpy as np
@@ -34,12 +34,13 @@ if __name__ == "__main__":
     # CUSTOM_GENOME = [0.8, 1.0, 0.5, 0.6]  # Milling
     # CUSTOM_GENOME = [1.0, 0.95, 1.0, 1.0]  # Wall Following
     # CUSTOM_GENOME = [-0.8, -0.7, 0.2, -0.5]  # Random
-    #CUSTOM_GENOME = [0.5118773770184124, 0.12775717006510645, 0.2612236621699462, 0.5507791161133743]
+    # CUSTOM_GENOME = [0.5118773770184124, 0.12775717006510645, 0.2612236621699462, 0.5507791161133743]
 
     #[v_0, w_0, v_1, w_1]
-    # CUSTOM_GENOME = [-3.06, 0.17, 0.0, 0.59]  # Aggregation
-    CUSTOM_GENOME = [7.0,-1.0, 7.0, 1.0]  # Cyclic
-
+    
+    # CUSTOM_GENOME = [0.275, -0.0025, 0.275, 0.0] #wall following
+    # CUSTOM_GENOME = [0.27, 0.03, 1.50, 0.01]  # milling
+    CUSTOM_GENOME =[-3.06, 0.17, 0.0, 0.59]
     SEED = None
 
     sensors = SensorSet([
@@ -54,8 +55,8 @@ if __name__ == "__main__":
     #     sensors=sensors,
     #     seed=None,
     # )
-
-    agent_config = HeroRobotConfig(
+    # HeroRobot is the one without bump shield, HeroPlusRobot is the one with bump shiled
+    agent_config = HeroPlusRobotConfig(
         controller=CUSTOM_GENOME,
         sensors=sensors,
         trace_length=0,
@@ -72,10 +73,11 @@ if __name__ == "__main__":
         TotalCollisionsBehavior(),
     ]
 
-    num_agents = 8
+    num_agents = 2
     world_config = RectangularWorldConfig(
         size=(171*3, 142*3),
         n_agents=num_agents,
+        friction= True, # wall collisions
         seed=0,
         behavior=behavior,
         agentConfig=agent_config,

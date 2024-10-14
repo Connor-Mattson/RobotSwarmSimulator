@@ -7,6 +7,7 @@ class RectangularWorldConfig:
     def __init__(self,
                  size=(500, 500),
                  n_agents=30,
+                 friction=False,
                  seed=None,
                  behavior=None,
                  agentConfig=None,
@@ -43,6 +44,7 @@ class RectangularWorldConfig:
         self.w = size[0]
         self.h = size[1]
         self.population_size = n_agents
+        self.friction=friction
         self.seed = seed
         self.padding = padding
         self.agentConfig = agentConfig
@@ -67,6 +69,7 @@ class RectangularWorldConfig:
         return RectangularWorldConfig(
             size=(self.w, self.h),
             n_agents=self.population_size,
+            friction=self.friction,
             seed=self.seed,
             padding=self.padding,
             goals=self.goals,
@@ -86,6 +89,7 @@ class RectangularWorldConfig:
             "w": self.w,
             "h": self.h,
             "population_size": self.population_size,
+            "friction": self.friction,
             "seed": self.seed,
             "padding": self.padding,
             "agent_config": self.agentConfig.as_dict(),
@@ -115,6 +119,7 @@ class RectangularWorldConfig:
             size=(d["w"], d["h"]),
             behavior=behavior,
             n_agents=d["population_size"],
+            friction=d["friction"],
             seed=d["seed"],
             padding=d["padding"],
             agentConfig=a_config,
