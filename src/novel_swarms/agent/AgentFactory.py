@@ -1,7 +1,7 @@
-from ..config.AgentConfig import DiffDriveAgentConfig, UnicycleAgentConfig, HeroRobotConfig, MazeAgentConfig, StaticAgentConfig, LevyAgentConfig, DroneAgentConfig, ModeSwitchingAgentConfig
+from ..config.AgentConfig import DiffDriveAgentConfig, UnicycleAgentConfig, HeroRobotConfig,HeroPlusRobotConfig, MazeAgentConfig, StaticAgentConfig, LevyAgentConfig, DroneAgentConfig, ModeSwitchingAgentConfig
 from .DiffDriveAgent import DifferentialDriveAgent
 from .UnicycleAgent import UnicycleAgent
-from .HeroRobot import HeroRobot
+from .HeroRobot import HeroRobot,HeroPlusRobot
 from .StaticAgent import StaticAgent
 from .MazeAgent import MazeAgent
 from .LevyAgent import LevyAgent
@@ -18,6 +18,8 @@ class AgentFactory:
             return UnicycleAgent(config=agent_config, name=name)
         if isinstance(agent_config, HeroRobotConfig):
             return HeroRobot(config=agent_config, name=name)
+        if isinstance(agent_config, HeroPlusRobotConfig):
+            return HeroPlusRobot(config=agent_config, name=name)
         if isinstance(agent_config, MazeAgentConfig):
             return MazeAgent(config=agent_config, name=name)
         if isinstance(agent_config, StaticAgentConfig):
