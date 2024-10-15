@@ -71,11 +71,11 @@ if __name__ == "__main__":
     # Increase simulation_lifespan to allow agents to interact with each other for longer.
     # Set save_archive to True to save the resulting archive to /out.
     novelty_config = GeneticEvolutionConfig(
-        seed=1,
+        seed=3,
         gene_rules=genotype,
         phenotype_config=phenotype,
-        n_generations=3,
-        n_population=24,
+        n_generations=100,
+        n_population=50,
         crossover_rate=0.7,
         mutation_rate=0.15,
         world_config=world_config,
@@ -99,7 +99,7 @@ if __name__ == "__main__":
     results_config = ConfigurationDefaults.RESULTS
     results_config.world = world_config
     results_config.archive = archive
-    results_config.k = 8
+    results_config.k = 10
 
     # Take Results from Evolution, reduce dimensionality, and present User with Clusters.
     report(config=results_config)
