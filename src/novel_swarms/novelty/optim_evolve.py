@@ -65,7 +65,9 @@ def main(config: GeneticEvolutionConfig, output_config=None, heterogeneous=False
         evolution.curr_generation = generation
 
         # Run the entire generation all at once -- The money-maker for optimization
-        evolution.runEntireGeneration(screen, output_config)
+        o, b, c = evolution.runEntireGeneration(screen, output_config)
+
+        print(c)
 
         evolution.evaluate()
         evolution.evolve()

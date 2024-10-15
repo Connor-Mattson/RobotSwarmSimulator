@@ -1,7 +1,7 @@
 import warnings
 import numpy as np
-from src.novel_swarms.world.initialization.AbstractInit import AbstractInitialization
-from src.novel_swarms.world.initialization.RandomInit import RectRandomInitialization
+from ..world.initialization.AbstractInit import AbstractInitialization
+from ..world.initialization.RandomInit import RectRandomInitialization
 
 class RectangularWorldConfig:
     def __init__(self,

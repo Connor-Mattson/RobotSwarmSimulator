@@ -1,10 +1,6 @@
-from src.novel_swarms.config.ResultsConfig import ResultsConfig
-from src.novel_swarms.results.Cluster import Cluster
-from src.novel_swarms.results.Trends import Trends
-
-
-def foo():
-    pass
+from ..config.ResultsConfig import ResultsConfig
+from ..results.Cluster import Cluster
+from ..results.Trends import Trends
 
 
 # define a main function

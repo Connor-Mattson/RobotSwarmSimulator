@@ -5,9 +5,9 @@ from sklearn.manifold import TSNE
 from sklearn.cluster import AgglomerativeClustering, SpectralClustering, DBSCAN
 from sklearn_extra.cluster import KMedoids
 
-from src.novel_swarms.novelty.NoveltyArchive import NoveltyArchive
-from src.novel_swarms.results.ClusterPoint import ClusterPoint
-from src.novel_swarms.config.ResultsConfig import ResultsConfig
+from ..novelty.NoveltyArchive import NoveltyArchive
+from ..results.ClusterPoint import ClusterPoint
+from ..config.ResultsConfig import ResultsConfig
 
 
 class Cluster:
@@ -105,10 +105,16 @@ class Cluster:
         self.medoid_genomes = [[] for _ in self.cluster_medoids]
         self.medoid_indices = [-1 for _ in self.cluster_medoids]
         for i, medoid in enumerate(self.cluster_medoids):
-            index = np.where(dataset == medoid)[0][0]
+            truth = [np.array_equal(i, medoid) for i in dataset]
+            index = 0
+            for j in range(len(truth)):
+                if truth[j]:
+                    index = j
             if index > -1:
                 self.medoid_genomes[i] = self.archive.genotypes[index]
                 self.medoid_indices[i] = index
+            else:
+                print("Wait a minute, we couldn't find ", medoid, " in the archive...")
 
         print("Clustering Finished!")
         print("\nMedoid Genomes")

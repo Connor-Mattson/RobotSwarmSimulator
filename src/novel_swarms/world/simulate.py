@@ -192,6 +192,7 @@ class DirectEvaluation:
             gui_width = gui.w
         if show_gui:
             self.screen = pygame.display.set_mode((world_config.w + gui_width, world_config.h))
+            self.output.screen = self.screen
 
         # define a variable to control the main loop
         self.running = True
